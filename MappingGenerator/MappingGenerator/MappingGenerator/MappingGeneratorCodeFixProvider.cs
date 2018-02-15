@@ -94,25 +94,42 @@ namespace MappingGenerator
             {
                 yield break ;
             }
+            
+            if (HasInterface(targetClassSymbol, "System.Collections.Generic.ICollection<T>") && HasInterface(sourceClassSymbol, "System.Collections.Generic.IEnumerable<T>"))
+            {
+                var converAccess = generator.MemberAccessExpression(globalSourceAccessor, "ConvertAll");
+                var sourcelistElementType = sourceClassSymbol.TypeArguments[0];
+                var targetListElementType = targetClassSymbol.TypeArguments[0];
+                var lambdaParameterName = ToSingularLocalVariableName(ToLocalVariableName("x"));
+                var listElementMappingStms = MapTypes(sourcelistElementType, targetListElementType, generator, generator.IdentifierName(lambdaParameterName));
+                var linqCall = generator.InvocationExpression(converAccess, generator.ValueReturningLambdaExpression(lambdaParameterName, listElementMappingStms));
+                if (globbalTargetAccessor == null)
+                {
+                    yield return generator.ReturnStatement(linqCall);    
+                }
+                else if(targetExists == false)
+                {
+                    yield return generator.AssignmentStatement(globbalTargetAccessor, linqCall);
+                }
+                yield break;
+            }
 
-            var matchedProperties = RetrieveMatchedProperties(sourceClassSymbol, targetClassSymbol).ToList();
-
-            //
             var targetLocalVariableName = globbalTargetAccessor ==null? ToLocalVariableName(targetClassSymbol.Name): ToLocalVariableName(globbalTargetAccessor.ToFullString());
             if (targetExists == false)
             {
                 var init = generator.ObjectCreationExpression(targetClassSymbol);
                 yield return generator.LocalDeclarationStatement(targetLocalVariableName, init);
             }
-            
 
+
+            var matchedProperties = RetrieveMatchedProperties(sourceClassSymbol, targetClassSymbol).ToList();
             //Direct 1-1 mapping
             var localTargetIdentifier = targetExists? globbalTargetAccessor: generator.IdentifierName(targetLocalVariableName);
             foreach (var x in matchedProperties.Where(x => x.Source != null && x.Target != null && x.Target.IsReadOnly == false))
             {
                 var sourcePropertyType = x.Source.Type;
-                if (HasInterface(x.Target, "System.Collections.Generic.ICollection<T>") &&
-                    HasInterface(x.Source, "System.Collections.Generic.IEnumerable<T>"))
+                if (HasInterface(x.Target.Type, "System.Collections.Generic.ICollection<T>") &&
+                    HasInterface(x.Source.Type, "System.Collections.Generic.IEnumerable<T>"))
                 {
                     var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, x.Target.Name);
                     var sourceAccess = generator.MemberAccessExpression(globalSourceAccessor, x.Source.Name);
@@ -135,6 +152,8 @@ namespace MappingGenerator
                 }
                 else if (IsSimpleType(sourcePropertyType) == false)
                 {   
+                    //TODO: What if both sides has the same type?
+                    //TODO: What if source is  byte[]
                     var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, x.Target.Name);
                     var sourceAccess = generator.MemberAccessExpression(globalSourceAccessor, x.Source.Name);
                     foreach (var complexPropertyMappingNode in MapTypes(x.Source.Type, x.Target.Type, generator, sourceAccess, targetAccess))
@@ -209,9 +228,9 @@ namespace MappingGenerator
             return proposalLocalName;
         }
 
-        private static bool HasInterface(IPropertySymbol xt, string interfaceName)
+        private static bool HasInterface(ITypeSymbol xt, string interfaceName)
         {
-            return xt.Type.OriginalDefinition.AllInterfaces.Any(x => x.ToDisplayString() == interfaceName);
+            return xt.OriginalDefinition.AllInterfaces.Any(x => x.ToDisplayString() == interfaceName);
         }
 
         private static bool IsPublicPropertySymbol(ISymbol x)

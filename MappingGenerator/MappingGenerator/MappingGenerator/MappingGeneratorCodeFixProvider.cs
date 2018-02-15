@@ -97,6 +97,7 @@ namespace MappingGenerator
             
             if (HasInterface(targetClassSymbol, "System.Collections.Generic.ICollection<T>") && HasInterface(sourceClassSymbol, "System.Collections.Generic.IEnumerable<T>"))
             {
+                //TODO: use .Select().ToList() if there is no "ConvertAll"
                 var converAccess = generator.MemberAccessExpression(globalSourceAccessor, "ConvertAll");
                 var sourcelistElementType = sourceClassSymbol.TypeArguments[0];
                 var targetListElementType = targetClassSymbol.TypeArguments[0];
@@ -109,16 +110,27 @@ namespace MappingGenerator
                 }
                 else if(targetExists == false)
                 {
+                    //TODO: This should be much more complicated thatn simple assigment. This should add new rows, delete non exisiting, and update existing
                     yield return generator.AssignmentStatement(globbalTargetAccessor, linqCall);
                 }
                 yield break;
             }
-
+            
             var targetLocalVariableName = globbalTargetAccessor ==null? ToLocalVariableName(targetClassSymbol.Name): ToLocalVariableName(globbalTargetAccessor.ToFullString());
             if (targetExists == false)
             {
-                var init = generator.ObjectCreationExpression(targetClassSymbol);
-                yield return generator.LocalDeclarationStatement(targetLocalVariableName, init);
+                var copyConstructor = FindCopyConstructor(targetClassSymbol, sourceClassSymbol);
+                if (copyConstructor != null)
+                {
+                    var init = generator.ObjectCreationExpression(targetClassSymbol, globalSourceAccessor);
+                    yield return generator.ReturnStatement(init);
+                    yield break;
+                }
+                else
+                {
+                    var init = generator.ObjectCreationExpression(targetClassSymbol);
+                    yield return generator.LocalDeclarationStatement(targetLocalVariableName, init);     
+                }
             }
 
 
@@ -201,6 +213,11 @@ namespace MappingGenerator
             {
                 yield return generator.AssignmentStatement(globbalTargetAccessor, localTargetIdentifier);
             }
+        }
+
+        private static IMethodSymbol FindCopyConstructor(INamedTypeSymbol type, INamedTypeSymbol constructorParameterType)
+        {
+            return type.Constructors.FirstOrDefault(c => c.Parameters.Length == 1 && c.Parameters[0].Type == constructorParameterType);
         }
 
         private static string[] SimpleTypes = new[] {"String", "Decimal"};

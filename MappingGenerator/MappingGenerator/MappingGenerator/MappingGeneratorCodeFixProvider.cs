@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition;
@@ -139,6 +140,11 @@ namespace MappingGenerator
             var localTargetIdentifier = targetExists? globbalTargetAccessor: generator.IdentifierName(targetLocalVariableName);
             foreach (var x in matchedProperties.Where(x => x.Source != null && x.Target != null && x.Target.IsReadOnly == false))
             {
+                if (x.Target.SetMethod.DeclaredAccessibility != Accessibility.Public && globbalTargetAccessor.Kind() != SyntaxKind.ThisExpression)
+                {
+                      continue;
+                }
+
                 var sourcePropertyType = x.Source.Type;
                 if (HasInterface(x.Target.Type, "System.Collections.Generic.ICollection<T>") &&
                     HasInterface(x.Source.Type, "System.Collections.Generic.IEnumerable<T>"))
@@ -162,7 +168,7 @@ namespace MappingGenerator
                     }
                     
                 }
-                else if (IsSimpleType(sourcePropertyType) == false)
+                else if (IsSimpleType(x.Target.Type) == false)
                 {   
                     //TODO: What if both sides has the same type?
                     //TODO: What if source is  byte[]
@@ -222,9 +228,9 @@ namespace MappingGenerator
 
         private static string[] SimpleTypes = new[] {"String", "Decimal"};
 
-        private static bool IsSimpleType(ITypeSymbol sourcePropertyType)
+        private static bool IsSimpleType(ITypeSymbol type)
         {
-            return sourcePropertyType.IsValueType || SimpleTypes.Contains(sourcePropertyType.Name);
+            return type.IsValueType || SimpleTypes.Contains(type.Name);
         }
 
         private static char[] FobiddenSigns = new[] {'.', '[', ']', '(', ')'};

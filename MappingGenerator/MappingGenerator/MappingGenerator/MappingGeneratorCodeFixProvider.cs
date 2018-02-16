@@ -94,7 +94,7 @@ namespace MappingGenerator
             {
                 yield break ;
             }
-            
+
             if (HasInterface(targetClassSymbol, "System.Collections.Generic.ICollection<T>") && HasInterface(sourceClassSymbol, "System.Collections.Generic.IEnumerable<T>"))
             {
                 //TODO: use .Select().ToList() if there is no "ConvertAll"
@@ -272,9 +272,19 @@ namespace MappingGenerator
 
         private static IEnumerable<IPropertySymbol> GetPublicPropertySymbols(INamedTypeSymbol source)
         {
-            return source.GetMembers().Where(IsPublicPropertySymbol).OfType<IPropertySymbol>();
+            return GetBaseTypesAndThis(source).SelectMany(x=> x.GetMembers()).Where(IsPublicPropertySymbol).OfType<IPropertySymbol>();
         }
 
+        private  static IEnumerable<ITypeSymbol> GetBaseTypesAndThis(INamedTypeSymbol type)
+        {
+            var current = type;
+            while (current != null)
+            {
+                yield return current;
+                current = current.BaseType;
+            }
+        }
+        
         //TODO: Search for GetXXX or SetXXX methods
         private static IEnumerable<MatchedPropertySymbols> RetrieveMatchedProperties(INamedTypeSymbol source, INamedTypeSymbol target)
         {

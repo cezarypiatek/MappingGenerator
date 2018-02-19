@@ -138,21 +138,20 @@ namespace MappingGenerator
             var matchedProperties = RetrieveMatchedProperties(sourceClassSymbol, targetClassSymbol).ToList();
             //Direct 1-1 mapping
             var localTargetIdentifier = targetExists? globbalTargetAccessor: generator.IdentifierName(targetLocalVariableName);
-            foreach (var x in matchedProperties.Where(x => x.Source != null && x.Target != null && x.Target.IsReadOnly == false))
+            foreach (var x in matchedProperties.Where(x => x.Source != null  && x.Target != null))
             {
                 if (x.Target.SetMethod.DeclaredAccessibility != Accessibility.Public && globbalTargetAccessor.Kind() != SyntaxKind.ThisExpression)
                 {
                       continue;
                 }
 
-                var sourcePropertyType = x.Source.Type;
-                if (HasInterface(x.Target.Type, "System.Collections.Generic.ICollection<T>") &&
+               if (HasInterface(x.Target.Type, "System.Collections.Generic.ICollection<T>") &&
                     HasInterface(x.Source.Type, "System.Collections.Generic.IEnumerable<T>"))
                 {
                     var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, x.Target.Name);
                     var sourceAccess = generator.MemberAccessExpression(globalSourceAccessor, x.Source.Name);
                     var converAccess = generator.MemberAccessExpression(sourceAccess, "ConvertAll");
-                    var listElementType = ((INamedTypeSymbol) sourcePropertyType).TypeArguments[0];
+                    var listElementType = ((INamedTypeSymbol) x.Source.Type).TypeArguments[0];
                     var lambdaParameterName = ToSingularLocalVariableName(ToLocalVariableName(x.Source.Name));
                     if (IsSimpleType(listElementType))
                     {
@@ -190,7 +189,7 @@ namespace MappingGenerator
            
 
             //Non-direct (mapping like y.UserName = x.User.Name)
-            var unmappedDirectlySources = matchedProperties.Where(x => x.Source != null && x.Target == null);
+            var unmappedDirectlySources = matchedProperties.Where(x => x.Source != null  && x.Target == null);
             foreach (var unmappedSource in unmappedDirectlySources)
             {
                 var targetsWithPartialNameAsSource = matchedProperties.Where(x => x.Target != null && x.Target.Name.StartsWith(unmappedSource.Source.Name)).Select(x => x.Target);
@@ -210,6 +209,26 @@ namespace MappingGenerator
                     }
                 }
             }
+
+            //Flattening with function eg. t.Total = s.GetTotal()
+            var unmappedDirectlySourcesMethod = matchedProperties.Where(x => x.SourceGetMethod != null  && x.Target == null);
+            foreach (var unmappedSourceMethod in unmappedDirectlySourcesMethod)
+            {
+                var target = matchedProperties.FirstOrDefault(x => x.Target!=null && unmappedSourceMethod.SourceGetMethod.Name.EndsWith(x.Target.Name))?.Target;
+                if (target != null)
+                {
+                    if (target.SetMethod.DeclaredAccessibility != Accessibility.Public && globbalTargetAccessor.Kind() != SyntaxKind.ThisExpression)
+                    {
+                        continue;
+                    }
+
+                    var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, target.Name);
+                    var sourceAccess = generator.MemberAccessExpression(globalSourceAccessor, unmappedSourceMethod.SourceGetMethod.Name);
+                    var sourceCall = generator.InvocationExpression(sourceAccess);
+                    yield return generator.AssignmentStatement(targetAccess, sourceCall);
+                }
+            }
+
 
             if (globbalTargetAccessor == null)
             {
@@ -256,6 +275,17 @@ namespace MappingGenerator
             return xt.OriginalDefinition.AllInterfaces.Any(x => x.ToDisplayString() == interfaceName);
         }
 
+        private static bool IsPublicGetMethod(ISymbol x)
+        {
+           return x is IMethodSymbol mSymbol
+                   && mSymbol.ReturnsVoid == false
+                   && mSymbol.Parameters.Length == 0
+                   && x.DeclaredAccessibility == Accessibility.Public
+                   && x.IsImplicitlyDeclared == false
+                   && mSymbol.MethodKind == MethodKind.Ordinary
+                ;
+        }
+
         private static bool IsPublicPropertySymbol(ISymbol x)
         {
             if (x.Kind != SymbolKind.Property)
@@ -279,6 +309,11 @@ namespace MappingGenerator
         private static IEnumerable<IPropertySymbol> GetPublicPropertySymbols(INamedTypeSymbol source)
         {
             return GetBaseTypesAndThis(source).SelectMany(x=> x.GetMembers()).Where(IsPublicPropertySymbol).OfType<IPropertySymbol>();
+        }   
+        
+        private static IEnumerable<IMethodSymbol> GetPublicGetMethods(INamedTypeSymbol source)
+        {
+            return GetBaseTypesAndThis(source).SelectMany(x=> x.GetMembers()).Where(IsPublicGetMethod).OfType<IMethodSymbol>();
         }
 
         private  static IEnumerable<ITypeSymbol> GetBaseTypesAndThis(INamedTypeSymbol type)
@@ -291,7 +326,6 @@ namespace MappingGenerator
             }
         }
         
-        //TODO: Search for GetXXX or SetXXX methods
         private static IEnumerable<MatchedPropertySymbols> RetrieveMatchedProperties(INamedTypeSymbol source, INamedTypeSymbol target)
         {
             var propertiesMap = new SortedDictionary<string, MatchedPropertySymbols>();
@@ -306,8 +340,24 @@ namespace MappingGenerator
                 }
             }
 
+            foreach (var methodSymbol in GetPublicGetMethods(source))
+            {
+                if (propertiesMap.ContainsKey(methodSymbol.Name) == false)
+                {
+                    propertiesMap.Add(methodSymbol.Name, new MatchedPropertySymbols()
+                    {
+                        SourceGetMethod = methodSymbol
+                    });
+                }
+            }
+
             foreach (var mSymbol in GetPublicPropertySymbols(target))
             {
+                if (mSymbol.IsReadOnly)
+                {
+                    continue;
+                }
+
                 MatchedPropertySymbols sourceProperty = null;
                 if (!propertiesMap.TryGetValue(mSymbol.Name, out sourceProperty))
                 {
@@ -328,6 +378,7 @@ namespace MappingGenerator
     internal class MatchedPropertySymbols
     {
         public IPropertySymbol Source { get; set; }
+        public IMethodSymbol SourceGetMethod { get; set; }
         public IPropertySymbol Target { get; set; }
     }
 }

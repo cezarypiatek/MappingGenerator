@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using System.Composition;
 using System.Linq;
 using System.Threading;
@@ -96,23 +97,16 @@ namespace MappingGenerator
                 yield break ;
             }
 
-            if (HasInterface(targetClassSymbol, "System.Collections.Generic.ICollection<T>") && HasInterface(sourceClassSymbol, "System.Collections.Generic.IEnumerable<T>"))
+            if (IsMappingBetweenCollections(targetClassSymbol, sourceClassSymbol))
             {
-                //TODO: use .Select().ToList() if there is no "ConvertAll"
-                var converAccess = generator.MemberAccessExpression(globalSourceAccessor, "ConvertAll");
-                var sourcelistElementType = sourceClassSymbol.TypeArguments[0];
-                var targetListElementType = targetClassSymbol.TypeArguments[0];
-                var lambdaParameterName = ToSingularLocalVariableName(ToLocalVariableName("x"));
-                var listElementMappingStms = MapTypes(sourcelistElementType, targetListElementType, generator, generator.IdentifierName(lambdaParameterName));
-                var linqCall = generator.InvocationExpression(converAccess, generator.ValueReturningLambdaExpression(lambdaParameterName, listElementMappingStms));
+                var collectionMapping = MapCollections(generator, globalSourceAccessor, sourceClassSymbol, targetClassSymbol);
                 if (globbalTargetAccessor == null)
                 {
-                    yield return generator.ReturnStatement(linqCall);    
+                    yield return generator.ReturnStatement(collectionMapping);    
                 }
                 else if(targetExists == false)
                 {
-                    //TODO: This should be much more complicated thatn simple assigment. This should add new rows, delete non exisiting, and update existing
-                    yield return generator.AssignmentStatement(globbalTargetAccessor, linqCall);
+                    yield return generator.AssignmentStatement(globbalTargetAccessor, collectionMapping);
                 }
                 yield break;
             }
@@ -145,32 +139,18 @@ namespace MappingGenerator
                       continue;
                 }
 
-               if (HasInterface(x.Target.Type, "System.Collections.Generic.ICollection<T>") &&
-                    HasInterface(x.Source.Type, "System.Collections.Generic.IEnumerable<T>"))
+               if (IsMappingBetweenCollections(x.Target.Type, x.Source.Type))
                 {
                     var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, x.Target.Name);
                     var sourceAccess = generator.MemberAccessExpression(globalSourceAccessor, x.Source.Name);
-                    var converAccess = generator.MemberAccessExpression(sourceAccess, "ConvertAll");
-                    var listElementType = ((INamedTypeSymbol) x.Source.Type).TypeArguments[0];
-                    var lambdaParameterName = ToSingularLocalVariableName(ToLocalVariableName(x.Source.Name));
-                    if (IsSimpleType(listElementType))
-                    {
-                        var linqCall = generator.InvocationExpression(converAccess, generator.ValueReturningLambdaExpression(lambdaParameterName, generator.IdentifierName(lambdaParameterName)));
-                        yield return generator.AssignmentStatement(targetAccess, linqCall);
-                    }
-                    else
-                    {
-                        var targetListElementType = ((INamedTypeSymbol) x.Target.Type).TypeArguments[0];
-                        var listElementMappingStms = MapTypes(listElementType, targetListElementType, generator, generator.IdentifierName(lambdaParameterName));
-                        var linqCall = generator.InvocationExpression(converAccess, generator.ValueReturningLambdaExpression(lambdaParameterName, listElementMappingStms));
-                        yield return generator.AssignmentStatement(targetAccess, linqCall);
-                    }
-                    
+                    var collectionMapping = MapCollections(generator, sourceAccess, (INamedTypeSymbol) x.Source.Type, (INamedTypeSymbol) x.Target.Type);
+                    yield return generator.AssignmentStatement(targetAccess, collectionMapping);
                 }
                 else if (IsSimpleType(x.Target.Type) == false)
                 {   
                     //TODO: What if both sides has the same type?
                     //TODO: What if source is  byte[]
+                    //TODO: Reverse flattening
                     var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, x.Target.Name);
                     var sourceAccess = generator.MemberAccessExpression(globalSourceAccessor, x.Source.Name);
                     foreach (var complexPropertyMappingNode in MapTypes(x.Source.Type, x.Target.Type, generator, sourceAccess, targetAccess))
@@ -180,26 +160,27 @@ namespace MappingGenerator
                 }
                 else
                 {
+                    //TODO: What if boths sides has different type? 
+                    // - Source is a wrapper of target (has only one property that match the target type)
+                    // - There is another type of conversion between source and target
                     var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, x.Target.Name);
                     var sourceAccess = generator.MemberAccessExpression(globalSourceAccessor, x.Source.Name);
                     yield return generator.AssignmentStatement(targetAccess, sourceAccess);
                 }
             }
 
-           
-
             //Non-direct (mapping like y.UserName = x.User.Name)
-            var unmappedDirectlySources = matchedProperties.Where(x => x.Source != null  && x.Target == null);
-            foreach (var unmappedSource in unmappedDirectlySources)
+            var unmappedDirectly = matchedProperties.Where(x => x.Source != null  && x.Target == null);
+            foreach (var unmapped in unmappedDirectly)
             {
-                var targetsWithPartialNameAsSource = matchedProperties.Where(x => x.Target != null && x.Target.Name.StartsWith(unmappedSource.Source.Name)).Select(x => x.Target);
-                var sourceProperties = GetPublicPropertySymbols(unmappedSource.Source.Type as INamedTypeSymbol).ToList();
-                var sourceFirstLevelAccess = generator.MemberAccessExpression(globalSourceAccessor, unmappedSource.Source.Name);
+                var targetsWithPartialNameAsSource = matchedProperties.Where(x => x.Target != null && x.Target.Name.StartsWith(unmapped.Source.Name)).Select(x => x.Target);
+                var sourceProperties = GetPublicPropertySymbols(unmapped.Source.Type as INamedTypeSymbol).ToList();
+                var sourceFirstLevelAccess = generator.MemberAccessExpression(globalSourceAccessor, unmapped.Source.Name);
                 foreach (var target in targetsWithPartialNameAsSource)
                 {   
                     foreach (var sourceProperty in sourceProperties)
                     {
-                        if (target.Name == $"{unmappedSource.Source.Name}{sourceProperty.Name}")
+                        if (target.Name == $"{unmapped.Source.Name}{sourceProperty.Name}")
                         {
                             var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, target.Name);
                             var sourceAccess = generator.MemberAccessExpression(sourceFirstLevelAccess, sourceProperty.Name);
@@ -238,6 +219,40 @@ namespace MappingGenerator
             {
                 yield return generator.AssignmentStatement(globbalTargetAccessor, localTargetIdentifier);
             }
+        }
+
+        private static SyntaxNode MapCollections(SyntaxGenerator generator, SyntaxNode sourceAccess, INamedTypeSymbol sourceListType, INamedTypeSymbol targetListType)
+        {
+            var isReadolyCollection = targetListType.Name == "ReadOnlyCollection";
+            var sourceListElementType = sourceListType.TypeArguments[0];
+            var targetListElementType = targetListType.TypeArguments[0];
+            if (IsSimpleType(sourceListElementType))
+            {
+                var toListAccess = generator.MemberAccessExpression(sourceAccess, "ToList");
+                var toListInvocation = generator.InvocationExpression(toListAccess);
+                return WrapInReadonlyyCollectionIfNecessary(isReadolyCollection, toListInvocation, generator);
+            }
+            var converAccess = generator.MemberAccessExpression(sourceAccess, "ConvertAll");
+            var lambdaParameterName = ToSingularLocalVariableName(ToLocalVariableName(sourceListElementType.Name));
+            var listElementMappingStms = MapTypes(sourceListElementType, targetListElementType, generator, generator.IdentifierName(lambdaParameterName));
+            var convertInvocation = generator.InvocationExpression(converAccess, generator.ValueReturningLambdaExpression(lambdaParameterName, listElementMappingStms));
+            return WrapInReadonlyyCollectionIfNecessary(isReadolyCollection, convertInvocation, generator);
+        }
+
+        private static SyntaxNode WrapInReadonlyyCollectionIfNecessary(bool isReadonly, SyntaxNode node, SyntaxGenerator generator)
+        {
+            if (isReadonly == false)
+            {
+                return node;
+            }
+
+            var accessAsReadonly = generator.MemberAccessExpression(node, "AsReadOnly");
+            return generator.InvocationExpression(accessAsReadonly);
+        }
+
+        private static bool IsMappingBetweenCollections(ITypeSymbol targetClassSymbol, ITypeSymbol sourceClassSymbol)
+        {
+            return HasInterface(targetClassSymbol, "System.Collections.Generic.ICollection<T>") && HasInterface(sourceClassSymbol, "System.Collections.Generic.IEnumerable<T>");
         }
 
         private static IMethodSymbol FindCopyConstructor(INamedTypeSymbol type, INamedTypeSymbol constructorParameterType)

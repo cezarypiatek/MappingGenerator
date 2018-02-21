@@ -226,20 +226,26 @@ namespace MappingGenerator
             var isReadolyCollection = targetListType.Name == "ReadOnlyCollection";
             var sourceListElementType = sourceListType.TypeArguments[0];
             var targetListElementType = targetListType.TypeArguments[0];
-            if (IsSimpleType(sourceListElementType))
+            if (IsSimpleType(sourceListElementType) || sourceListElementType == targetListElementType)
             {
-                var toListAccess = generator.MemberAccessExpression(sourceAccess, "ToList");
-                var toListInvocation = generator.InvocationExpression(toListAccess);
-                return WrapInReadonlyyCollectionIfNecessary(isReadolyCollection, toListInvocation, generator);
+                var toListInvocation = AddToListInvocation(generator, sourceAccess);
+                return WrapInReadonlyCollectionIfNecessary(isReadolyCollection, toListInvocation, generator);
             }
-            var converAccess = generator.MemberAccessExpression(sourceAccess, "ConvertAll");
+            var selectAccess = generator.MemberAccessExpression(sourceAccess, "Select");
             var lambdaParameterName = ToSingularLocalVariableName(ToLocalVariableName(sourceListElementType.Name));
             var listElementMappingStms = MapTypes(sourceListElementType, targetListElementType, generator, generator.IdentifierName(lambdaParameterName));
-            var convertInvocation = generator.InvocationExpression(converAccess, generator.ValueReturningLambdaExpression(lambdaParameterName, listElementMappingStms));
-            return WrapInReadonlyyCollectionIfNecessary(isReadolyCollection, convertInvocation, generator);
+            var selectInvocation = generator.InvocationExpression(selectAccess, generator.ValueReturningLambdaExpression(lambdaParameterName, listElementMappingStms));
+            var toList = AddToListInvocation(generator, selectInvocation);
+            return WrapInReadonlyCollectionIfNecessary(isReadolyCollection, toList, generator);
         }
 
-        private static SyntaxNode WrapInReadonlyyCollectionIfNecessary(bool isReadonly, SyntaxNode node, SyntaxGenerator generator)
+        private static SyntaxNode AddToListInvocation(SyntaxGenerator generator, SyntaxNode sourceAccess)
+        {
+            var toListAccess = generator.MemberAccessExpression(sourceAccess, "ToList" );
+            return generator.InvocationExpression(toListAccess);
+        }
+
+        private static SyntaxNode WrapInReadonlyCollectionIfNecessary(bool isReadonly, SyntaxNode node, SyntaxGenerator generator)
         {
             if (isReadonly == false)
             {

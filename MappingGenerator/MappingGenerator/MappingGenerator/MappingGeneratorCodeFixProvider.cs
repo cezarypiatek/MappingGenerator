@@ -334,13 +334,18 @@ namespace MappingGenerator
         private  static IEnumerable<ITypeSymbol> GetBaseTypesAndThis(INamedTypeSymbol type)
         {
             var current = type;
-            while (current != null)
+            while (current != null && IsSystemObject(current) == false)
             {
                 yield return current;
                 current = current.BaseType;
             }
         }
-        
+
+        private static bool IsSystemObject(INamedTypeSymbol current)
+        {
+            return current.Name == "Object" && current.ContainingNamespace.Name =="System";
+        }
+
         private static IEnumerable<MatchedPropertySymbols> RetrieveMatchedProperties(INamedTypeSymbol source, INamedTypeSymbol target)
         {
             var propertiesMap = new SortedDictionary<string, MatchedPropertySymbols>();

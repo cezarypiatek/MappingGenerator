@@ -90,16 +90,9 @@ namespace MappingGenerator
 
         private static IEnumerable<SyntaxNode> MapTypes(ITypeSymbol sourceType, ITypeSymbol targetType, SyntaxGenerator generator, SyntaxNode globalSourceAccessor, SyntaxNode globbalTargetAccessor=null, bool targetExists = false)
         {
-            var sourceClassSymbol = sourceType as INamedTypeSymbol;
-            var targetClassSymbol = targetType as INamedTypeSymbol;
-            if (sourceClassSymbol == null || targetClassSymbol == null)
+            if (IsMappingBetweenCollections(targetType, sourceType))
             {
-                yield break ;
-            }
-
-            if (IsMappingBetweenCollections(targetClassSymbol, sourceClassSymbol))
-            {
-                var collectionMapping = MapCollections(generator, globalSourceAccessor, sourceClassSymbol, targetClassSymbol);
+                var collectionMapping = MapCollections(generator, globalSourceAccessor, sourceType, targetType);
                 if (globbalTargetAccessor == null)
                 {
                     yield return generator.ReturnStatement(collectionMapping);    
@@ -111,25 +104,25 @@ namespace MappingGenerator
                 yield break;
             }
             
-            var targetLocalVariableName = globbalTargetAccessor ==null? ToLocalVariableName(targetClassSymbol.Name): ToLocalVariableName(globbalTargetAccessor.ToFullString());
+            var targetLocalVariableName = globbalTargetAccessor ==null? ToLocalVariableName(targetType.Name): ToLocalVariableName(globbalTargetAccessor.ToFullString());
             if (targetExists == false)
             {
-                var copyConstructor = FindCopyConstructor(targetClassSymbol, sourceClassSymbol);
+                var copyConstructor = FindCopyConstructor(targetType, sourceType);
                 if (copyConstructor != null)
                 {
-                    var init = generator.ObjectCreationExpression(targetClassSymbol, globalSourceAccessor);
+                    var init = generator.ObjectCreationExpression(targetType, globalSourceAccessor);
                     yield return generator.ReturnStatement(init);
                     yield break;
                 }
                 else
                 {
-                    var init = generator.ObjectCreationExpression(targetClassSymbol);
+                    var init = generator.ObjectCreationExpression(targetType);
                     yield return generator.LocalDeclarationStatement(targetLocalVariableName, init);     
                 }
             }
 
 
-            var matchedProperties = RetrieveMatchedProperties(sourceClassSymbol, targetClassSymbol).ToList();
+            var matchedProperties = RetrieveMatchedProperties(sourceType, targetType).ToList();
             //Direct 1-1 mapping
             var localTargetIdentifier = targetExists? globbalTargetAccessor: generator.IdentifierName(targetLocalVariableName);
             foreach (var x in matchedProperties.Where(x => x.Source != null  && x.Target != null))
@@ -143,13 +136,12 @@ namespace MappingGenerator
                 {
                     var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, x.Target.Name);
                     var sourceAccess = generator.MemberAccessExpression(globalSourceAccessor, x.Source.Name);
-                    var collectionMapping = MapCollections(generator, sourceAccess, (INamedTypeSymbol) x.Source.Type, (INamedTypeSymbol) x.Target.Type);
+                    var collectionMapping = MapCollections(generator, sourceAccess,  x.Source.Type,  x.Target.Type);
                     yield return generator.AssignmentStatement(targetAccess, collectionMapping);
                 }
                 else if (IsSimpleType(x.Target.Type) == false)
                 {   
                     //TODO: What if both sides has the same type?
-                    //TODO: What if source is  byte[]
                     //TODO: Reverse flattening
                     var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, x.Target.Name);
                     var sourceAccess = generator.MemberAccessExpression(globalSourceAccessor, x.Source.Name);
@@ -210,7 +202,6 @@ namespace MappingGenerator
                 }
             }
 
-
             if (globbalTargetAccessor == null)
             {
                 yield return generator.ReturnStatement(localTargetIdentifier);    
@@ -221,27 +212,41 @@ namespace MappingGenerator
             }
         }
 
-        private static SyntaxNode MapCollections(SyntaxGenerator generator, SyntaxNode sourceAccess, INamedTypeSymbol sourceListType, INamedTypeSymbol targetListType)
+        private static SyntaxNode MapCollections(SyntaxGenerator generator, SyntaxNode sourceAccess, ITypeSymbol sourceListType, ITypeSymbol targetListType)
         {
             var isReadolyCollection = targetListType.Name == "ReadOnlyCollection";
-            var sourceListElementType = sourceListType.TypeArguments[0];
-            var targetListElementType = targetListType.TypeArguments[0];
+            var sourceListElementType = GetElementType(sourceListType);
+            var targetListElementType = GetElementType(targetListType);
             if (IsSimpleType(sourceListElementType) || sourceListElementType == targetListElementType)
             {
-                var toListInvocation = AddToListInvocation(generator, sourceAccess);
+                var toListInvocation = AddMaterializeCollectionInvocation(generator, sourceAccess, targetListType);
                 return WrapInReadonlyCollectionIfNecessary(isReadolyCollection, toListInvocation, generator);
             }
             var selectAccess = generator.MemberAccessExpression(sourceAccess, "Select");
             var lambdaParameterName = ToSingularLocalVariableName(ToLocalVariableName(sourceListElementType.Name));
             var listElementMappingStms = MapTypes(sourceListElementType, targetListElementType, generator, generator.IdentifierName(lambdaParameterName));
             var selectInvocation = generator.InvocationExpression(selectAccess, generator.ValueReturningLambdaExpression(lambdaParameterName, listElementMappingStms));
-            var toList = AddToListInvocation(generator, selectInvocation);
+            var toList = AddMaterializeCollectionInvocation(generator, selectInvocation, targetListType);
             return WrapInReadonlyCollectionIfNecessary(isReadolyCollection, toList, generator);
         }
 
-        private static SyntaxNode AddToListInvocation(SyntaxGenerator generator, SyntaxNode sourceAccess)
+        private static ITypeSymbol GetElementType(ITypeSymbol collectionType)
         {
-            var toListAccess = generator.MemberAccessExpression(sourceAccess, "ToList" );
+            switch (collectionType)
+            {
+                    case INamedTypeSymbol namedType:
+                        return namedType.TypeArguments[0];
+                    case IArrayTypeSymbol arrayType:
+                        return arrayType.ElementType;
+                    default:
+                        throw new NotSupportedException("Unknown collection type");
+            }
+        }
+
+        private static SyntaxNode AddMaterializeCollectionInvocation(SyntaxGenerator generator, SyntaxNode sourceAccess, ITypeSymbol targetListType)
+        {
+            var materializeFunction =  targetListType.Kind == SymbolKind.ArrayType? "ToArray": "ToList";
+            var toListAccess = generator.MemberAccessExpression(sourceAccess, materializeFunction );
             return generator.InvocationExpression(toListAccess);
         }
 
@@ -258,12 +263,17 @@ namespace MappingGenerator
 
         private static bool IsMappingBetweenCollections(ITypeSymbol targetClassSymbol, ITypeSymbol sourceClassSymbol)
         {
-            return HasInterface(targetClassSymbol, "System.Collections.Generic.ICollection<T>") && HasInterface(sourceClassSymbol, "System.Collections.Generic.IEnumerable<T>");
+            return (HasInterface(targetClassSymbol, "System.Collections.Generic.ICollection<T>") || targetClassSymbol.Kind == SymbolKind.ArrayType)
+                   && (HasInterface(sourceClassSymbol, "System.Collections.Generic.IEnumerable<T>") || sourceClassSymbol.Kind == SymbolKind.ArrayType);
         }
 
-        private static IMethodSymbol FindCopyConstructor(INamedTypeSymbol type, INamedTypeSymbol constructorParameterType)
+        private static IMethodSymbol FindCopyConstructor(ITypeSymbol type, ITypeSymbol constructorParameterType)
         {
-            return type.Constructors.FirstOrDefault(c => c.Parameters.Length == 1 && c.Parameters[0].Type == constructorParameterType);
+            if (type is INamedTypeSymbol namedType)
+            {
+                return namedType.Constructors.FirstOrDefault(c => c.Parameters.Length == 1 && c.Parameters[0].Type == constructorParameterType);
+            }
+            return null;
         }
 
         private static string[] SimpleTypes = new[] {"String", "Decimal"};
@@ -327,17 +337,17 @@ namespace MappingGenerator
             return false;
         }
 
-        private static IEnumerable<IPropertySymbol> GetPublicPropertySymbols(INamedTypeSymbol source)
+        private static IEnumerable<IPropertySymbol> GetPublicPropertySymbols(ITypeSymbol source)
         {
             return GetBaseTypesAndThis(source).SelectMany(x=> x.GetMembers()).Where(IsPublicPropertySymbol).OfType<IPropertySymbol>();
         }   
         
-        private static IEnumerable<IMethodSymbol> GetPublicGetMethods(INamedTypeSymbol source)
+        private static IEnumerable<IMethodSymbol> GetPublicGetMethods(ITypeSymbol source)
         {
             return GetBaseTypesAndThis(source).SelectMany(x=> x.GetMembers()).Where(IsPublicGetMethod).OfType<IMethodSymbol>();
         }
 
-        private  static IEnumerable<ITypeSymbol> GetBaseTypesAndThis(INamedTypeSymbol type)
+        private  static IEnumerable<ITypeSymbol> GetBaseTypesAndThis(ITypeSymbol type)
         {
             var current = type;
             while (current != null && IsSystemObject(current) == false)
@@ -347,12 +357,12 @@ namespace MappingGenerator
             }
         }
 
-        private static bool IsSystemObject(INamedTypeSymbol current)
+        private static bool IsSystemObject(ITypeSymbol current)
         {
             return current.Name == "Object" && current.ContainingNamespace.Name =="System";
         }
 
-        private static IEnumerable<MatchedPropertySymbols> RetrieveMatchedProperties(INamedTypeSymbol source, INamedTypeSymbol target)
+        private static IEnumerable<MatchedPropertySymbols> RetrieveMatchedProperties(ITypeSymbol source, ITypeSymbol target)
         {
             var propertiesMap = new SortedDictionary<string, MatchedPropertySymbols>();
 

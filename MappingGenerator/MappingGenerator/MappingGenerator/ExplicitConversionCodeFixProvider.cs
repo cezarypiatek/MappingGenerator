@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Composition;
 using System.Collections.Immutable;
 using System.Linq;
@@ -45,6 +47,7 @@ namespace MappingGenerator
                     context.RegisterCodeFix(CodeAction.Create(title: title, createChangedDocument: c => GenerateExplicitConversion(context.Document, assignmentExpression, c), equivalenceKey: title), diagnostic);
                     break;
                 case ReturnStatementSyntax returnStatement:
+                    context.RegisterCodeFix(CodeAction.Create(title: title, createChangedDocument: c => GenerateExplicitConversion(context.Document, returnStatement, c), equivalenceKey: title), diagnostic);
                     break;
                
             }
@@ -59,11 +62,25 @@ namespace MappingGenerator
             //WARN: cheap speaculation, no idea how to deal with it in more generic way
             var targetExists = assignmentExpression.Left.Kind() == SyntaxKind.IdentifierName && semanticModel.GetSymbolInfo(assignmentExpression.Left).Symbol.Kind != SymbolKind.Property;
             var mappingStatements = MappingGenerator.MapTypes(sourceType, destimationType, generator, assignmentExpression.Right, assignmentExpression.Left, targetExists).ToList();
-            var root = await document.GetSyntaxRootAsync(cancellationToken);
             var assignmentStatement = assignmentExpression.Parent;
-            var newRoot = assignmentStatement.Parent.Kind() == SyntaxKind.Block
-                ? root.ReplaceNode(assignmentStatement, mappingStatements)
-                : root.ReplaceNode(assignmentStatement, SyntaxFactory.Block(mappingStatements.OfType<StatementSyntax>()));
+            return await ReplaceStatement(document, assignmentStatement, mappingStatements, cancellationToken);
+        }
+
+        private async Task<Document> GenerateExplicitConversion(Document document, ReturnStatementSyntax returnStatement, CancellationToken cancellationToken)
+        {
+            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+            var generator = SyntaxGenerator.GetGenerator(document);
+            var returnExpressionType = semanticModel.GetTypeInfo(returnStatement.Expression);
+            var mappingStatements = MappingGenerator.MapTypes(returnExpressionType.Type, returnExpressionType.ConvertedType, generator, returnStatement.Expression);
+            return await ReplaceStatement(document, returnStatement, mappingStatements, cancellationToken);
+        }
+
+        private static async Task<Document> ReplaceStatement(Document document, SyntaxNode statement, IEnumerable<SyntaxNode> newStatements, CancellationToken cancellationToken)
+        {
+            var root = await document.GetSyntaxRootAsync(cancellationToken);
+            var newRoot = statement.Parent.Kind() == SyntaxKind.Block
+                ? root.ReplaceNode(statement, newStatements)
+                : root.ReplaceNode(statement, SyntaxFactory.Block(newStatements.OfType<StatementSyntax>()));
             return document.WithSyntaxRoot(newRoot);
         }
 

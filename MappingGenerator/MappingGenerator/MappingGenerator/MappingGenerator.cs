@@ -7,10 +7,21 @@ using Microsoft.CodeAnalysis.Editing;
 
 namespace MappingGenerator
 {
-    public class MappingGenerator
+    public static class SyntaxGeneratorExtensions
+    {
+        public static SyntaxNode CompleteAssignmentStatement(this SyntaxGenerator generator, SyntaxNode left, SyntaxNode right)
+        {
+            var assignmentExpression = generator.AssignmentStatement(left, right);
+            return generator.ExpressionStatement(assignmentExpression);
+        }
+    }
+
+    public static class MappingGenerator
     {
         private static string[] SimpleTypes = new[] {"String", "Decimal"};
         private static char[] FobiddenSigns = new[] {'.', '[', ']', '(', ')'};
+
+
 
         public static IEnumerable<SyntaxNode> MapTypes(ITypeSymbol sourceType, ITypeSymbol targetType, SyntaxGenerator generator, SyntaxNode globalSourceAccessor, SyntaxNode globbalTargetAccessor=null, bool targetExists = false)
         {
@@ -23,7 +34,7 @@ namespace MappingGenerator
                 }
                 else if(targetExists == false)
                 {
-                    yield return generator.AssignmentStatement(globbalTargetAccessor, collectionMapping);
+                    yield return generator.CompleteAssignmentStatement(globbalTargetAccessor, collectionMapping);
                 }
                 yield break;
             }
@@ -61,7 +72,7 @@ namespace MappingGenerator
                     var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, x.Target.Name);
                     var sourceAccess = generator.MemberAccessExpression(globalSourceAccessor, x.Source.Name);
                     var collectionMapping = MapCollections(generator, sourceAccess,  x.Source.Type,  x.Target.Type);
-                    yield return generator.AssignmentStatement(targetAccess, collectionMapping);
+                    yield return generator.CompleteAssignmentStatement(targetAccess, collectionMapping);
                 }
                 else if (IsSimpleType(x.Target.Type) == false)
                 {   
@@ -81,7 +92,7 @@ namespace MappingGenerator
                     // - There is another type of conversion between source and target
                     var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, x.Target.Name);
                     var sourceAccess = generator.MemberAccessExpression(globalSourceAccessor, x.Source.Name);
-                    yield return generator.AssignmentStatement(targetAccess, sourceAccess);
+                    yield return generator.CompleteAssignmentStatement(targetAccess, sourceAccess);
                 }
             }
 
@@ -100,8 +111,7 @@ namespace MappingGenerator
                         {
                             var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, target.Name);
                             var sourceAccess = generator.MemberAccessExpression(sourceFirstLevelAccess, sourceProperty.Name);
-                            var assigment = generator.AssignmentStatement(targetAccess, sourceAccess);
-                            yield return assigment;
+                            yield return generator.CompleteAssignmentStatement(targetAccess, sourceAccess);
                         }
                     }
                 }
@@ -122,7 +132,7 @@ namespace MappingGenerator
                     var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, target.Name);
                     var sourceAccess = generator.MemberAccessExpression(globalSourceAccessor, unmappedSourceMethod.SourceGetMethod.Name);
                     var sourceCall = generator.InvocationExpression(sourceAccess);
-                    yield return generator.AssignmentStatement(targetAccess, sourceCall);
+                    yield return generator.CompleteAssignmentStatement(targetAccess, sourceCall);
                 }
             }
 
@@ -132,7 +142,7 @@ namespace MappingGenerator
             }
             else if(targetExists == false)
             {
-                yield return generator.AssignmentStatement(globbalTargetAccessor, localTargetIdentifier);
+                yield return generator.CompleteAssignmentStatement(globbalTargetAccessor, localTargetIdentifier);
             }
         }
 
@@ -207,7 +217,11 @@ namespace MappingGenerator
 
         private static string ToLocalVariableName(string proposalLocalName)
         {
-            var withoutForbiddenSigns = string.Join("",proposalLocalName.Trim().Split(FobiddenSigns).Select(x=>  $"{x.Substring(0, 1).ToUpper()}{x.Substring(1)}"));
+            var withoutForbiddenSigns = string.Join("",proposalLocalName.Trim().Split(FobiddenSigns).Select(x=>
+            {
+                var cleanElement = x.Trim();
+                return $"{cleanElement.Substring(0, 1).ToUpper()}{cleanElement.Substring(1)}";
+            }));
             return $"{withoutForbiddenSigns.Substring(0, 1).ToLower()}{withoutForbiddenSigns.Substring(1)}";
         }
 

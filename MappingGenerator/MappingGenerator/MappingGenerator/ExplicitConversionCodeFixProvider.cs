@@ -9,7 +9,6 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
-using Microsoft.CodeAnalysis.Formatting;
 
 namespace MappingGenerator
 {
@@ -32,65 +31,52 @@ namespace MappingGenerator
         public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
-
-            // TODO: Replace the following code with your own analysis, generating a CodeAction for each fix to suggest
             var diagnostic = context.Diagnostics.First();
-            var diagnosticSpan = diagnostic.Location.SourceSpan;
-
-            // Find the type declaration identified by the diagnostic.
-            var declaration = root.FindToken(diagnosticSpan.Start);
-
-            // Register a code action that will invoke the fix.
-            context.RegisterCodeFix(
-                CodeAction.Create(
-                    title: title,
-                    createChangedDocument: c => GenerateExplicitConversion(context.Document, declaration, c), 
-                    equivalenceKey: title),
-                diagnostic);
-        }
-
-        private async Task<Document> GenerateExplicitConversion(Document document, SyntaxToken culprit, CancellationToken cancellationToken)
-        {
-            var statement = FindStatementToReplace(culprit.Parent);
+            var token = root.FindToken(diagnostic.Location.SourceSpan.Start);
+            var statement = FindStatementToReplace(token.Parent);
             if (statement == null)
             {
-                return document;
+                return;
             }
-
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var generator = SyntaxGenerator.GetGenerator(document);
 
             switch (statement)
             {
-                case AssignmentExpressionSyntax assignmentStatement:
-                    var sourceType = semanticModel.GetTypeInfo(assignmentStatement.Right).Type;
-                    var destimationType = semanticModel.GetTypeInfo(assignmentStatement.Left).Type;
-                    var mappingStatements = MappingGenerator.MapTypes(sourceType, destimationType, generator, assignmentStatement.Right, assignmentStatement.Left).ToList();
-
-                    var root = await document.GetSyntaxRootAsync(cancellationToken);
-                    var syntaxEditor = new SyntaxEditor(root, document.Project.Solution.Workspace);
-                    syntaxEditor.InsertAfter(assignmentStatement, mappingStatements);
-                    syntaxEditor.RemoveNode(assignmentStatement);
-                    var newRoot = syntaxEditor.GetChangedRoot();
-                    return document.WithSyntaxRoot(newRoot);
-
+                case AssignmentExpressionSyntax assignmentExpression:
+                    context.RegisterCodeFix(CodeAction.Create(title: title, createChangedDocument: c => GenerateExplicitConversion(context.Document, assignmentExpression, c), equivalenceKey: title), diagnostic);
+                    break;
                 case ReturnStatementSyntax returnStatement:
-                    return document;
-                default:
-                    return document;
+                    break;
+               
             }
         }
 
-        private SyntaxNode FindStatementToReplace(SyntaxNode culprit)
+        private async Task<Document> GenerateExplicitConversion(Document document, AssignmentExpressionSyntax assignmentExpression, CancellationToken cancellationToken)
         {
-            switch (culprit)
+            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+            var generator = SyntaxGenerator.GetGenerator(document);
+            var sourceType = semanticModel.GetTypeInfo(assignmentExpression.Right).Type;
+            var destimationType = semanticModel.GetTypeInfo(assignmentExpression.Left).Type;
+            //WARN: cheap speaculation, no idea how to deal with it in more generic way
+            var targetExists = assignmentExpression.Left.Kind() == SyntaxKind.IdentifierName && semanticModel.GetSymbolInfo(assignmentExpression.Left).Symbol.Kind != SymbolKind.Property;
+            var mappingStatements = MappingGenerator.MapTypes(sourceType, destimationType, generator, assignmentExpression.Right, assignmentExpression.Left, targetExists).ToList();
+            var root = await document.GetSyntaxRootAsync(cancellationToken);
+            var assignmentStatement = assignmentExpression.Parent;
+            var newRoot = assignmentStatement.Parent.Kind() == SyntaxKind.Block
+                ? root.ReplaceNode(assignmentStatement, mappingStatements)
+                : root.ReplaceNode(assignmentStatement, SyntaxFactory.Block(mappingStatements.OfType<StatementSyntax>()));
+            return document.WithSyntaxRoot(newRoot);
+        }
+
+        private SyntaxNode FindStatementToReplace(SyntaxNode node)
+        {
+            switch (node)
             {
                     case AssignmentExpressionSyntax assignmentStatement:
                         return assignmentStatement;
                     case ReturnStatementSyntax returnStatement:
                         return returnStatement;
                     default:
-                        return culprit.Parent == null? null: FindStatementToReplace(culprit.Parent);
+                        return node.Parent == null? null: FindStatementToReplace(node.Parent);
             }
         }
     }

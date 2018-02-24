@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 
 namespace MappingGenerator
@@ -14,6 +15,15 @@ namespace MappingGenerator
             var assignmentExpression = generator.AssignmentStatement(left, right);
             return generator.ExpressionStatement(assignmentExpression);
         }
+        
+        public static SyntaxNode ContextualReturnStatement(this SyntaxGenerator generator, SyntaxNode nodeToReturn, bool generatorContext)
+        {
+            if (generatorContext)
+            {
+                return SyntaxFactory.YieldStatement(SyntaxKind.YieldReturnStatement, nodeToReturn as ExpressionSyntax);
+            }
+            return generator.ReturnStatement(nodeToReturn);
+        }
     }
 
     public static class MappingGenerator
@@ -23,14 +33,14 @@ namespace MappingGenerator
 
 
 
-        public static IEnumerable<SyntaxNode> MapTypes(ITypeSymbol sourceType, ITypeSymbol targetType, SyntaxGenerator generator, SyntaxNode globalSourceAccessor, SyntaxNode globbalTargetAccessor=null, bool targetExists = false)
+        public static IEnumerable<SyntaxNode> MapTypes(ITypeSymbol sourceType, ITypeSymbol targetType, SyntaxGenerator generator, SyntaxNode globalSourceAccessor, SyntaxNode globbalTargetAccessor=null, bool targetExists = false, bool generatorContext=false)
         {
             if (IsMappingBetweenCollections(targetType, sourceType))
             {
                 var collectionMapping = MapCollections(generator, globalSourceAccessor, sourceType, targetType);
                 if (globbalTargetAccessor == null)
                 {
-                    yield return generator.ReturnStatement(collectionMapping);    
+                    yield return generator.ContextualReturnStatement(collectionMapping, generatorContext);    
                 }
                 else if(targetExists == false)
                 {
@@ -46,7 +56,7 @@ namespace MappingGenerator
                 if (copyConstructor != null)
                 {
                     var init = generator.ObjectCreationExpression(targetType, globalSourceAccessor);
-                    yield return generator.ReturnStatement(init);
+                    yield return generator.ContextualReturnStatement(init, generatorContext);
                     yield break;
                 }
                 else
@@ -138,7 +148,7 @@ namespace MappingGenerator
 
             if (globbalTargetAccessor == null)
             {
-                yield return generator.ReturnStatement(localTargetIdentifier);    
+                yield return generator.ContextualReturnStatement(localTargetIdentifier, generatorContext);    
             }
             else if(targetExists == false)
             {

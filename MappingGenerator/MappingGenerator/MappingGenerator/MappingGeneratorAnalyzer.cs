@@ -52,7 +52,6 @@ namespace MappingGenerator
             if (methodNode != null && methodNode.ParameterList.Parameters.Count > 0 && methodNode.ParameterList.Parameters.Count < 3)
             {
                 var methodSymbol = context.SemanticModel.GetDeclaredSymbol(methodNode);
-                //TODO: Check if it is constructor
                 if (SymbolHelper.IsPureMappingFunction(methodSymbol) ||
                     SymbolHelper.IsUpdateThisObjectFunction(methodSymbol) ||
                     SymbolHelper.IsUpdateParameterFunction(methodSymbol) ||

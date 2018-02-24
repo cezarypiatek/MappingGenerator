@@ -26,18 +26,25 @@ namespace MappingGenerator
         }
     }
 
-    public static class MappingGenerator
+    public class MappingGenerator
     {
+        private readonly SyntaxGenerator generator;
         private static string[] SimpleTypes = new[] {"String", "Decimal"};
         private static char[] FobiddenSigns = new[] {'.', '[', ']', '(', ')'};
 
+        public MappingGenerator(SyntaxGenerator generator)
+        {
+            this.generator = generator;
+        }
 
 
-        public static IEnumerable<SyntaxNode> MapTypes(ITypeSymbol sourceType, ITypeSymbol targetType, SyntaxGenerator generator, SyntaxNode globalSourceAccessor, SyntaxNode globbalTargetAccessor=null, bool targetExists = false, bool generatorContext=false)
+        public IEnumerable<SyntaxNode> MapTypes(ITypeSymbol sourceType, ITypeSymbol targetType,
+            SyntaxNode globalSourceAccessor, SyntaxNode globbalTargetAccessor = null, bool targetExists = false,
+            bool generatorContext = false)
         {
             if (IsMappingBetweenCollections(targetType, sourceType))
             {
-                var collectionMapping = MapCollections(generator, globalSourceAccessor, sourceType, targetType);
+                var collectionMapping = MapCollections(globalSourceAccessor, sourceType, targetType);
                 if (globbalTargetAccessor == null)
                 {
                     yield return generator.ContextualReturnStatement(collectionMapping, generatorContext);    
@@ -67,7 +74,7 @@ namespace MappingGenerator
             }
 
 
-            var matchedProperties = Enumerable.ToList<MatchedPropertySymbols>(RetrieveMatchedProperties(sourceType, targetType));
+            var matchedProperties = RetrieveMatchedProperties(sourceType, targetType).ToList();
             //Direct 1-1 mapping
             var localTargetIdentifier = targetExists? globbalTargetAccessor: generator.IdentifierName(targetLocalVariableName);
             foreach (var x in matchedProperties.Where(x => x.Source != null  && x.Target != null))
@@ -81,7 +88,7 @@ namespace MappingGenerator
                 {
                     var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, x.Target.Name);
                     var sourceAccess = generator.MemberAccessExpression(globalSourceAccessor, x.Source.Name);
-                    var collectionMapping = MapCollections(generator, sourceAccess,  x.Source.Type,  x.Target.Type);
+                    var collectionMapping = MapCollections(sourceAccess,  x.Source.Type,  x.Target.Type);
                     yield return generator.CompleteAssignmentStatement(targetAccess, collectionMapping);
                 }
                 else if (IsSimpleType(x.Target.Type) == false)
@@ -90,7 +97,7 @@ namespace MappingGenerator
                     //TODO: Reverse flattening
                     var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, x.Target.Name);
                     var sourceAccess = generator.MemberAccessExpression(globalSourceAccessor, x.Source.Name);
-                    foreach (var complexPropertyMappingNode in MapTypes(x.Source.Type, x.Target.Type, generator, sourceAccess, targetAccess))
+                    foreach (var complexPropertyMappingNode in MapTypes(x.Source.Type, x.Target.Type, sourceAccess, targetAccess))
                     {
                         yield return complexPropertyMappingNode;
                     }
@@ -111,7 +118,7 @@ namespace MappingGenerator
             foreach (var unmapped in unmappedDirectly)
             {
                 var targetsWithPartialNameAsSource = matchedProperties.Where(x => x.Target != null && x.Target.Name.StartsWith(unmapped.Source.Name)).Select(x => x.Target);
-                var sourceProperties = Enumerable.ToList<IPropertySymbol>(GetPublicPropertySymbols(unmapped.Source.Type as INamedTypeSymbol));
+                var sourceProperties = GetPublicPropertySymbols(unmapped.Source.Type as INamedTypeSymbol).ToList();
                 var sourceFirstLevelAccess = generator.MemberAccessExpression(globalSourceAccessor, unmapped.Source.Name);
                 foreach (var target in targetsWithPartialNameAsSource)
                 {   
@@ -156,7 +163,7 @@ namespace MappingGenerator
             }
         }
 
-        private static SyntaxNode MapCollections(SyntaxGenerator generator, SyntaxNode sourceAccess, ITypeSymbol sourceListType, ITypeSymbol targetListType)
+        private SyntaxNode MapCollections(SyntaxNode sourceAccess, ITypeSymbol sourceListType, ITypeSymbol targetListType)
         {
             var isReadolyCollection = targetListType.Name == "ReadOnlyCollection";
             var sourceListElementType = GetElementType(sourceListType);
@@ -168,7 +175,7 @@ namespace MappingGenerator
             }
             var selectAccess = generator.MemberAccessExpression(sourceAccess, "Select");
             var lambdaParameterName = ToSingularLocalVariableName(ToLocalVariableName(sourceListElementType.Name));
-            var listElementMappingStms = MapTypes(sourceListElementType, targetListElementType, generator, generator.IdentifierName(lambdaParameterName));
+            var listElementMappingStms = MapTypes(sourceListElementType, targetListElementType, generator.IdentifierName(lambdaParameterName));
             var selectInvocation = generator.InvocationExpression(selectAccess, generator.ValueReturningLambdaExpression(lambdaParameterName, listElementMappingStms));
             var toList = AddMaterializeCollectionInvocation(generator, selectInvocation, targetListType);
             return WrapInReadonlyCollectionIfNecessary(isReadolyCollection, toList, generator);

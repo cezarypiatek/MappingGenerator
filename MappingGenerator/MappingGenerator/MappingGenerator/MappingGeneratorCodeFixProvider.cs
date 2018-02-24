@@ -54,33 +54,34 @@ namespace MappingGenerator
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var methodSymbol = semanticModel.GetDeclaredSymbol(methodSyntax);
             var generator = SyntaxGenerator.GetGenerator(document);
-            var mappingExpressions = GenerateMappingCode(methodSymbol, generator);
+            var mappingGenerator = new MappingGenerator(generator);
+            var mappingExpressions = GenerateMappingCode(methodSymbol, generator, mappingGenerator);
             var root = await document.GetSyntaxRootAsync(cancellationToken);
             var newRoot = root.ReplaceNode(methodSyntax.Body, ((BaseMethodDeclarationSyntax)generator.MethodDeclaration(methodSymbol, mappingExpressions)).Body);
             return document.WithSyntaxRoot(newRoot);
         }
 
-        private static IEnumerable<SyntaxNode> GenerateMappingCode(IMethodSymbol methodSymbol, SyntaxGenerator generator)
+        private static IEnumerable<SyntaxNode> GenerateMappingCode(IMethodSymbol methodSymbol, SyntaxGenerator generator,  MappingGenerator mappingGenerator)
         {
             if (SymbolHelper.IsPureMappingFunction(methodSymbol))
             {
                 var source = methodSymbol.Parameters[0];
                 var targetType = methodSymbol.ReturnType;
-                return MappingGenerator.MapTypes(source.Type, targetType, generator,generator.IdentifierName(source.Name));
+                return mappingGenerator.MapTypes(source.Type, targetType,generator.IdentifierName(source.Name));
             }
 
             if (SymbolHelper.IsUpdateThisObjectFunction(methodSymbol) || SymbolHelper.IsMappingConstructor(methodSymbol))
             {
                 var source = methodSymbol.Parameters[0];
                 var targetType = methodSymbol.ContainingType;
-                return MappingGenerator.MapTypes(source.Type, targetType, generator, generator.IdentifierName(source.Name), generator.ThisExpression(), true);
+                return mappingGenerator.MapTypes(source.Type, targetType, generator.IdentifierName(source.Name), generator.ThisExpression(), targetExists: true);
             }
 
             if (SymbolHelper.IsUpdateParameterFunction(methodSymbol))
             {
                 var source = methodSymbol.Parameters[0];
                 var target = methodSymbol.Parameters[1];
-                return MappingGenerator.MapTypes(source.Type, target.Type, generator, generator.IdentifierName(source.Name), generator.IdentifierName(target.Name), true);
+                return mappingGenerator.MapTypes(source.Type, target.Type, generator.IdentifierName(source.Name), generator.IdentifierName(target.Name), targetExists: true);
             }
 
             return Enumerable.Empty<SyntaxNode>();

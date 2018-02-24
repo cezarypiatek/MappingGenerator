@@ -54,7 +54,7 @@ namespace MappingGenerator
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var methodSymbol = semanticModel.GetDeclaredSymbol(methodSyntax);
             var generator = SyntaxGenerator.GetGenerator(document);
-            var mappingGenerator = new MappingGenerator(generator);
+            var mappingGenerator = new MappingGenerator(generator, semanticModel);
             var mappingExpressions = GenerateMappingCode(methodSymbol, generator, mappingGenerator);
             var root = await document.GetSyntaxRootAsync(cancellationToken);
             var newRoot = root.ReplaceNode(methodSyntax.Body, ((BaseMethodDeclarationSyntax)generator.MethodDeclaration(methodSymbol, mappingExpressions)).Body);

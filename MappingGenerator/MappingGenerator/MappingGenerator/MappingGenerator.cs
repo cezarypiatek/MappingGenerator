@@ -3,40 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 
 namespace MappingGenerator
 {
-    public static class SyntaxGeneratorExtensions
-    {
-        public static SyntaxNode CompleteAssignmentStatement(this SyntaxGenerator generator, SyntaxNode left, SyntaxNode right)
-        {
-            var assignmentExpression = generator.AssignmentStatement(left, right);
-            return generator.ExpressionStatement(assignmentExpression);
-        }
-        
-        public static SyntaxNode ContextualReturnStatement(this SyntaxGenerator generator, SyntaxNode nodeToReturn, bool generatorContext)
-        {
-            if (generatorContext)
-            {
-                return SyntaxFactory.YieldStatement(SyntaxKind.YieldReturnStatement, nodeToReturn as ExpressionSyntax);
-            }
-            return generator.ReturnStatement(nodeToReturn);
-        }
-    }
-
     public class MappingGenerator
     {
         private readonly SyntaxGenerator generator;
+        private readonly SemanticModel semanticModel;
         private static string[] SimpleTypes = new[] {"String", "Decimal"};
         private static char[] FobiddenSigns = new[] {'.', '[', ']', '(', ')'};
 
-        public MappingGenerator(SyntaxGenerator generator)
+        public MappingGenerator(SyntaxGenerator generator, SemanticModel semanticModel)
         {
             this.generator = generator;
+            this.semanticModel = semanticModel;
         }
-
 
         public IEnumerable<SyntaxNode> MapTypes(ITypeSymbol sourceType, ITypeSymbol targetType,
             SyntaxNode globalSourceAccessor, SyntaxNode globbalTargetAccessor = null, bool targetExists = false,
@@ -104,11 +86,29 @@ namespace MappingGenerator
                 }
                 else
                 {
-                    //TODO: What if boths sides has different type? 
-                    // - Source is a wrapper of target (has only one property that match the target type)
-                    // - There is another type of conversion between source and target
                     var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, x.Target.Name);
                     var sourceAccess = generator.MemberAccessExpression(globalSourceAccessor, x.Source.Name);
+                    if (x.Target.Type != x.Source.Type)
+                    {
+                        var conversion =  semanticModel.Compilation.ClassifyConversion(x.Source.Type, x.Target.Type);
+                        if (conversion.Exists == false)
+                        {
+                            var wrapper = GetWrappingInfo(x.Source.Type, x.Target.Type);
+                            if (wrapper.Type == WrapperInfoType.Property)
+                            {
+                                sourceAccess = generator.MemberAccessExpression(sourceAccess, wrapper.UnwrappingProperty.Name);
+                            }else if (wrapper.Type == WrapperInfoType.Method)
+                            {
+                                var unwrappingMethodAccess = generator.MemberAccessExpression(sourceAccess, wrapper.UnwrappingMethod.Name);
+                                sourceAccess = generator.InvocationExpression(unwrappingMethodAccess);
+                            }
+
+                        }else if(conversion.IsExplicit)
+                        {
+                            sourceAccess = generator.CastExpression(x.Target.Type, sourceAccess);
+                        }
+                    }
+                    
                     yield return generator.CompleteAssignmentStatement(targetAccess, sourceAccess);
                 }
             }
@@ -288,14 +288,40 @@ namespace MappingGenerator
             return false;
         }
 
+        private static WrapperInfo GetWrappingInfo(ITypeSymbol wrapperType, ITypeSymbol wrappedType)
+        {
+            var unwrappingProperties = GetUnwrappingProperties(wrapperType, wrappedType).ToList();
+            var unwrappingMethods = GetUnwrappingMethods(wrapperType, wrappedType).ToList();
+            if (unwrappingMethods.Count + unwrappingProperties.Count == 1)
+            {
+                if (unwrappingMethods.Count == 1)
+                {
+                    return new WrapperInfo(unwrappingMethods.First());
+                }
+
+                return new WrapperInfo(unwrappingProperties.First());
+            }
+            return new WrapperInfo();
+        }
+
+        private static IEnumerable<IPropertySymbol> GetUnwrappingProperties(ITypeSymbol wrapperType, ITypeSymbol wrappedType)
+        {
+            return GetPublicPropertySymbols(wrapperType).Where(x => x.SetMethod.DeclaredAccessibility == Accessibility.Public && x.Type == wrappedType);
+        }
+        
+        private static IEnumerable<IMethodSymbol> GetUnwrappingMethods(ITypeSymbol wrapperType, ITypeSymbol wrappedType)
+        {
+            return GetPublicGetMethods(wrapperType).Where(x => x.DeclaredAccessibility == Accessibility.Public && x.ReturnType == wrappedType);
+        }
+
         private static IEnumerable<IPropertySymbol> GetPublicPropertySymbols(ITypeSymbol source)
         {
-            return Enumerable.SelectMany<ITypeSymbol, ISymbol>(GetBaseTypesAndThis(source), x=> x.GetMembers()).Where(IsPublicPropertySymbol).OfType<IPropertySymbol>();
+            return GetBaseTypesAndThis(source).SelectMany(x=> x.GetMembers()).Where(IsPublicPropertySymbol).OfType<IPropertySymbol>();
         }
 
         private static IEnumerable<IMethodSymbol> GetPublicGetMethods(ITypeSymbol source)
         {
-            return Enumerable.SelectMany<ITypeSymbol, ISymbol>(GetBaseTypesAndThis(source), x=> x.GetMembers()).Where(IsPublicGetMethod).OfType<IMethodSymbol>();
+            return GetBaseTypesAndThis(source).SelectMany(x=> x.GetMembers()).Where(IsPublicGetMethod).OfType<IMethodSymbol>();
         }
 
         private  static IEnumerable<ITypeSymbol> GetBaseTypesAndThis(ITypeSymbol type)

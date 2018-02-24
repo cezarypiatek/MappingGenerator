@@ -58,7 +58,7 @@ namespace MappingGenerator
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
-            var mappingGenerator = new MappingGenerator(syntaxGenerator);
+            var mappingGenerator = new MappingGenerator(syntaxGenerator, semanticModel);
             var sourceType = semanticModel.GetTypeInfo(assignmentExpression.Right).Type;
             var destimationType = semanticModel.GetTypeInfo(assignmentExpression.Left).Type;
             //WARN: cheap speaculation, no idea how to deal with it in more generic way
@@ -72,7 +72,7 @@ namespace MappingGenerator
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
-            var mappingGenerator = new MappingGenerator(syntaxGenerator);
+            var mappingGenerator = new MappingGenerator(syntaxGenerator, semanticModel);
             var returnExpressionType = semanticModel.GetTypeInfo(returnStatement.Expression);
             var mappingStatements = mappingGenerator.MapTypes(returnExpressionType.Type, returnExpressionType.ConvertedType, returnStatement.Expression);
             return await ReplaceStatement(document, returnStatement, mappingStatements, cancellationToken);
@@ -82,7 +82,7 @@ namespace MappingGenerator
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
-            var mappingGenerator = new MappingGenerator(syntaxGenerator);
+            var mappingGenerator = new MappingGenerator(syntaxGenerator, semanticModel);
             var yieldExpressionType = semanticModel.GetTypeInfo(yieldStatement.Expression);
             var mappingStatements = mappingGenerator.MapTypes(yieldExpressionType.Type, yieldExpressionType.ConvertedType, yieldStatement.Expression, generatorContext: true);
             return await ReplaceStatement(document, yieldStatement, mappingStatements, cancellationToken);

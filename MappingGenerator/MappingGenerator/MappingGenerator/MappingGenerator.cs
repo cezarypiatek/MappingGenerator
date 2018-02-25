@@ -45,7 +45,14 @@ namespace MappingGenerator
                 if (copyConstructor != null)
                 {
                     var init = generator.ObjectCreationExpression(targetType, globalSourceAccessor);
-                    yield return generator.ContextualReturnStatement(init, generatorContext);
+                    if (globbalTargetAccessor == null)
+                    {
+                        yield return generator.ContextualReturnStatement(init, generatorContext);
+                    }
+                    else
+                    {
+                        yield return generator.CompleteAssignmentStatement(globbalTargetAccessor, init);
+                    }
                     yield break;
                 }
                 else

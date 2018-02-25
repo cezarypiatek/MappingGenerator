@@ -16,12 +16,11 @@ namespace MappingGenerator
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ExplicitConversionCodeFixProvider)), Shared]
     public class ExplicitConversionCodeFixProvider : CodeFixProvider
     {
-        public const string DiagnosticId = "CS0029";
         private const string title = "Generate explicit conversion";
     
         public sealed override ImmutableArray<string> FixableDiagnosticIds
         {
-            get { return ImmutableArray.Create(DiagnosticId); }
+            get { return ImmutableArray.Create( "CS0029", "CS0266"); }
         }
 
         public sealed override FixAllProvider GetFixAllProvider()

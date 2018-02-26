@@ -3,7 +3,7 @@
 
 "AutoMapper" like, Roslyn based, code fix provider that allows to generate mapping code in design time.
 
-You can download it as Visual Studio Extension from [Releases](https://github.com/cezarypiatek/MappingGenerator/releases) page.
+You can download it as Visual Studio Extension from [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=54748ff9-45fc-43c2-8ec5-cf7912bc3b84.mappinggenerator).
 
 ## Main features
 

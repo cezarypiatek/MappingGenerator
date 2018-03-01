@@ -52,6 +52,12 @@ namespace MappingGenerator
             if (methodNode != null && methodNode.ParameterList.Parameters.Count > 0 && methodNode.ParameterList.Parameters.Count < 3)
             {
                 var methodSymbol = context.SemanticModel.GetDeclaredSymbol(methodNode);
+                var allParameterHaveNames = methodSymbol.Parameters.All(x => string.IsNullOrWhiteSpace(x.Name) == false);
+                if (allParameterHaveNames == false)
+                {
+                    return;
+                }
+
                 if (SymbolHelper.IsPureMappingFunction(methodSymbol) ||
                     SymbolHelper.IsUpdateThisObjectFunction(methodSymbol) ||
                     SymbolHelper.IsUpdateParameterFunction(methodSymbol) ||

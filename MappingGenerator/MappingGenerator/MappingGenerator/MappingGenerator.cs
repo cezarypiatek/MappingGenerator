@@ -62,45 +62,48 @@ namespace MappingGenerator
                 }
             }
 
-
-            var matchedProperties = RetrieveMatchedProperties(sourceType, targetType).ToList();
-            //Direct 1-1 mapping
+            var mappingSourceFinder = new MappingSourceFinder(sourceType, globalSourceAccessor, generator);
+            var targetProperties = ObjectHelper.GetPublicPropertySymbols(targetType).ToList();
             var localTargetIdentifier = targetExists? globbalTargetAccessor: generator.IdentifierName(targetLocalVariableName);
-            foreach (var x in matchedProperties.Where(x => x.Source != null  && x.Target != null))
+            foreach (var targetProperty in targetProperties)
             {
-                if (x.Target.SetMethod.DeclaredAccessibility != Accessibility.Public && globbalTargetAccessor.Kind() != SyntaxKind.ThisExpression)
+                if (targetProperty.SetMethod.DeclaredAccessibility != Accessibility.Public && globbalTargetAccessor.Kind() != SyntaxKind.ThisExpression)
                 {
                     continue;
                 }
 
-                if (IsMappingBetweenCollections(x.Target.Type, x.Source.Type))
+                var mappingSource = mappingSourceFinder.FindMappingSource(targetProperty.Name);
+                if (mappingSource == null)
                 {
-                    var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, x.Target.Name);
-                    var sourceAccess = generator.MemberAccessExpression(globalSourceAccessor, x.Source.Name);
-                    var collectionMapping = MapCollections(sourceAccess,  x.Source.Type,  x.Target.Type);
+                    continue;
+                }
+
+                if (IsMappingBetweenCollections(targetProperty.Type, mappingSource.ExpressionType))
+                {
+                    var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, targetProperty.Name);
+                    var collectionMapping = MapCollections(mappingSource.Expression,  mappingSource.ExpressionType,  targetProperty.Type);
                     yield return generator.CompleteAssignmentStatement(targetAccess, collectionMapping);
                 }
-                else if (IsSimpleType(x.Target.Type) == false)
+                else if (IsSimpleType(targetProperty.Type) == false)
                 {   
                     //TODO: What if both sides has the same type?
                     //TODO: Reverse flattening
-                    var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, x.Target.Name);
-                    var sourceAccess = generator.MemberAccessExpression(globalSourceAccessor, x.Source.Name);
-                    foreach (var complexPropertyMappingNode in MapTypes(x.Source.Type, x.Target.Type, sourceAccess, targetAccess))
+                    var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, targetProperty.Name);
+                    foreach (var complexPropertyMappingNode in MapTypes(mappingSource.ExpressionType, targetProperty.Type, mappingSource.Expression, targetAccess))
                     {
                         yield return complexPropertyMappingNode;
                     }
                 }
                 else
                 {
-                    var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, x.Target.Name);
-                    var sourceAccess = generator.MemberAccessExpression(globalSourceAccessor, x.Source.Name);
-                    if (x.Target.Type != x.Source.Type)
+                    var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, targetProperty.Name);
+                    var sourceAccess = mappingSource.Expression as SyntaxNode;
+                    if (targetProperty.Type != mappingSource.ExpressionType)
                     {
-                        var conversion =  semanticModel.Compilation.ClassifyConversion(x.Source.Type, x.Target.Type);
+                        var conversion =  semanticModel.Compilation.ClassifyConversion(mappingSource.ExpressionType, targetProperty.Type);
                         if (conversion.Exists == false)
                         {
-                            var wrapper = GetWrappingInfo(x.Source.Type, x.Target.Type);
+                            var wrapper = GetWrappingInfo(mappingSource.ExpressionType, targetProperty.Type);
                             if (wrapper.Type == WrapperInfoType.Property)
                             {
                                 sourceAccess = generator.MemberAccessExpression(sourceAccess, wrapper.UnwrappingProperty.Name);
@@ -112,51 +115,11 @@ namespace MappingGenerator
 
                         }else if(conversion.IsExplicit)
                         {
-                            sourceAccess = generator.CastExpression(x.Target.Type, sourceAccess);
+                            sourceAccess = generator.CastExpression(targetProperty.Type, sourceAccess);
                         }
                     }
                     
                     yield return generator.CompleteAssignmentStatement(targetAccess, sourceAccess);
-                }
-            }
-
-            //Non-direct (mapping like y.UserName = x.User.Name)
-            var unmappedDirectly = matchedProperties.Where(x => x.Source != null  && x.Target == null);
-            foreach (var unmapped in unmappedDirectly)
-            {
-                var targetsWithPartialNameAsSource = matchedProperties.Where(x => x.Target != null && x.Target.Name.StartsWith(unmapped.Source.Name)).Select(x => x.Target);
-                var sourceProperties = ObjectHelper.GetPublicPropertySymbols(unmapped.Source.Type as INamedTypeSymbol).ToList();
-                var sourceFirstLevelAccess = generator.MemberAccessExpression(globalSourceAccessor, unmapped.Source.Name);
-                foreach (var target in targetsWithPartialNameAsSource)
-                {   
-                    foreach (var sourceProperty in sourceProperties)
-                    {
-                        if (target.Name == $"{unmapped.Source.Name}{sourceProperty.Name}")
-                        {
-                            var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, target.Name);
-                            var sourceAccess = generator.MemberAccessExpression(sourceFirstLevelAccess, sourceProperty.Name);
-                            yield return generator.CompleteAssignmentStatement(targetAccess, sourceAccess);
-                        }
-                    }
-                }
-            }
-
-            //Flattening with function eg. t.Total = s.GetTotal()
-            var unmappedDirectlySourcesMethod = matchedProperties.Where(x => x.SourceGetMethod != null  && x.Target == null);
-            foreach (var unmappedSourceMethod in unmappedDirectlySourcesMethod)
-            {
-                var target = matchedProperties.FirstOrDefault(x => x.Target!=null && unmappedSourceMethod.SourceGetMethod.Name.EndsWith(x.Target.Name))?.Target;
-                if (target != null)
-                {
-                    if (target.SetMethod.DeclaredAccessibility != Accessibility.Public && globbalTargetAccessor.Kind() != SyntaxKind.ThisExpression)
-                    {
-                        continue;
-                    }
-
-                    var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, target.Name);
-                    var sourceAccess = generator.MemberAccessExpression(globalSourceAccessor, unmappedSourceMethod.SourceGetMethod.Name);
-                    var sourceCall = generator.InvocationExpression(sourceAccess);
-                    yield return generator.CompleteAssignmentStatement(targetAccess, sourceCall);
                 }
             }
 
@@ -278,54 +241,6 @@ namespace MappingGenerator
                 return new WrapperInfo(unwrappingProperties.First());
             }
             return new WrapperInfo();
-        }
-
-        private static IEnumerable<MatchedPropertySymbols> RetrieveMatchedProperties(ITypeSymbol source, ITypeSymbol target)
-        {
-            var propertiesMap = new SortedDictionary<string, MatchedPropertySymbols>();
-
-            foreach (var mSymbol in ObjectHelper.GetPublicPropertySymbols(source))
-            {
-                if (!propertiesMap.ContainsKey(mSymbol.Name))
-                {
-                    // If class definition is invalid, it may happen that we get multiple properties with the same name
-                    // Ignore all but first
-                    propertiesMap.Add(mSymbol.Name, new MatchedPropertySymbols() { Source = mSymbol });
-                }
-            }
-
-            foreach (var methodSymbol in ObjectHelper.GetPublicGetMethods(source))
-            {
-                if (propertiesMap.ContainsKey(methodSymbol.Name) == false)
-                {
-                    propertiesMap.Add(methodSymbol.Name, new MatchedPropertySymbols()
-                    {
-                        SourceGetMethod = methodSymbol
-                    });
-                }
-            }
-
-            foreach (var mSymbol in ObjectHelper.GetPublicPropertySymbols(target))
-            {
-                if (mSymbol.IsReadOnly)
-                {
-                    continue;
-                }
-
-                MatchedPropertySymbols sourceProperty = null;
-                if (!propertiesMap.TryGetValue(mSymbol.Name, out sourceProperty))
-                {
-                    propertiesMap.Add(mSymbol.Name, new MatchedPropertySymbols { Target = mSymbol });
-                }
-                else if (sourceProperty.Target == null)
-                {
-                    // If class definition is invalid, it may happen that we get multiple properties with the same name
-                    // Ignore all but first
-                    sourceProperty.Target = mSymbol;
-                }
-            }
-
-            return propertiesMap.Values;
         }
     }
 }

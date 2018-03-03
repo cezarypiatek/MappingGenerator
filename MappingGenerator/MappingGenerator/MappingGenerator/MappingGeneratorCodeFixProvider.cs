@@ -87,11 +87,4 @@ namespace MappingGenerator
             return Enumerable.Empty<SyntaxNode>();
         }
     }
-
-    internal class MatchedPropertySymbols
-    {
-        public IPropertySymbol Source { get; set; }
-        public IMethodSymbol SourceGetMethod { get; set; }
-        public IPropertySymbol Target { get; set; }
-    }
 }

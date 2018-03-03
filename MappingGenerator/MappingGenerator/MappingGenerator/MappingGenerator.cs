@@ -125,7 +125,7 @@ namespace MappingGenerator
             foreach (var unmapped in unmappedDirectly)
             {
                 var targetsWithPartialNameAsSource = matchedProperties.Where(x => x.Target != null && x.Target.Name.StartsWith(unmapped.Source.Name)).Select(x => x.Target);
-                var sourceProperties = GetPublicPropertySymbols(unmapped.Source.Type as INamedTypeSymbol).ToList();
+                var sourceProperties = ObjectHelper.GetPublicPropertySymbols(unmapped.Source.Type as INamedTypeSymbol).ToList();
                 var sourceFirstLevelAccess = generator.MemberAccessExpression(globalSourceAccessor, unmapped.Source.Name);
                 foreach (var target in targetsWithPartialNameAsSource)
                 {   
@@ -264,41 +264,10 @@ namespace MappingGenerator
             return xt.OriginalDefinition.AllInterfaces.Any(x => x.ToDisplayString() == interfaceName);
         }
 
-        private static bool IsPublicGetMethod(ISymbol x)
-        {
-            return x is IMethodSymbol mSymbol
-                   && mSymbol.ReturnsVoid == false
-                   && mSymbol.Parameters.Length == 0
-                   && x.DeclaredAccessibility == Accessibility.Public
-                   && x.IsImplicitlyDeclared == false
-                   && mSymbol.MethodKind == MethodKind.Ordinary
-                ;
-        }
-
-        private static bool IsPublicPropertySymbol(ISymbol x)
-        {
-            if (x.Kind != SymbolKind.Property)
-            {
-                return false;
-            }
-
-            if (x is IPropertySymbol mSymbol)
-            {
-                if (mSymbol.IsStatic || mSymbol.IsIndexer || mSymbol.DeclaredAccessibility != Accessibility.Public)
-                {
-                    return false;
-                }
-
-                return true;
-            }
-
-            return false;
-        }
-
         private static WrapperInfo GetWrappingInfo(ITypeSymbol wrapperType, ITypeSymbol wrappedType)
         {
-            var unwrappingProperties = GetUnwrappingProperties(wrapperType, wrappedType).ToList();
-            var unwrappingMethods = GetUnwrappingMethods(wrapperType, wrappedType).ToList();
+            var unwrappingProperties = ObjectHelper.GetUnwrappingProperties(wrapperType, wrappedType).ToList();
+            var unwrappingMethods = ObjectHelper.GetUnwrappingMethods(wrapperType, wrappedType).ToList();
             if (unwrappingMethods.Count + unwrappingProperties.Count == 1)
             {
                 if (unwrappingMethods.Count == 1)
@@ -311,46 +280,11 @@ namespace MappingGenerator
             return new WrapperInfo();
         }
 
-        private static IEnumerable<IPropertySymbol> GetUnwrappingProperties(ITypeSymbol wrapperType, ITypeSymbol wrappedType)
-        {
-            return GetPublicPropertySymbols(wrapperType).Where(x => x.SetMethod.DeclaredAccessibility == Accessibility.Public && x.Type == wrappedType);
-        }
-        
-        private static IEnumerable<IMethodSymbol> GetUnwrappingMethods(ITypeSymbol wrapperType, ITypeSymbol wrappedType)
-        {
-            return GetPublicGetMethods(wrapperType).Where(x => x.DeclaredAccessibility == Accessibility.Public && x.ReturnType == wrappedType);
-        }
-
-        private static IEnumerable<IPropertySymbol> GetPublicPropertySymbols(ITypeSymbol source)
-        {
-            return GetBaseTypesAndThis(source).SelectMany(x=> x.GetMembers()).Where(IsPublicPropertySymbol).OfType<IPropertySymbol>();
-        }
-
-        private static IEnumerable<IMethodSymbol> GetPublicGetMethods(ITypeSymbol source)
-        {
-            return GetBaseTypesAndThis(source).SelectMany(x=> x.GetMembers()).Where(IsPublicGetMethod).OfType<IMethodSymbol>();
-        }
-
-        private  static IEnumerable<ITypeSymbol> GetBaseTypesAndThis(ITypeSymbol type)
-        {
-            var current = type;
-            while (current != null && IsSystemObject(current) == false)
-            {
-                yield return current;
-                current = current.BaseType;
-            }
-        }
-
-        private static bool IsSystemObject(ITypeSymbol current)
-        {
-            return current.Name == "Object" && current.ContainingNamespace.Name =="System";
-        }
-
         private static IEnumerable<MatchedPropertySymbols> RetrieveMatchedProperties(ITypeSymbol source, ITypeSymbol target)
         {
             var propertiesMap = new SortedDictionary<string, MatchedPropertySymbols>();
 
-            foreach (var mSymbol in GetPublicPropertySymbols(source))
+            foreach (var mSymbol in ObjectHelper.GetPublicPropertySymbols(source))
             {
                 if (!propertiesMap.ContainsKey(mSymbol.Name))
                 {
@@ -360,7 +294,7 @@ namespace MappingGenerator
                 }
             }
 
-            foreach (var methodSymbol in GetPublicGetMethods(source))
+            foreach (var methodSymbol in ObjectHelper.GetPublicGetMethods(source))
             {
                 if (propertiesMap.ContainsKey(methodSymbol.Name) == false)
                 {
@@ -371,7 +305,7 @@ namespace MappingGenerator
                 }
             }
 
-            foreach (var mSymbol in GetPublicPropertySymbols(target))
+            foreach (var mSymbol in ObjectHelper.GetPublicPropertySymbols(target))
             {
                 if (mSymbol.IsReadOnly)
                 {

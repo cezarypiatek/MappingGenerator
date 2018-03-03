@@ -32,6 +32,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Resources.Designer.cs" DesignTime="True" AutoGen="True" DependentUpon="Resources.resx" />
+    <Compile Update="SplattingCodeFixProvider.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <EmbeddedResource Update="Resources.resx" Generator="ResXFileCodeGenerator" LastGenOutput="Resources.Designer.cs" />
   </ItemGroup>
 

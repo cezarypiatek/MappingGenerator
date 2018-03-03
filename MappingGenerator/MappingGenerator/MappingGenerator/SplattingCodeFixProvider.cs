@@ -53,9 +53,9 @@ namespace MappingGenerator
             var root = await document.GetSyntaxRootAsync(cancellationToken);
             var invalidArgument = invocationExpression.ArgumentList.Arguments.First();
             var sourceType = semanticModel.GetTypeInfo(invalidArgument.Expression);
-            var sourceMembers = ObjectHelper.GetPublicPropertySymbols(sourceType.Type).ToList();
             var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
-            var argumentList = FindBestArgumentsMatch(methodSymbol, sourceMembers, syntaxGenerator, invalidArgument, cancellationToken);
+            var mappingSourceFinder = new MappingSourceFinder(sourceType.Type, invalidArgument.Expression, syntaxGenerator);
+            var argumentList = FindBestArgumentsMatch(methodSymbol, cancellationToken, mappingSourceFinder);
             if (argumentList == null)
             {
                 return document;
@@ -64,28 +64,27 @@ namespace MappingGenerator
             return document.WithSyntaxRoot(newRoot);
         }
 
-        private static ArgumentListSyntax FindBestArgumentsMatch(IMethodSymbol methodSymbol, IReadOnlyList<IPropertySymbol> sourceMembers, SyntaxGenerator syntaxGenerator, ArgumentSyntax invalidArgument, CancellationToken cancellationToken)
+        private static ArgumentListSyntax FindBestArgumentsMatch(IMethodSymbol methodSymbol, CancellationToken cancellationToken, MappingSourceFinder mappingSourceFinder)
         {
             return methodSymbol.DeclaringSyntaxReferences.Select(ds =>
                 {
                     var declaration = (MethodDeclarationSyntax) ds.GetSyntax(cancellationToken);
-                    return FindArgumentsMatch(sourceMembers, syntaxGenerator, invalidArgument, declaration);
+                    return FindArgumentsMatch(declaration, mappingSourceFinder);
                 })
                 .Where(x => x.Arguments.Count > 0)
                 .OrderByDescending(argumentList => argumentList.Arguments.Count)
                 .FirstOrDefault();
         }
 
-        private static ArgumentListSyntax FindArgumentsMatch(IReadOnlyList<IPropertySymbol> sourceMembers, SyntaxGenerator syntaxGenerator, ArgumentSyntax invalidArgument, MethodDeclarationSyntax declaration)
+        private static ArgumentListSyntax FindArgumentsMatch(MethodDeclarationSyntax declaration, MappingSourceFinder mappingSourceFinder)
         {
             var argumentList = SyntaxFactory.ArgumentList();
             foreach (var parameter in declaration.ParameterList.Parameters)
             {
-                var sourceMember = sourceMembers.FirstOrDefault(x => x.Name.ToLower() == parameter.Identifier.Text.ToLower());
-                if (sourceMember != null)
+                var mappingSource = mappingSourceFinder.FindMappingSource(parameter.Identifier.Text);
+                if (mappingSource != null)
                 {
-                    var sourceAccess = syntaxGenerator.MemberAccessExpression(invalidArgument.Expression, sourceMember.Name);
-                    var argument = SyntaxFactory.Argument(SyntaxFactory.NameColon(parameter.Identifier.Text), SyntaxFactory.Token(SyntaxKind.None), (ExpressionSyntax) sourceAccess);
+                    var argument = SyntaxFactory.Argument(SyntaxFactory.NameColon(parameter.Identifier.Text), SyntaxFactory.Token(SyntaxKind.None), mappingSource.Expression);
                     argumentList = argumentList.AddArguments(argument);
                 }
             }

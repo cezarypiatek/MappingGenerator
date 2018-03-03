@@ -25,7 +25,7 @@ namespace MappingGenerator
         public MappingSource FindMappingSource(string targetName)
         {
             //Direct 1-1 mapping
-            var matchedSourceProperty = sourceProperties.Value.FirstOrDefault(x => x.Name == targetName);
+            var matchedSourceProperty = sourceProperties.Value.FirstOrDefault(x => x.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase));
             if (matchedSourceProperty != null)
             {
                 return new MappingSource()
@@ -36,13 +36,13 @@ namespace MappingGenerator
             }
 
             //Non-direct (mapping like y.UserName = x.User.Name)
-            var partialyMatchedSourceProperty = sourceProperties.Value.FirstOrDefault(x => targetName.StartsWith(x.Name));
+            var partialyMatchedSourceProperty = sourceProperties.Value.FirstOrDefault(x => targetName.StartsWith(x.Name, StringComparison.OrdinalIgnoreCase));
             if (partialyMatchedSourceProperty != null)
             {
                 var subProperties = ObjectHelper.GetPublicPropertySymbols(partialyMatchedSourceProperty.Type).ToList();
                 foreach (var subProperty in subProperties)
                 {
-                    if (targetName == $"{partialyMatchedSourceProperty.Name}{subProperty.Name}")
+                    if (targetName.Equals($"{partialyMatchedSourceProperty.Name}{subProperty.Name}", StringComparison.OrdinalIgnoreCase))
                     {
                         var firstLevelAccessor = generator.MemberAccessExpression(sourceGlobalAccessor, partialyMatchedSourceProperty.Name);
                         return new MappingSource()
@@ -55,7 +55,7 @@ namespace MappingGenerator
             }
 
             //Flattening with function eg. t.Total = s.GetTotal()
-            var matchedSourceMethod = sourceMethods.Value.FirstOrDefault(x => x.Name.EndsWith(targetName));
+            var matchedSourceMethod = sourceMethods.Value.FirstOrDefault(x => x.Name.EndsWith(targetName, StringComparison.OrdinalIgnoreCase));
             if (matchedSourceMethod != null)
             {
                 var sourceMethodAccessor = generator.MemberAccessExpression(sourceGlobalAccessor, matchedSourceMethod.Name);

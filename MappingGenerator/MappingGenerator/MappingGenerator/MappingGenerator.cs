@@ -11,7 +11,6 @@ namespace MappingGenerator
     {
         private readonly SyntaxGenerator generator;
         private readonly SemanticModel semanticModel;
-        private static string[] SimpleTypes = new[] {"String", "Decimal"};
         private static char[] FobiddenSigns = new[] {'.', '[', ']', '(', ')'};
 
         public MappingGenerator(SyntaxGenerator generator, SemanticModel semanticModel)
@@ -62,7 +61,7 @@ namespace MappingGenerator
                 }
             }
 
-            var mappingSourceFinder = new MappingSourceFinder(sourceType, globalSourceAccessor, generator);
+            var mappingSourceFinder = new MappingSourceFinder(sourceType, globalSourceAccessor, generator, semanticModel);
             var targetProperties = ObjectHelper.GetPublicPropertySymbols(targetType).ToList();
             var localTargetIdentifier = targetExists? globbalTargetAccessor: generator.IdentifierName(targetLocalVariableName);
             foreach (var targetProperty in targetProperties)
@@ -72,7 +71,7 @@ namespace MappingGenerator
                     continue;
                 }
 
-                var mappingSource = mappingSourceFinder.FindMappingSource(targetProperty.Name);
+                var mappingSource = mappingSourceFinder.FindMappingSource(targetProperty.Name, targetProperty.Type);
                 if (mappingSource == null)
                 {
                     continue;
@@ -84,7 +83,7 @@ namespace MappingGenerator
                     var collectionMapping = MapCollections(mappingSource.Expression,  mappingSource.ExpressionType,  targetProperty.Type);
                     yield return generator.CompleteAssignmentStatement(targetAccess, collectionMapping);
                 }
-                else if (IsSimpleType(targetProperty.Type) == false)
+                else if (ObjectHelper.IsSimpleType(targetProperty.Type) == false)
                 {   
                     //TODO: What if both sides has the same type?
                     //TODO: Reverse flattening
@@ -97,29 +96,7 @@ namespace MappingGenerator
                 else
                 {
                     var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, targetProperty.Name);
-                    var sourceAccess = mappingSource.Expression as SyntaxNode;
-                    if (targetProperty.Type != mappingSource.ExpressionType)
-                    {
-                        var conversion =  semanticModel.Compilation.ClassifyConversion(mappingSource.ExpressionType, targetProperty.Type);
-                        if (conversion.Exists == false)
-                        {
-                            var wrapper = GetWrappingInfo(mappingSource.ExpressionType, targetProperty.Type);
-                            if (wrapper.Type == WrapperInfoType.Property)
-                            {
-                                sourceAccess = generator.MemberAccessExpression(sourceAccess, wrapper.UnwrappingProperty.Name);
-                            }else if (wrapper.Type == WrapperInfoType.Method)
-                            {
-                                var unwrappingMethodAccess = generator.MemberAccessExpression(sourceAccess, wrapper.UnwrappingMethod.Name);
-                                sourceAccess = generator.InvocationExpression(unwrappingMethodAccess);
-                            }
-
-                        }else if(conversion.IsExplicit)
-                        {
-                            sourceAccess = generator.CastExpression(targetProperty.Type, sourceAccess);
-                        }
-                    }
-                    
-                    yield return generator.CompleteAssignmentStatement(targetAccess, sourceAccess);
+                    yield return generator.CompleteAssignmentStatement(targetAccess,  mappingSource.Expression);
                 }
             }
 
@@ -138,7 +115,7 @@ namespace MappingGenerator
             var isReadolyCollection = targetListType.Name == "ReadOnlyCollection";
             var sourceListElementType = GetElementType(sourceListType);
             var targetListElementType = GetElementType(targetListType);
-            if (IsSimpleType(sourceListElementType) || sourceListElementType == targetListElementType)
+            if (ObjectHelper.IsSimpleType(sourceListElementType) || sourceListElementType == targetListElementType)
             {
                 var toListInvocation = AddMaterializeCollectionInvocation(generator, sourceAccess, targetListType);
                 return WrapInReadonlyCollectionIfNecessary(isReadolyCollection, toListInvocation, generator);
@@ -197,10 +174,7 @@ namespace MappingGenerator
             return null;
         }
 
-        private static bool IsSimpleType(ITypeSymbol type)
-        {
-            return type.IsValueType || SimpleTypes.Contains(type.Name);
-        }
+      
 
         private static string ToLocalVariableName(string proposalLocalName)
         {
@@ -225,22 +199,6 @@ namespace MappingGenerator
         private static bool HasInterface(ITypeSymbol xt, string interfaceName)
         {
             return xt.OriginalDefinition.AllInterfaces.Any(x => x.ToDisplayString() == interfaceName);
-        }
-
-        private static WrapperInfo GetWrappingInfo(ITypeSymbol wrapperType, ITypeSymbol wrappedType)
-        {
-            var unwrappingProperties = ObjectHelper.GetUnwrappingProperties(wrapperType, wrappedType).ToList();
-            var unwrappingMethods = ObjectHelper.GetUnwrappingMethods(wrapperType, wrappedType).ToList();
-            if (unwrappingMethods.Count + unwrappingProperties.Count == 1)
-            {
-                if (unwrappingMethods.Count == 1)
-                {
-                    return new WrapperInfo(unwrappingMethods.First());
-                }
-
-                return new WrapperInfo(unwrappingProperties.First());
-            }
-            return new WrapperInfo();
         }
     }
 }

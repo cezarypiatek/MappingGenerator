@@ -71,5 +71,12 @@ namespace MappingGenerator
         {
             return current.Name == "Object" && current.ContainingNamespace.Name =="System";
         }
+
+        private static string[] SimpleTypes = new[] {"String", "Decimal"};
+
+        public static bool IsSimpleType(ITypeSymbol type)
+        {
+            return type.IsValueType || SimpleTypes.Contains(type.Name);
+        }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 
 namespace MappingGenerator
@@ -38,12 +39,13 @@ namespace MappingGenerator
             }
             
             var targetLocalVariableName = globbalTargetAccessor ==null? ToLocalVariableName(targetType.Name): ToLocalVariableName(globbalTargetAccessor.ToFullString());
+            var mappingSourceFinder = new MappingSourceFinder(sourceType, globalSourceAccessor, generator, semanticModel);
             if (targetExists == false)
             {
-                var copyConstructor = FindCopyConstructor(targetType, sourceType);
-                if (copyConstructor != null)
+                var mappingConstructorParameters = FindMappingConstructorParameters(targetType, sourceType, mappingSourceFinder, (ExpressionSyntax) globalSourceAccessor);
+                if (mappingConstructorParameters != null)
                 {
-                    var init = generator.ObjectCreationExpression(targetType, globalSourceAccessor);
+                    var init = generator.ObjectCreationExpression(targetType, mappingConstructorParameters.Arguments);
                     if (globbalTargetAccessor == null)
                     {
                         yield return generator.ContextualReturnStatement(init, generatorContext);
@@ -61,10 +63,8 @@ namespace MappingGenerator
                 }
             }
 
-            var mappingSourceFinder = new MappingSourceFinder(sourceType, globalSourceAccessor, generator, semanticModel);
-            var targetProperties = ObjectHelper.GetPublicPropertySymbols(targetType).ToList();
             var localTargetIdentifier = targetExists? globbalTargetAccessor: generator.IdentifierName(targetLocalVariableName);
-            foreach (var targetProperty in targetProperties)
+            foreach (var targetProperty in ObjectHelper.GetPublicPropertySymbols(targetType))
             {
                 if (targetProperty.SetMethod.DeclaredAccessibility != Accessibility.Public && globbalTargetAccessor.Kind() != SyntaxKind.ThisExpression)
                 {
@@ -165,16 +165,20 @@ namespace MappingGenerator
                    && (HasInterface(sourceClassSymbol, "System.Collections.Generic.IEnumerable<T>") || sourceClassSymbol.Kind == SymbolKind.ArrayType);
         }
 
-        private static IMethodSymbol FindCopyConstructor(ITypeSymbol type, ITypeSymbol constructorParameterType)
+        private static ArgumentListSyntax FindMappingConstructorParameters(ITypeSymbol targetType, ITypeSymbol sourceType, MappingSourceFinder mappingSourceFinder, ExpressionSyntax globalSourceAccessor)
         {
-            if (type is INamedTypeSymbol namedType)
+            if (targetType is INamedTypeSymbol namedType)
             {
-                return namedType.Constructors.FirstOrDefault(c => c.Parameters.Length == 1 && c.Parameters[0].Type == constructorParameterType);
+                var directlyMappingConstructor = namedType.Constructors.FirstOrDefault(c => c.Parameters.Length == 1 && c.Parameters[0].Type == sourceType);
+                if (directlyMappingConstructor != null)
+                {
+                    return SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument(globalSourceAccessor));
+                }
+                var constructorOverloadParameterSets = namedType.Constructors.Select(x=>x.Parameters);
+                return MethodHelper.FindBestArgumentsMatch(mappingSourceFinder, constructorOverloadParameterSets);
             }
             return null;
         }
-
-      
 
         private static string ToLocalVariableName(string proposalLocalName)
         {

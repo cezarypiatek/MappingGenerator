@@ -64,34 +64,15 @@ namespace MappingGenerator
             return document.WithSyntaxRoot(newRoot);
         }
 
-        private static ArgumentListSyntax FindBestArgumentsMatch(IMethodSymbol methodSymbol,
-            CancellationToken cancellationToken, MappingSourceFinder mappingSourceFinder, SemanticModel semanticModel)
+        private static ArgumentListSyntax FindBestArgumentsMatch(IMethodSymbol methodSymbol, CancellationToken cancellationToken, MappingSourceFinder mappingSourceFinder, SemanticModel semanticModel)
         {
-            
-            return methodSymbol.DeclaringSyntaxReferences.Select(ds =>
-                {
-                    var overloadDeclaration = (MethodDeclarationSyntax) ds.GetSyntax(cancellationToken);
-                    var overloadMethod = semanticModel.GetDeclaredSymbol(overloadDeclaration);
-                    return FindArgumentsMatch(overloadMethod, mappingSourceFinder);
-                })
-                .Where(x => x.Arguments.Count > 0)
-                .OrderByDescending(argumentList => argumentList.Arguments.Count)
-                .FirstOrDefault();
-        }
-
-        private static ArgumentListSyntax FindArgumentsMatch(IMethodSymbol methodSymbol, MappingSourceFinder mappingSourceFinder)
-        {
-            var argumentList = SyntaxFactory.ArgumentList();
-            foreach (var parameter in methodSymbol.Parameters)
+            var overloadParameterSets = methodSymbol.DeclaringSyntaxReferences.Select(ds =>
             {
-                var mappingSource = mappingSourceFinder.FindMappingSource(parameter.Name, parameter.Type);
-                if (mappingSource != null)
-                {
-                    var argument = SyntaxFactory.Argument(SyntaxFactory.NameColon(parameter.Name), SyntaxFactory.Token(SyntaxKind.None), mappingSource.Expression);
-                    argumentList = argumentList.AddArguments(argument);
-                }
-            }
-            return argumentList;
+                var overloadDeclaration = (MethodDeclarationSyntax) ds.GetSyntax(cancellationToken);
+                var overloadMethod = semanticModel.GetDeclaredSymbol(overloadDeclaration);
+                return overloadMethod.Parameters;
+            });
+            return MethodHelper.FindBestArgumentsMatch(mappingSourceFinder, overloadParameterSets);
         }
 
         private InvocationExpressionSyntax FindMethodInvocation(SyntaxNode tokenParent)

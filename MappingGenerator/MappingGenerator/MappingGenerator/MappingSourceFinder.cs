@@ -10,6 +10,7 @@ namespace MappingGenerator
 {
     public class MappingSourceFinder
     {
+        private readonly ITypeSymbol sourceType;
         private readonly SyntaxNode sourceGlobalAccessor;
         private readonly SyntaxGenerator generator;
         private readonly SemanticModel semanticModel;
@@ -18,6 +19,7 @@ namespace MappingGenerator
 
         public MappingSourceFinder(ITypeSymbol sourceType, SyntaxNode sourceGlobalAccessor, SyntaxGenerator generator, SemanticModel semanticModel)
         {
+            this.sourceType = sourceType;
             this.sourceGlobalAccessor = sourceGlobalAccessor;
             this.generator = generator;
             this.semanticModel = semanticModel;
@@ -43,44 +45,25 @@ namespace MappingGenerator
         private MappingSource FindSource(string targetName)
         {
             //Direct 1-1 mapping
-            var matchedSourceProperty =
-                sourceProperties.Value.FirstOrDefault(x => x.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase));
+            var matchedSourceProperty = sourceProperties.Value.FirstOrDefault(x => x.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase));
             if (matchedSourceProperty != null)
             {
                 return new MappingSource()
                 {
-                    Expression =
-                        (ExpressionSyntax) generator.MemberAccessExpression(sourceGlobalAccessor, matchedSourceProperty.Name),
+                    Expression = (ExpressionSyntax) generator.MemberAccessExpression(sourceGlobalAccessor, matchedSourceProperty.Name),
                     ExpressionType = matchedSourceProperty.Type
                 };
             }
 
             //Non-direct (mapping like y.UserName = x.User.Name)
-            var partialyMatchedSourceProperty =
-                sourceProperties.Value.FirstOrDefault(x => targetName.StartsWith(x.Name, StringComparison.OrdinalIgnoreCase));
-            if (partialyMatchedSourceProperty != null)
+            var source = FindSubPropertySource(targetName, sourceType, sourceProperties.Value, sourceGlobalAccessor);
+            if (source != null)
             {
-                var subProperties = ObjectHelper.GetPublicPropertySymbols(partialyMatchedSourceProperty.Type).ToList();
-                foreach (var subProperty in subProperties)
-                {
-                    if (targetName.Equals($"{partialyMatchedSourceProperty.Name}{subProperty.Name}",
-                        StringComparison.OrdinalIgnoreCase))
-                    {
-                        var firstLevelAccessor =
-                            generator.MemberAccessExpression(sourceGlobalAccessor, partialyMatchedSourceProperty.Name);
-                        return new MappingSource()
-                        {
-                            Expression =
-                                (ExpressionSyntax) generator.MemberAccessExpression(firstLevelAccessor, subProperty.Name),
-                            ExpressionType = subProperty.Type
-                        };
-                    }
-                }
+                return source;
             }
 
             //Flattening with function eg. t.Total = s.GetTotal()
-            var matchedSourceMethod =
-                sourceMethods.Value.FirstOrDefault(x => x.Name.EndsWith(targetName, StringComparison.OrdinalIgnoreCase));
+            var matchedSourceMethod = sourceMethods.Value.FirstOrDefault(x => x.Name.EndsWith(targetName, StringComparison.OrdinalIgnoreCase));
             if (matchedSourceMethod != null)
             {
                 var sourceMethodAccessor = generator.MemberAccessExpression(sourceGlobalAccessor, matchedSourceMethod.Name);
@@ -91,6 +74,31 @@ namespace MappingGenerator
                 };
             }
 
+            return null;
+        }
+
+        private MappingSource FindSubPropertySource(string targetName, ITypeSymbol containingType, IEnumerable<IPropertySymbol> properties, SyntaxNode currentAccessor, string prefix=null)
+        {
+            if (ObjectHelper.IsSimpleType(containingType))
+            {
+                return null;
+            }
+
+            var subProperty = properties.FirstOrDefault(x=> targetName.StartsWith($"{prefix}{x.Name}", StringComparison.OrdinalIgnoreCase));
+            if (subProperty != null)
+            {
+                var currentNamePart = $"{prefix}{subProperty.Name}";
+                var subPropertyAccessor = (ExpressionSyntax) generator.MemberAccessExpression(currentAccessor, subProperty.Name);
+                if (targetName.Equals(currentNamePart, StringComparison.OrdinalIgnoreCase))
+                {
+                    return new MappingSource
+                    {
+                        Expression = subPropertyAccessor,
+                        ExpressionType = subProperty.Type
+                    };
+                }
+                return FindSubPropertySource(targetName, subProperty.Type, ObjectHelper.GetPublicPropertySymbols(subProperty.Type),  subPropertyAccessor, currentNamePart);
+            }
             return null;
         }
 

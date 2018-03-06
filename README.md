@@ -64,6 +64,11 @@ public void UpdateWith(UserEntity en)
 
 ![cs0266](/doc/cs0266.jpg)
 
+CS7036 There is no argument given that corresponds to the required formal parameter 
+
+![CS7036](/doc/splatting.gif)
+
+
 ## Mapping features
 - Mapping Property-To-Property
   ```csharp

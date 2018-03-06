@@ -137,10 +137,13 @@ CS7036 There is no argument given that corresponds to the required formal parame
         public CustomerKind Kind { get; set; }
     }
   ```
-- Using existing mapping constructor
+- Using existing direct mapping constructor
   ```csharp
   target.MainAddress = new AddressDTO(source.MainAddress);
   ```
 
-
+- using existing multi-parameter constuctor
+  ```csharp
+  this.User =  new UserDTO(firstName: entity.FirstName, lastName: entity.LastName, age: entity.Age);
+  ```
 

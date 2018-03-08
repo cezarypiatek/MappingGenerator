@@ -32,6 +32,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="EmptyInitializationBlockAnalyzer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="EmptyInitializationBlockCodeFixProvider.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="ExplicitConversionCodeFixProvider.cs">
       <SubType>Code</SubType>
     </Compile>

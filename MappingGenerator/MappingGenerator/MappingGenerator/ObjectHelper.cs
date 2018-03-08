@@ -39,7 +39,7 @@ namespace MappingGenerator
 
         public static IEnumerable<IPropertySymbol> GetUnwrappingProperties(ITypeSymbol wrapperType, ITypeSymbol wrappedType)
         {
-            return GetPublicPropertySymbols(wrapperType).Where(x => x.SetMethod.DeclaredAccessibility == Accessibility.Public && x.Type == wrappedType);
+            return GetPublicPropertySymbols(wrapperType).Where(x => x.GetMethod.DeclaredAccessibility == Accessibility.Public && x.Type == wrappedType);
         }
 
         public static IEnumerable<IMethodSymbol> GetUnwrappingMethods(ITypeSymbol wrapperType, ITypeSymbol wrappedType)

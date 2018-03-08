@@ -1,6 +1,4 @@
-using System;
 using System.Composition;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -32,7 +30,7 @@ namespace MappingGenerator
             var diagnostic = context.Diagnostics.First();
             var token = root.FindToken(diagnostic.Location.SourceSpan.Start);
             
-            var statement = FindMethodInvocation(token.Parent);
+            var statement = token.Parent.FindContainer<InvocationExpressionSyntax>();
             if (statement == null)
             {
                 return;
@@ -73,16 +71,6 @@ namespace MappingGenerator
                 return overloadMethod.Parameters;
             });
             return MethodHelper.FindBestArgumentsMatch(mappingSourceFinder, overloadParameterSets);
-        }
-
-        private InvocationExpressionSyntax FindMethodInvocation(SyntaxNode tokenParent)
-        {
-            if (tokenParent is InvocationExpressionSyntax invocation)
-            {
-                return invocation;
-            }
-
-            return tokenParent.Parent == null ? null : FindMethodInvocation(tokenParent.Parent);
         }
     }
 }

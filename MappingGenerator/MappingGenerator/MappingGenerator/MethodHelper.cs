@@ -9,7 +9,8 @@ namespace MappingGenerator
 {
     public static class MethodHelper
     {
-        public static ArgumentListSyntax FindBestArgumentsMatch(IMethodSymbol methodSymbol, SemanticModel semanticModel, IMappingSourceFinder mappingSourceFinder)
+        public static MatchedParameterList FindBestParametersMatch(IMethodSymbol methodSymbol, SemanticModel semanticModel,
+            IMappingSourceFinder mappingSourceFinder)
         {
             var overloadParameterSets = methodSymbol.DeclaringSyntaxReferences.Select(ds =>
             {
@@ -17,31 +18,27 @@ namespace MappingGenerator
                 var overloadMethod = semanticModel.GetDeclaredSymbol(overloadDeclaration);
                 return overloadMethod.Parameters;
             });
-            return FindBestArgumentsMatch(mappingSourceFinder, overloadParameterSets);
+            return FindBestParametersMatch(mappingSourceFinder, overloadParameterSets);
         }
 
-        public static ArgumentListSyntax FindBestArgumentsMatch(IMappingSourceFinder mappingSourceFinder, IEnumerable<ImmutableArray<IParameterSymbol>> overloadParameterSets)
+        public static MatchedParameterList FindBestParametersMatch(IMappingSourceFinder mappingSourceFinder, IEnumerable<ImmutableArray<IParameterSymbol>> overloadParameterSets)
         {
-            return overloadParameterSets
-                .Select(x=> FindArgumentsMatch(x, mappingSourceFinder))
-                .Where(x => x.Arguments.Count > 0)
-                .OrderByDescending(argumentList => argumentList.Arguments.Count)
+            return overloadParameterSets.Select(x=> FindArgumentsMatch(x, mappingSourceFinder))
+                .Where(x=>x.HasAnyMatch())
+                .OrderByDescending(x=> x.IsCompletlyMatched())
+                .ThenByDescending(x => x.MatchedCount)
                 .FirstOrDefault();
         }
 
-        private static ArgumentListSyntax FindArgumentsMatch(ImmutableArray<IParameterSymbol> parameters, IMappingSourceFinder mappingSourceFinder)
+        private static MatchedParameterList FindArgumentsMatch(ImmutableArray<IParameterSymbol> parameters, IMappingSourceFinder mappingSourceFinder)
         {
-            var argumentList = SyntaxFactory.ArgumentList();
+            var matchedArgumentList = new MatchedParameterList();
             foreach (var parameter in parameters)
             {
                 var mappingSource = mappingSourceFinder.FindMappingSource(parameter.Name, parameter.Type);
-                if (mappingSource != null)
-                {
-                    var argument = SyntaxFactory.Argument(SyntaxFactory.NameColon(parameter.Name), SyntaxFactory.Token(SyntaxKind.None), mappingSource.Expression);
-                    argumentList = argumentList.AddArguments(argument);
-                }
+                matchedArgumentList.AddMatch(parameter, mappingSource?.Expression);
             }
-            return argumentList;
+            return matchedArgumentList;
         }
     }
 }

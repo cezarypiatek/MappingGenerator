@@ -1,6 +1,7 @@
 using System.Composition;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
@@ -9,6 +10,7 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
+using Microsoft.CodeAnalysis.Formatting;
 
 namespace MappingGenerator
 {
@@ -35,10 +37,12 @@ namespace MappingGenerator
             {
                 return;
             }
-            context.RegisterCodeFix(CodeAction.Create(title: title, createChangedDocument: c => GenerateSplatting(context.Document, statement, c), equivalenceKey: title), diagnostic);
+
+            context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with value parameters", createChangedDocument: c => GenerateSplatting(context.Document, statement, false, c), equivalenceKey: "Generate splatting with value parameters"), diagnostic);
+            context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with named parameters", createChangedDocument: c => GenerateSplatting(context.Document, statement, true, c), equivalenceKey: "Generate splatting with named parameters"), diagnostic);
         }
 
-        private async Task<Document> GenerateSplatting(Document document, InvocationExpressionSyntax invocationExpression, CancellationToken cancellationToken)
+        private async Task<Document> GenerateSplatting(Document document,  InvocationExpressionSyntax invocationExpression, bool generateNamedParameters, CancellationToken cancellationToken)
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
 
@@ -59,11 +63,11 @@ namespace MappingGenerator
                 return document;
             }
 
-            var argumentList = parametersMatch.ToArgumentListSyntax(syntaxGenerator);
+            var argumentList = parametersMatch.ToArgumentListSyntax(syntaxGenerator, generateNamedParameters);
             var newRoot = root.ReplaceNode(invocationExpression, invocationExpression.WithArgumentList(argumentList));
             return document.WithSyntaxRoot(newRoot);
         }
 
-       
-    }
+
+}
 }

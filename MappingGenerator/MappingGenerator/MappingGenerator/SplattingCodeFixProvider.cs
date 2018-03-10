@@ -31,7 +31,7 @@ namespace MappingGenerator
             var token = root.FindToken(diagnostic.Location.SourceSpan.Start);
             
             var statement = token.Parent.FindContainer<InvocationExpressionSyntax>();
-            if (statement == null)
+            if (statement == null || statement.ArgumentList.Arguments.Count != 1)
             {
                 return;
             }

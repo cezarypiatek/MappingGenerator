@@ -8,6 +8,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Editing;
 
 namespace MappingGenerator
 {
@@ -46,10 +47,12 @@ namespace MappingGenerator
             if (methodSymbol != null)
             {
                 var mappingSourceFinder = new LocalScopeMappingSourceFinder(semanticModel, invocationExpression);
-                var argumentList = MethodHelper.FindBestArgumentsMatch(methodSymbol, semanticModel, mappingSourceFinder);
-                if (argumentList != null)
+                var parametersMatch = MethodHelper.FindBestParametersMatch(methodSymbol, semanticModel, mappingSourceFinder);
+                if (parametersMatch != null)
                 {
                     var root = await document.GetSyntaxRootAsync(cancellationToken);
+                    var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
+                    var argumentList = parametersMatch.ToArgumentListSyntax(syntaxGenerator);
                     var newRoot = root.ReplaceNode(invocationExpression, invocationExpression.WithArgumentList(argumentList));
                     return document.WithSyntaxRoot(newRoot);
                 }

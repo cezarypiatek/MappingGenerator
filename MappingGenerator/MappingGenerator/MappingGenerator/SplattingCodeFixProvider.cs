@@ -53,11 +53,13 @@ namespace MappingGenerator
             var sourceType = semanticModel.GetTypeInfo(invalidArgument.Expression);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
             var mappingSourceFinder = new ObjectMembersMappingSourceFinder(sourceType.Type, invalidArgument.Expression, syntaxGenerator, semanticModel);
-            var argumentList = MethodHelper.FindBestArgumentsMatch(methodSymbol, semanticModel, mappingSourceFinder);
-            if (argumentList == null)
+            var parametersMatch = MethodHelper.FindBestParametersMatch(methodSymbol, semanticModel, mappingSourceFinder);
+            if (parametersMatch == null)
             {
                 return document;
             }
+
+            var argumentList = parametersMatch.ToArgumentListSyntax(syntaxGenerator);
             var newRoot = root.ReplaceNode(invocationExpression, invocationExpression.WithArgumentList(argumentList));
             return document.WithSyntaxRoot(newRoot);
         }

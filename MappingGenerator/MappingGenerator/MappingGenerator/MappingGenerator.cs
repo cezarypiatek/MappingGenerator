@@ -165,7 +165,7 @@ namespace MappingGenerator
                    && (HasInterface(sourceClassSymbol, "System.Collections.Generic.IEnumerable<T>") || sourceClassSymbol.Kind == SymbolKind.ArrayType);
         }
 
-        private static ArgumentListSyntax FindMappingConstructorParameters(ITypeSymbol targetType, ITypeSymbol sourceType, ObjectMembersMappingSourceFinder mappingSourceFinder, ExpressionSyntax globalSourceAccessor)
+        private ArgumentListSyntax FindMappingConstructorParameters(ITypeSymbol targetType, ITypeSymbol sourceType, ObjectMembersMappingSourceFinder mappingSourceFinder, ExpressionSyntax globalSourceAccessor)
         {
             if (targetType is INamedTypeSymbol namedType)
             {
@@ -175,7 +175,7 @@ namespace MappingGenerator
                     return SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument(globalSourceAccessor));
                 }
                 var constructorOverloadParameterSets = namedType.Constructors.Select(x=>x.Parameters);
-                return MethodHelper.FindBestArgumentsMatch(mappingSourceFinder, constructorOverloadParameterSets);
+                return MethodHelper.FindBestParametersMatch(mappingSourceFinder, constructorOverloadParameterSets)?.ToArgumentListSyntax(generator);
             }
             return null;
         }

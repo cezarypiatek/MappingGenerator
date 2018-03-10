@@ -8,7 +8,12 @@ using Microsoft.CodeAnalysis.Editing;
 
 namespace MappingGenerator
 {
-    public class MappingSourceFinder
+    public interface IMappingSourceFinder
+    {
+        MappingSource FindMappingSource(string targetName, ITypeSymbol targetType);
+    }
+
+    public class ObjectMembersMappingSourceFinder : IMappingSourceFinder
     {
         private readonly ITypeSymbol sourceType;
         private readonly SyntaxNode sourceGlobalAccessor;
@@ -17,7 +22,7 @@ namespace MappingGenerator
         private readonly Lazy<IReadOnlyList<IPropertySymbol>> sourceProperties;
         private readonly Lazy<IReadOnlyList<IMethodSymbol>> sourceMethods;
 
-        public MappingSourceFinder(ITypeSymbol sourceType, SyntaxNode sourceGlobalAccessor, SyntaxGenerator generator, SemanticModel semanticModel)
+        public ObjectMembersMappingSourceFinder(ITypeSymbol sourceType, SyntaxNode sourceGlobalAccessor, SyntaxGenerator generator, SemanticModel semanticModel)
         {
             this.sourceType = sourceType;
             this.sourceGlobalAccessor = sourceGlobalAccessor;

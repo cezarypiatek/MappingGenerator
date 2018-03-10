@@ -52,8 +52,8 @@ namespace MappingGenerator
             var invalidArgument = invocationExpression.ArgumentList.Arguments.First();
             var sourceType = semanticModel.GetTypeInfo(invalidArgument.Expression);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
-            var mappingSourceFinder = new MappingSourceFinder(sourceType.Type, invalidArgument.Expression, syntaxGenerator, semanticModel);
-            var argumentList = FindBestArgumentsMatch(methodSymbol, cancellationToken, mappingSourceFinder, semanticModel);
+            var mappingSourceFinder = new ObjectMembersMappingSourceFinder(sourceType.Type, invalidArgument.Expression, syntaxGenerator, semanticModel);
+            var argumentList = MethodHelper.FindBestArgumentsMatch(methodSymbol, semanticModel, mappingSourceFinder);
             if (argumentList == null)
             {
                 return document;
@@ -62,15 +62,6 @@ namespace MappingGenerator
             return document.WithSyntaxRoot(newRoot);
         }
 
-        private static ArgumentListSyntax FindBestArgumentsMatch(IMethodSymbol methodSymbol, CancellationToken cancellationToken, MappingSourceFinder mappingSourceFinder, SemanticModel semanticModel)
-        {
-            var overloadParameterSets = methodSymbol.DeclaringSyntaxReferences.Select(ds =>
-            {
-                var overloadDeclaration = (MethodDeclarationSyntax) ds.GetSyntax(cancellationToken);
-                var overloadMethod = semanticModel.GetDeclaredSymbol(overloadDeclaration);
-                return overloadMethod.Parameters;
-            });
-            return MethodHelper.FindBestArgumentsMatch(mappingSourceFinder, overloadParameterSets);
-        }
+       
     }
 }

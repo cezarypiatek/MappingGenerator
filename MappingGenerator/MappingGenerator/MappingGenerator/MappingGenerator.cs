@@ -39,7 +39,7 @@ namespace MappingGenerator
             }
             
             var targetLocalVariableName = globbalTargetAccessor ==null? ToLocalVariableName(targetType.Name): ToLocalVariableName(globbalTargetAccessor.ToFullString());
-            var mappingSourceFinder = new MappingSourceFinder(sourceType, globalSourceAccessor, generator, semanticModel);
+            var mappingSourceFinder = new ObjectMembersMappingSourceFinder(sourceType, globalSourceAccessor, generator, semanticModel);
             if (targetExists == false)
             {
                 var mappingConstructorParameters = FindMappingConstructorParameters(targetType, sourceType, mappingSourceFinder, (ExpressionSyntax) globalSourceAccessor);
@@ -165,7 +165,7 @@ namespace MappingGenerator
                    && (HasInterface(sourceClassSymbol, "System.Collections.Generic.IEnumerable<T>") || sourceClassSymbol.Kind == SymbolKind.ArrayType);
         }
 
-        private static ArgumentListSyntax FindMappingConstructorParameters(ITypeSymbol targetType, ITypeSymbol sourceType, MappingSourceFinder mappingSourceFinder, ExpressionSyntax globalSourceAccessor)
+        private static ArgumentListSyntax FindMappingConstructorParameters(ITypeSymbol targetType, ITypeSymbol sourceType, ObjectMembersMappingSourceFinder mappingSourceFinder, ExpressionSyntax globalSourceAccessor)
         {
             if (targetType is INamedTypeSymbol namedType)
             {

@@ -9,7 +9,18 @@ namespace MappingGenerator
 {
     public static class MethodHelper
     {
-        public static ArgumentListSyntax FindBestArgumentsMatch(MappingSourceFinder mappingSourceFinder, IEnumerable<ImmutableArray<IParameterSymbol>> overloadParameterSets)
+        public static ArgumentListSyntax FindBestArgumentsMatch(IMethodSymbol methodSymbol, SemanticModel semanticModel, IMappingSourceFinder mappingSourceFinder)
+        {
+            var overloadParameterSets = methodSymbol.DeclaringSyntaxReferences.Select(ds =>
+            {
+                var overloadDeclaration = (MethodDeclarationSyntax) ds.GetSyntax();
+                var overloadMethod = semanticModel.GetDeclaredSymbol(overloadDeclaration);
+                return overloadMethod.Parameters;
+            });
+            return FindBestArgumentsMatch(mappingSourceFinder, overloadParameterSets);
+        }
+
+        public static ArgumentListSyntax FindBestArgumentsMatch(IMappingSourceFinder mappingSourceFinder, IEnumerable<ImmutableArray<IParameterSymbol>> overloadParameterSets)
         {
             return overloadParameterSets
                 .Select(x=> FindArgumentsMatch(x, mappingSourceFinder))
@@ -18,7 +29,7 @@ namespace MappingGenerator
                 .FirstOrDefault();
         }
 
-        private static ArgumentListSyntax FindArgumentsMatch(ImmutableArray<IParameterSymbol> parameters, MappingSourceFinder mappingSourceFinder)
+        private static ArgumentListSyntax FindArgumentsMatch(ImmutableArray<IParameterSymbol> parameters, IMappingSourceFinder mappingSourceFinder)
         {
             var argumentList = SyntaxFactory.ArgumentList();
             foreach (var parameter in parameters)

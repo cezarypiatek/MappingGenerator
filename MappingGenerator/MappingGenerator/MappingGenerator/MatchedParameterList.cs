@@ -43,14 +43,15 @@ namespace MappingGenerator
         {
             return Matches.Aggregate(SyntaxFactory.ArgumentList(), (list, match) =>
             {
-                if (generateNamedParameters && match.MatchedExpression == null && match.Parameter.IsOptional)
+                if (match.MatchedExpression == null && match.Parameter.IsOptional)
                 {
+                    generateNamedParameters = true;
                     return list;
                 }
 
-                var expression = match.MatchedExpression ?? (ExpressionSyntax)generator.DefaultExpression((ITypeSymbol) match.Parameter.Type);
+                var expression = match.MatchedExpression ?? (ExpressionSyntax)generator.DefaultExpression(match.Parameter.Type);
                 var argument = generateNamedParameters
-                    ? SyntaxFactory.Argument(SyntaxFactory.NameColon((string) match.Parameter.Name), SyntaxFactory.Token(SyntaxKind.None), expression)
+                    ? SyntaxFactory.Argument(SyntaxFactory.NameColon(match.Parameter.Name), SyntaxFactory.Token(SyntaxKind.None), expression)
                     : SyntaxFactory.Argument(expression);
                 return list.AddArguments(argument);
             });

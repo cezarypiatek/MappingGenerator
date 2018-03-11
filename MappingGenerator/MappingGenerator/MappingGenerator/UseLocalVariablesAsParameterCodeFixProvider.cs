@@ -16,6 +16,7 @@ namespace MappingGenerator
     public class UseLocalVariablesAsParameterCodeFixProvider : CodeFixProvider
     {
         private const string title = "Use local variables as parameters";
+        private const string titleWithNamed = "Use local variables as named parameters";
         
         public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create("CS1501", "CS7036");
 
@@ -36,10 +37,11 @@ namespace MappingGenerator
                 return;
             }
 
-            context.RegisterCodeFix(CodeAction.Create(title: title, createChangedDocument: c => UseLocalVariablesAsParameters(context.Document, statement, c), equivalenceKey: title), diagnostic);
+            context.RegisterCodeFix(CodeAction.Create(title: title, createChangedDocument: c => UseLocalVariablesAsParameters(context.Document, statement, false, c), equivalenceKey: title), diagnostic);
+            context.RegisterCodeFix(CodeAction.Create(title: titleWithNamed, createChangedDocument: c => UseLocalVariablesAsParameters(context.Document, statement, true, c), equivalenceKey: titleWithNamed), diagnostic);
         }
 
-        private async Task<Document> UseLocalVariablesAsParameters(Document document, InvocationExpressionSyntax invocationExpression, CancellationToken cancellationToken)
+        private async Task<Document> UseLocalVariablesAsParameters(Document document, InvocationExpressionSyntax invocationExpression, bool generateNamedParameters, CancellationToken cancellationToken)
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
 
@@ -52,7 +54,7 @@ namespace MappingGenerator
                 {
                     var root = await document.GetSyntaxRootAsync(cancellationToken);
                     var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
-                    var argumentList = parametersMatch.ToArgumentListSyntax(syntaxGenerator);
+                    var argumentList = parametersMatch.ToArgumentListSyntax(syntaxGenerator, generateNamedParameters);
                     var newRoot = root.ReplaceNode(invocationExpression, invocationExpression.WithArgumentList(argumentList));
                     return document.WithSyntaxRoot(newRoot);
                 }

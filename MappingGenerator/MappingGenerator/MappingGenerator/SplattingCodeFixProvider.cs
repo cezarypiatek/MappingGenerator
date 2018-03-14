@@ -68,7 +68,7 @@ namespace MappingGenerator
             }
 
             var argumentList = parametersMatch.ToArgumentListSyntax(syntaxGenerator, generateNamedParameters);
-            return await ReplaceExpressionInDocument(document, invocationExpression, invocationExpression.WithArgumentList(argumentList), cancellationToken);
+            return await document.ReplaceNodes(invocationExpression, invocationExpression.WithArgumentList(argumentList), cancellationToken);
         }
 
         private async Task<Document> GenerateSplatting(Document document, ObjectCreationExpressionSyntax creationExpression, bool generateNamedParameters, CancellationToken cancellationToken)
@@ -85,7 +85,7 @@ namespace MappingGenerator
             }
 
             var argumentList = parametersMatch.ToArgumentListSyntax(syntaxGenerator, generateNamedParameters);
-            return await ReplaceExpressionInDocument(document, creationExpression, creationExpression.WithArgumentList(argumentList), cancellationToken);
+            return await document.ReplaceNodes(creationExpression, creationExpression.WithArgumentList(argumentList), cancellationToken);
         }
 
         private static MatchedParameterList FindParametersMatch(ArgumentListSyntax invalidArgumentList, IEnumerable<ImmutableArray<IParameterSymbol>> overloadParameterSets, SemanticModel semanticModel, SyntaxGenerator syntaxGenerator) 
@@ -100,13 +100,6 @@ namespace MappingGenerator
             var invalidArgument = invalidArgumentList.Arguments.First();
             var sourceType = semanticModel.GetTypeInfo(invalidArgument.Expression).Type;
             return new ObjectMembersMappingSourceFinder(sourceType, invalidArgument.Expression, syntaxGenerator, semanticModel);
-        }
-
-        private static async Task<Document> ReplaceExpressionInDocument(Document document, SyntaxNode oldNode, SyntaxNode newNode, CancellationToken cancellationToken)
-        {
-            var root = await document.GetSyntaxRootAsync(cancellationToken);
-            var newRoot = root.ReplaceNode(oldNode, newNode);
-            return document.WithSyntaxRoot(newRoot);
         }
     }
 }

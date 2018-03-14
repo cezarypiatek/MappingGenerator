@@ -1,3 +1,5 @@
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -20,6 +22,13 @@ namespace MappingGenerator
                 return SyntaxFactory.YieldStatement(SyntaxKind.YieldReturnStatement, nodeToReturn as ExpressionSyntax);
             }
             return generator.ReturnStatement(nodeToReturn);
+        }
+
+        public static async Task<Document> ReplaceNodes(this Document document, SyntaxNode oldNode, SyntaxNode newNode, CancellationToken cancellationToken)
+        {
+            var root = await document.GetSyntaxRootAsync(cancellationToken);
+            var newRoot = root.ReplaceNode(oldNode, newNode);
+            return document.WithSyntaxRoot(newRoot);
         }
     }
 }

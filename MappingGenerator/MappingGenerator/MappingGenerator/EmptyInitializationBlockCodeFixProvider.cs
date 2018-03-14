@@ -54,9 +54,7 @@ namespace MappingGenerator
                 }
                 return expr;
             });
-            var root = await document.GetSyntaxRootAsync(cancellationToken);
-            var newRoot = root.ReplaceNode(objectInitializer, objectInitializer.WithExpressions(initExpressions));
-            return document.WithSyntaxRoot(newRoot);
+            return await document.ReplaceNodes(objectInitializer, objectInitializer.WithExpressions(initExpressions), cancellationToken);
         }
     }
 }

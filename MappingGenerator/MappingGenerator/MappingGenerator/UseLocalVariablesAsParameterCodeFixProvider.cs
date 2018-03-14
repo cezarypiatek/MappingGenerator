@@ -52,11 +52,9 @@ namespace MappingGenerator
                 var parametersMatch = MethodHelper.FindBestParametersMatch(methodSymbol, semanticModel, mappingSourceFinder);
                 if (parametersMatch != null)
                 {
-                    var root = await document.GetSyntaxRootAsync(cancellationToken);
                     var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
                     var argumentList = parametersMatch.ToArgumentListSyntax(syntaxGenerator, generateNamedParameters);
-                    var newRoot = root.ReplaceNode(invocationExpression, invocationExpression.WithArgumentList(argumentList));
-                    return document.WithSyntaxRoot(newRoot);
+                    return await  document.ReplaceNodes(invocationExpression, invocationExpression.WithArgumentList(argumentList), cancellationToken);
                 }
             }
             return document;

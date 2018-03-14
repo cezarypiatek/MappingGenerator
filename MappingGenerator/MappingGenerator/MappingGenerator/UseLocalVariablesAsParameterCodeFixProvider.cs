@@ -31,14 +31,20 @@ namespace MappingGenerator
             var diagnostic = context.Diagnostics.First();
             var token = root.FindToken(diagnostic.Location.SourceSpan.Start);
             
-            var statement = token.Parent.FindContainer<InvocationExpressionSyntax>();
-            if (statement == null || statement.ArgumentList.Arguments.Count != 0)
+            var invocationExpression = token.Parent.FindContainer<InvocationExpressionSyntax>();
+            if (invocationExpression != null && invocationExpression.ArgumentList.Arguments.Count == 0)
             {
+                context.RegisterCodeFix(CodeAction.Create(title: title, createChangedDocument: c => UseLocalVariablesAsParameters(context.Document, invocationExpression, false, c), equivalenceKey: title), diagnostic);
+                context.RegisterCodeFix(CodeAction.Create(title: titleWithNamed, createChangedDocument: c => UseLocalVariablesAsParameters(context.Document, invocationExpression, true, c), equivalenceKey: titleWithNamed), diagnostic);
                 return;
             }
 
-            context.RegisterCodeFix(CodeAction.Create(title: title, createChangedDocument: c => UseLocalVariablesAsParameters(context.Document, statement, false, c), equivalenceKey: title), diagnostic);
-            context.RegisterCodeFix(CodeAction.Create(title: titleWithNamed, createChangedDocument: c => UseLocalVariablesAsParameters(context.Document, statement, true, c), equivalenceKey: titleWithNamed), diagnostic);
+            var creationExpression = token.Parent.FindContainer<ObjectCreationExpressionSyntax>();
+            if (creationExpression != null && creationExpression.ArgumentList.Arguments.Count == 0)
+            {
+                context.RegisterCodeFix(CodeAction.Create(title: title, createChangedDocument: c => UseLocalVariablesAsParameters(context.Document, creationExpression, false, c), equivalenceKey: title+"for constructor"), diagnostic);
+                context.RegisterCodeFix(CodeAction.Create(title: titleWithNamed, createChangedDocument: c => UseLocalVariablesAsParameters(context.Document, creationExpression, true, c), equivalenceKey: titleWithNamed+"for constructor"), diagnostic);
+            }
         }
 
         private async Task<Document> UseLocalVariablesAsParameters(Document document, InvocationExpressionSyntax invocationExpression, bool generateNamedParameters, CancellationToken cancellationToken)
@@ -56,6 +62,24 @@ namespace MappingGenerator
                     var argumentList = parametersMatch.ToArgumentListSyntax(syntaxGenerator, generateNamedParameters);
                     return await  document.ReplaceNodes(invocationExpression, invocationExpression.WithArgumentList(argumentList), cancellationToken);
                 }
+            }
+            return document;
+        }
+
+        private async Task<Document> UseLocalVariablesAsParameters(Document document, ObjectCreationExpressionSyntax creationExpression, bool generateNamedParameters, CancellationToken cancellationToken)
+        {
+            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+
+            var mappingSourceFinder = new LocalScopeMappingSourceFinder(semanticModel, creationExpression);
+            var instantiatedType = (INamedTypeSymbol)semanticModel.GetSymbolInfo(creationExpression.Type).Symbol;
+            var overloadParameterSets = instantiatedType.Constructors.Select(x => x.Parameters);
+
+            var parametersMatch = MethodHelper.FindBestParametersMatch(mappingSourceFinder, overloadParameterSets);
+            if (parametersMatch != null)
+            {
+                var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
+                var argumentList = parametersMatch.ToArgumentListSyntax(syntaxGenerator, generateNamedParameters);
+                return await  document.ReplaceNodes(creationExpression, creationExpression.WithArgumentList(argumentList), cancellationToken);
             }
             return document;
         }

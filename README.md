@@ -2,8 +2,8 @@
 
 |Branch   | Status  |
 |---------|---------|
-|Master   | ![Build status](https://ci.appveyor.com/api/projects/status/v73nnoo09cc8kkmo/branch/master?svg=true)|
-|Develop  | ![Build status](https://ci.appveyor.com/api/projects/status/v73nnoo09cc8kkmo/branch/develop?svg=true)|
+|Master   | [![Build status](https://ci.appveyor.com/api/projects/status/v73nnoo09cc8kkmo/branch/master?svg=true)](https://ci.appveyor.com/project/cezarypiatek/mappinggenerator/branch/master)|
+|Develop  | [![Build status](https://ci.appveyor.com/api/projects/status/v73nnoo09cc8kkmo/branch/develop?svg=true)](https://ci.appveyor.com/project/cezarypiatek/mappinggenerator/branch/develop)|
 
 
 

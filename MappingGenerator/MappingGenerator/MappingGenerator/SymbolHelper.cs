@@ -1,8 +1,9 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Linq;
+using Microsoft.CodeAnalysis;
 
 namespace MappingGenerator
 {
-    internal class SymbolHelper
+    internal static class SymbolHelper
     {
         public static bool IsUpdateParameterFunction(IMethodSymbol methodSymbol)
         {
@@ -22,6 +23,15 @@ namespace MappingGenerator
         public static bool IsMappingConstructor(IMethodSymbol methodSymbol)
         {
             return methodSymbol.Parameters.Length == 1 && methodSymbol.MethodKind == MethodKind.Constructor;
+        }
+
+        public static ITypeSymbol UnwrapGeneric(this ITypeSymbol typeSymbol)
+        {
+            if (typeSymbol.TypeKind == TypeKind.TypeParameter && typeSymbol is ITypeParameterSymbol namedType && namedType.Kind != SymbolKind.ErrorType)
+            {
+                return namedType.ConstraintTypes.FirstOrDefault() ?? typeSymbol;
+            }
+            return typeSymbol;
         }
     }
 }

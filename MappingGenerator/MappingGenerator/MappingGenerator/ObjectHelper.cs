@@ -59,7 +59,7 @@ namespace MappingGenerator
 
         private  static IEnumerable<ITypeSymbol> GetBaseTypesAndThis(ITypeSymbol type)
         {
-            var current = type;
+            var current = type.UnwrapGeneric();
             while (current != null && IsSystemObject(current) == false)
             {
                 yield return current;

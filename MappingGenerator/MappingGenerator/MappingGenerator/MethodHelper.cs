@@ -9,8 +9,7 @@ namespace MappingGenerator
 {
     public static class MethodHelper
     {
-        public static MatchedParameterList FindBestParametersMatch(IMethodSymbol methodSymbol, SemanticModel semanticModel,
-            IMappingSourceFinder mappingSourceFinder)
+        public static IEnumerable<ImmutableArray<IParameterSymbol>> GetOverloadParameterSets(IMethodSymbol methodSymbol, SemanticModel semanticModel)
         {
             var overloadParameterSets = methodSymbol.DeclaringSyntaxReferences.Select(ds =>
             {
@@ -18,6 +17,12 @@ namespace MappingGenerator
                 var overloadMethod = semanticModel.GetDeclaredSymbol(overloadDeclaration);
                 return overloadMethod.Parameters;
             });
+            return overloadParameterSets;
+        }
+
+        public static MatchedParameterList FindBestParametersMatch(IMethodSymbol methodSymbol, SemanticModel semanticModel, IMappingSourceFinder mappingSourceFinder)
+        {
+            var overloadParameterSets = GetOverloadParameterSets(methodSymbol, semanticModel);
             return FindBestParametersMatch(mappingSourceFinder, overloadParameterSets);
         }
 

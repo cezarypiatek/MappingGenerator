@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace MappingGenerator
+namespace MappingGenerator.MethodHelpers
 {
     public static class MethodHelper
     {
@@ -19,12 +19,7 @@ namespace MappingGenerator
             });
             return overloadParameterSets;
         }
-
-        public static MatchedParameterList FindBestParametersMatch(IMethodSymbol methodSymbol, SemanticModel semanticModel, IMappingSourceFinder mappingSourceFinder)
-        {
-            var overloadParameterSets = GetOverloadParameterSets(methodSymbol, semanticModel);
-            return FindBestParametersMatch(mappingSourceFinder, overloadParameterSets);
-        }
+       
 
         public static MatchedParameterList FindBestParametersMatch(IMappingSourceFinder mappingSourceFinder, IEnumerable<ImmutableArray<IParameterSymbol>> overloadParameterSets)
         {

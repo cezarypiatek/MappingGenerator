@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MappingGenerator.MethodHelpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CodeActions;
@@ -34,58 +35,39 @@ namespace MappingGenerator
             var invocationExpression = token.Parent.FindContainer<InvocationExpressionSyntax>();
             if (invocationExpression != null && invocationExpression.ArgumentList.Arguments.Count == 1)
             {
-                context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with value parameters", createChangedDocument: c => GenerateSplatting(context.Document, invocationExpression, false, c), equivalenceKey: "Generate splatting with value parameters"), diagnostic);
-                context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with named parameters", createChangedDocument: c => GenerateSplatting(context.Document, invocationExpression, true, c), equivalenceKey: "Generate splatting with named parameters"), diagnostic);
+                var invocation = new MethodInvocation(invocationExpression);
+                context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with value parameters", createChangedDocument: c => GenerateSplatting(context.Document, invocation, false, c), equivalenceKey: "Generate splatting with value parameters"), diagnostic);
+                context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with named parameters", createChangedDocument: c => GenerateSplatting(context.Document, invocation, true, c), equivalenceKey: "Generate splatting with named parameters"), diagnostic);
                 return;
             }
 
             var creationExpression = token.Parent.FindContainer<ObjectCreationExpressionSyntax>();
             if (creationExpression != null && creationExpression.ArgumentList.Arguments.Count == 1)
             {
-                context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with value parameters", createChangedDocument: c => GenerateSplatting(context.Document, creationExpression, false, c), equivalenceKey: "Generate splatting with value parameters"), diagnostic);
-                context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with named parameters", createChangedDocument: c => GenerateSplatting(context.Document, creationExpression, true, c), equivalenceKey: "Generate splatting with named parameters"), diagnostic);
+                var invocation = new ConstructorInvocation(creationExpression);
+                context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with value parameters", createChangedDocument: c => GenerateSplatting(context.Document, invocation, false, c), equivalenceKey: "Generate splatting with value parameters"+"_constructor"), diagnostic);
+                context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with named parameters", createChangedDocument: c => GenerateSplatting(context.Document, invocation, true, c), equivalenceKey: "Generate splatting with named parameters"+"_constructor"), diagnostic);
             }
-            
         }
 
-        private async Task<Document> GenerateSplatting(Document document,  InvocationExpressionSyntax invocationExpression, bool generateNamedParameters, CancellationToken cancellationToken)
+        private async Task<Document> GenerateSplatting(Document document, IInvocation invocation, bool generateNamedParameters, CancellationToken cancellationToken)
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-
-            var methodSymbol = semanticModel.GetSymbolInfo(invocationExpression, cancellationToken).CandidateSymbols.OfType<IMethodSymbol>().FirstOrDefault();
-            if (methodSymbol == null)
+            var overloadParameterSets = invocation.GetOverloadParameterSets(semanticModel);
+            if (overloadParameterSets != null)
             {
-                return document;
+                var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
+                var invalidArgumentList = invocation.Arguments;
+                var parametersMatch = FindParametersMatch(invalidArgumentList, overloadParameterSets, semanticModel, syntaxGenerator);
+                if (parametersMatch != null)
+                {
+                    var argumentList = parametersMatch.ToArgumentListSyntax(syntaxGenerator, generateNamedParameters);
+                    return await document.ReplaceNodes(invocation.SourceNode, invocation.WithArgumentList(argumentList), cancellationToken);
+                
+                }
             }
 
-            var invalidArgumentList = invocationExpression.ArgumentList;
-            var overloadParameterSets = MethodHelper.GetOverloadParameterSets(methodSymbol, semanticModel);
-            var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
-            var parametersMatch = FindParametersMatch(invalidArgumentList,overloadParameterSets, semanticModel, syntaxGenerator);
-            if (parametersMatch == null)
-            {
-                return document;
-            }
-
-            var argumentList = parametersMatch.ToArgumentListSyntax(syntaxGenerator, generateNamedParameters);
-            return await document.ReplaceNodes(invocationExpression, invocationExpression.WithArgumentList(argumentList), cancellationToken);
-        }
-
-        private async Task<Document> GenerateSplatting(Document document, ObjectCreationExpressionSyntax creationExpression, bool generateNamedParameters, CancellationToken cancellationToken)
-        {
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var invalidArgumentList = creationExpression.ArgumentList;
-            var instantiatedType = (INamedTypeSymbol)semanticModel.GetSymbolInfo(creationExpression.Type).Symbol;
-            var overloadParameterSets = instantiatedType.Constructors.Select(x => x.Parameters);
-            var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
-            var parametersMatch = FindParametersMatch(invalidArgumentList, overloadParameterSets, semanticModel, syntaxGenerator);
-            if (parametersMatch == null)
-            {
-                return document;
-            }
-
-            var argumentList = parametersMatch.ToArgumentListSyntax(syntaxGenerator, generateNamedParameters);
-            return await document.ReplaceNodes(creationExpression, creationExpression.WithArgumentList(argumentList), cancellationToken);
+            return document;
         }
 
         private static MatchedParameterList FindParametersMatch(ArgumentListSyntax invalidArgumentList, IEnumerable<ImmutableArray<IParameterSymbol>> overloadParameterSets, SemanticModel semanticModel, SyntaxGenerator syntaxGenerator) 

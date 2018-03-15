@@ -66,7 +66,8 @@ namespace MappingGenerator
             var localTargetIdentifier = targetExists? globbalTargetAccessor: generator.IdentifierName(targetLocalVariableName);
             foreach (var targetProperty in ObjectHelper.GetPublicPropertySymbols(targetType))
             {
-                if (targetProperty.SetMethod.DeclaredAccessibility != Accessibility.Public && globbalTargetAccessor.Kind() != SyntaxKind.ThisExpression)
+
+                if (targetProperty.SetMethod?.DeclaredAccessibility != Accessibility.Public && globbalTargetAccessor.Kind() != SyntaxKind.ThisExpression)
                 {
                     continue;
                 }

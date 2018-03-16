@@ -28,7 +28,9 @@ namespace MappingGenerator
             this.sourceGlobalAccessor = sourceGlobalAccessor;
             this.generator = generator;
             this.semanticModel = semanticModel;
-            this.sourceProperties = new Lazy<IReadOnlyList<IPropertySymbol>>(() => ObjectHelper.GetPublicPropertySymbols(sourceType).ToList());
+            this.sourceProperties = new Lazy<IReadOnlyList<IPropertySymbol>>(() => ObjectHelper.GetPublicPropertySymbols(sourceType)
+                .Where(property => property.GetMethod!=null)
+                .ToList());
             this.sourceMethods = new Lazy<IReadOnlyList<IMethodSymbol>>(()=>  ObjectHelper.GetPublicGetMethods(sourceType).ToList());
         }
 

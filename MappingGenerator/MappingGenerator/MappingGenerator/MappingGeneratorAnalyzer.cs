@@ -39,7 +39,7 @@ namespace MappingGenerator
         private void AnalyzeConstructor(SyntaxNodeAnalysisContext context)
         {
             var methodNode = context.Node as ConstructorDeclarationSyntax;
-            if (methodNode != null && methodNode.ParameterList.Parameters.Count ==1)
+            if (methodNode != null && methodNode.ParameterList.Parameters.Count >=1)
             {
                 var diagnostic = Diagnostic.Create(MappingMethodRule, methodNode.Identifier.GetLocation());
                 context.ReportDiagnostic(diagnostic);
@@ -49,7 +49,7 @@ namespace MappingGenerator
         private void AnalyzeNode(SyntaxNodeAnalysisContext context)
         {
             var methodNode = context.Node as MethodDeclarationSyntax;
-            if (methodNode != null && methodNode.ParameterList.Parameters.Count > 0 && methodNode.ParameterList.Parameters.Count < 3)
+            if (methodNode != null && methodNode.ParameterList.Parameters.Count > 0)
             {
                 var methodSymbol = context.SemanticModel.GetDeclaredSymbol(methodNode);
                 var allParameterHaveNames = methodSymbol.Parameters.All(x => string.IsNullOrWhiteSpace(x.Name) == false);
@@ -61,7 +61,7 @@ namespace MappingGenerator
                 if (SymbolHelper.IsPureMappingFunction(methodSymbol) ||
                     SymbolHelper.IsUpdateThisObjectFunction(methodSymbol) ||
                     SymbolHelper.IsUpdateParameterFunction(methodSymbol) ||
-                    SymbolHelper.IsMappingConstructor(methodSymbol)
+                    SymbolHelper.IsMultiParameterUpdateThisObjectFunction(methodSymbol)
                     )
                 {
 

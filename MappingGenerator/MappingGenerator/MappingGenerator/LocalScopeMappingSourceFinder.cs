@@ -18,6 +18,13 @@ namespace MappingGenerator
             this.localSymbols = semanticModel.LookupSymbols(nodeFromScope.GetLocation().SourceSpan.Start).Where(x=>x.Kind == SymbolKind.Local || x.Kind == SymbolKind.Parameter).ToList();
         }
 
+
+        public LocalScopeMappingSourceFinder(SemanticModel semanticModel, IReadOnlyList<ISymbol> localSymbols)
+        {
+            this.semanticModel = semanticModel;
+            this.localSymbols = localSymbols;
+        }
+
         public MappingSource FindMappingSource(string targetName, ITypeSymbol targetType)
         {
             var candidate= localSymbols.FirstOrDefault(x => x.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase));

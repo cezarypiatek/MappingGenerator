@@ -55,11 +55,12 @@ namespace MappingGenerator
             var methodSymbol = semanticModel.GetDeclaredSymbol(methodSyntax);
             var generator = SyntaxGenerator.GetGenerator(document);
             var mappingGenerator = new MappingGenerator(generator, semanticModel);
-            var mappingExpressions = GenerateMappingCode(methodSymbol, generator, mappingGenerator);
+            var mappingExpressions = GenerateMappingCode(methodSymbol, generator, mappingGenerator, semanticModel);
             return await document.ReplaceNodes(methodSyntax.Body, ((BaseMethodDeclarationSyntax) generator.MethodDeclaration(methodSymbol, mappingExpressions)).Body, cancellationToken);
         }
 
-        private static IEnumerable<SyntaxNode> GenerateMappingCode(IMethodSymbol methodSymbol, SyntaxGenerator generator,  MappingGenerator mappingGenerator)
+        private static IEnumerable<SyntaxNode> GenerateMappingCode(IMethodSymbol methodSymbol,
+            SyntaxGenerator generator, MappingGenerator mappingGenerator, SemanticModel semanticModel)
         {
             if (SymbolHelper.IsPureMappingFunction(methodSymbol))
             {
@@ -82,6 +83,18 @@ namespace MappingGenerator
                 return mappingGenerator.MapTypes(source.Type, target.Type, generator.IdentifierName(source.Name), generator.IdentifierName(target.Name), targetExists: true);
             }
 
+            if (SymbolHelper.IsMultiParameterUpdateThisObjectFunction(methodSymbol) || SymbolHelper.IsMultiParameterMappingConstructor(methodSymbol))
+            {
+                var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters);
+                return ObjectHelper.GetPublicPropertySymbols(methodSymbol.ContainingType)
+                .Where(property => property.SetMethod!=null)
+                .Select(property => new
+                {
+                    source = sourceFinder.FindMappingSource(property.Name, property.Type),
+                    target = property
+                })
+                .SelectMany(pair => mappingGenerator.Map(pair.target, pair.source, generator.IdentifierName(pair.target.Name)));
+            }
             return Enumerable.Empty<SyntaxNode>();
         }
     }

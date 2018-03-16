@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 
 namespace MappingGenerator
@@ -25,13 +26,13 @@ namespace MappingGenerator
             return methodSymbol.Parameters.Length == 1 && methodSymbol.MethodKind == MethodKind.Constructor;
         }
 
-        public static ITypeSymbol UnwrapGeneric(this ITypeSymbol typeSymbol)
+        public static IEnumerable<ITypeSymbol> UnwrapGeneric(this ITypeSymbol typeSymbol)
         {
             if (typeSymbol.TypeKind == TypeKind.TypeParameter && typeSymbol is ITypeParameterSymbol namedType && namedType.Kind != SymbolKind.ErrorType)
             {
-                return namedType.ConstraintTypes.FirstOrDefault() ?? typeSymbol;
+                return namedType.ConstraintTypes;
             }
-            return typeSymbol;
+            return new []{typeSymbol};
         }
     }
 }

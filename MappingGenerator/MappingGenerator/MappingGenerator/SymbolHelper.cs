@@ -15,6 +15,11 @@ namespace MappingGenerator
         {
             return methodSymbol.Parameters.Length == 1 && methodSymbol.ReturnsVoid;
         }
+        
+        public static bool IsMultiParameterUpdateThisObjectFunction(IMethodSymbol methodSymbol)
+        {
+            return methodSymbol.Parameters.Length > 1 && methodSymbol.ReturnsVoid;
+        }
 
         public static bool IsPureMappingFunction(IMethodSymbol methodSymbol)
         {
@@ -24,6 +29,11 @@ namespace MappingGenerator
         public static bool IsMappingConstructor(IMethodSymbol methodSymbol)
         {
             return methodSymbol.Parameters.Length == 1 && methodSymbol.MethodKind == MethodKind.Constructor;
+        }  
+        
+        public static bool IsMultiParameterMappingConstructor(IMethodSymbol methodSymbol)
+        {
+            return methodSymbol.Parameters.Length > 1 && methodSymbol.MethodKind == MethodKind.Constructor;
         }
 
         public static IEnumerable<ITypeSymbol> UnwrapGeneric(this ITypeSymbol typeSymbol)

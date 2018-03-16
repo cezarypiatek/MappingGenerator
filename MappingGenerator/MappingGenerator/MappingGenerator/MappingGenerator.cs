@@ -77,27 +77,10 @@ namespace MappingGenerator
                 {
                     continue;
                 }
-
-                if (IsMappingBetweenCollections(targetProperty.Type, mappingSource.ExpressionType))
+                var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, targetProperty.Name);
+                foreach (var syntaxNode in Map(targetProperty, mappingSource, targetAccess))
                 {
-                    var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, targetProperty.Name);
-                    var collectionMapping = MapCollections(mappingSource.Expression,  mappingSource.ExpressionType,  targetProperty.Type);
-                    yield return generator.CompleteAssignmentStatement(targetAccess, collectionMapping);
-                }
-                else if (ObjectHelper.IsSimpleType(targetProperty.Type) == false)
-                {   
-                    //TODO: What if both sides has the same type?
-                    //TODO: Reverse flattening
-                    var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, targetProperty.Name);
-                    foreach (var complexPropertyMappingNode in MapTypes(mappingSource.ExpressionType, targetProperty.Type, mappingSource.Expression, targetAccess))
-                    {
-                        yield return complexPropertyMappingNode;
-                    }
-                }
-                else
-                {
-                    var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, targetProperty.Name);
-                    yield return generator.CompleteAssignmentStatement(targetAccess,  mappingSource.Expression);
+                    yield return syntaxNode;
                 }
             }
 
@@ -108,6 +91,30 @@ namespace MappingGenerator
             else if(targetExists == false)
             {
                 yield return generator.CompleteAssignmentStatement(globbalTargetAccessor, localTargetIdentifier);
+            }
+        }
+
+        public IEnumerable<SyntaxNode> Map(IPropertySymbol targetProperty, MappingSource mappingSource, SyntaxNode targetAccess)
+        {
+            if (IsMappingBetweenCollections(targetProperty.Type, mappingSource.ExpressionType))
+            {
+                var collectionMapping =
+                    MapCollections(mappingSource.Expression, mappingSource.ExpressionType, targetProperty.Type);
+                yield return generator.CompleteAssignmentStatement(targetAccess, collectionMapping);
+            }
+            else if (ObjectHelper.IsSimpleType(targetProperty.Type) == false)
+            {
+                //TODO: What if both sides has the same type?
+                //TODO: Reverse flattening
+                foreach (var complexPropertyMappingNode in MapTypes(mappingSource.ExpressionType, targetProperty.Type,
+                    mappingSource.Expression, targetAccess))
+                {
+                    yield return complexPropertyMappingNode;
+                }
+            }
+            else
+            {
+                yield return generator.CompleteAssignmentStatement(targetAccess, mappingSource.Expression);
             }
         }
 

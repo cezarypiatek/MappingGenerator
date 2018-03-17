@@ -77,8 +77,14 @@ namespace MappingGenerator
                 {
                     continue;
                 }
-                var targetAccess = generator.MemberAccessExpression(localTargetIdentifier, targetProperty.Name);
-                foreach (var syntaxNode in Map(targetProperty, mappingSource, targetAccess))
+
+                var mappingTarget = new MappingElement()
+                {
+                    Expression = (ExpressionSyntax)generator.MemberAccessExpression(localTargetIdentifier, targetProperty.Name),
+                    ExpressionType = targetProperty.Type
+                };
+
+                foreach (var syntaxNode in Map(mappingSource, mappingTarget))
                 {
                     yield return syntaxNode;
                 }
@@ -94,27 +100,25 @@ namespace MappingGenerator
             }
         }
 
-        public IEnumerable<SyntaxNode> Map(IPropertySymbol targetProperty, MappingSource mappingSource, SyntaxNode targetAccess)
+        public IEnumerable<SyntaxNode> Map(MappingElement source, MappingElement target)
         {
-            if (IsMappingBetweenCollections(targetProperty.Type, mappingSource.ExpressionType))
+            if (IsMappingBetweenCollections(target.ExpressionType, source.ExpressionType))
             {
-                var collectionMapping =
-                    MapCollections(mappingSource.Expression, mappingSource.ExpressionType, targetProperty.Type);
-                yield return generator.CompleteAssignmentStatement(targetAccess, collectionMapping);
+                var collectionMapping = MapCollections(source.Expression, source.ExpressionType, target.ExpressionType);
+                yield return generator.CompleteAssignmentStatement(target.Expression, collectionMapping);
             }
-            else if (ObjectHelper.IsSimpleType(targetProperty.Type) == false)
+            else if (ObjectHelper.IsSimpleType(target.ExpressionType) == false)
             {
                 //TODO: What if both sides has the same type?
                 //TODO: Reverse flattening
-                foreach (var complexPropertyMappingNode in MapTypes(mappingSource.ExpressionType, targetProperty.Type,
-                    mappingSource.Expression, targetAccess))
+                foreach (var complexPropertyMappingNode in MapTypes(source.ExpressionType, target.ExpressionType,  source.Expression, target.Expression))
                 {
                     yield return complexPropertyMappingNode;
                 }
             }
             else
             {
-                yield return generator.CompleteAssignmentStatement(targetAccess, mappingSource.Expression);
+                yield return generator.CompleteAssignmentStatement(target.Expression, source.Expression);
             }
         }
 

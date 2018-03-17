@@ -10,7 +10,7 @@ namespace MappingGenerator
 {
     public interface IMappingSourceFinder
     {
-        MappingSource FindMappingSource(string targetName, ITypeSymbol targetType);
+        MappingElement FindMappingSource(string targetName, ITypeSymbol targetType);
     }
 
     public class ObjectMembersMappingSourceFinder : IMappingSourceFinder
@@ -34,7 +34,7 @@ namespace MappingGenerator
             this.sourceMethods = new Lazy<IReadOnlyList<IMethodSymbol>>(()=>  ObjectHelper.GetPublicGetMethods(sourceType).ToList());
         }
 
-        public MappingSource FindMappingSource(string targetName, ITypeSymbol targetType)
+        public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType)
         {
             var mappingSource = FindSource(targetName);
             if (mappingSource != null && IsUnrappingNeeded(targetType, mappingSource))
@@ -44,18 +44,18 @@ namespace MappingGenerator
             return mappingSource;
         }
 
-        private static bool IsUnrappingNeeded(ITypeSymbol targetType, MappingSource mappingSource)
+        private static bool IsUnrappingNeeded(ITypeSymbol targetType, MappingElement mappingSource)
         {
             return targetType != mappingSource.ExpressionType && ObjectHelper.IsSimpleType(targetType);
         }
 
-        private MappingSource FindSource(string targetName)
+        private MappingElement FindSource(string targetName)
         {
             //Direct 1-1 mapping
             var matchedSourceProperty = sourceProperties.Value.FirstOrDefault(x => x.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase));
             if (matchedSourceProperty != null)
             {
-                return new MappingSource()
+                return new MappingElement()
                 {
                     Expression = (ExpressionSyntax) generator.MemberAccessExpression(sourceGlobalAccessor, matchedSourceProperty.Name),
                     ExpressionType = matchedSourceProperty.Type
@@ -74,7 +74,7 @@ namespace MappingGenerator
             if (matchedSourceMethod != null)
             {
                 var sourceMethodAccessor = generator.MemberAccessExpression(sourceGlobalAccessor, matchedSourceMethod.Name);
-                return new MappingSource()
+                return new MappingElement()
                 {
                     Expression = (ExpressionSyntax) generator.InvocationExpression(sourceMethodAccessor),
                     ExpressionType = matchedSourceMethod.ReturnType
@@ -84,7 +84,7 @@ namespace MappingGenerator
             return null;
         }
 
-        private MappingSource FindSubPropertySource(string targetName, ITypeSymbol containingType, IEnumerable<IPropertySymbol> properties, SyntaxNode currentAccessor, string prefix=null)
+        private MappingElement FindSubPropertySource(string targetName, ITypeSymbol containingType, IEnumerable<IPropertySymbol> properties, SyntaxNode currentAccessor, string prefix=null)
         {
             if (ObjectHelper.IsSimpleType(containingType))
             {
@@ -98,7 +98,7 @@ namespace MappingGenerator
                 var subPropertyAccessor = (ExpressionSyntax) generator.MemberAccessExpression(currentAccessor, subProperty.Name);
                 if (targetName.Equals(currentNamePart, StringComparison.OrdinalIgnoreCase))
                 {
-                    return new MappingSource
+                    return new MappingElement
                     {
                         Expression = subPropertyAccessor,
                         ExpressionType = subProperty.Type
@@ -109,7 +109,7 @@ namespace MappingGenerator
             return null;
         }
 
-        private MappingSource TryToUnwrapp(MappingSource mappingSource, ITypeSymbol targetType)
+        private MappingElement TryToUnwrapp(MappingElement mappingSource, ITypeSymbol targetType)
         {
             var sourceAccess = mappingSource.Expression as SyntaxNode;
             var conversion =  semanticModel.Compilation.ClassifyConversion(mappingSource.ExpressionType, targetType);
@@ -118,7 +118,7 @@ namespace MappingGenerator
                 var wrapper = GetWrappingInfo(mappingSource.ExpressionType, targetType);
                 if (wrapper.Type == WrapperInfoType.Property)
                 {
-                    return new MappingSource()
+                    return new MappingElement()
                     {
                         Expression = (ExpressionSyntax) generator.MemberAccessExpression(sourceAccess, wrapper.UnwrappingProperty.Name),
                         ExpressionType = wrapper.UnwrappingProperty.Type
@@ -127,7 +127,7 @@ namespace MappingGenerator
                 {
                     var unwrappingMethodAccess = generator.MemberAccessExpression(sourceAccess, wrapper.UnwrappingMethod.Name);
                     ;
-                    return new MappingSource()
+                    return new MappingElement()
                     {
                         Expression = (InvocationExpressionSyntax) generator.InvocationExpression(unwrappingMethodAccess),
                         ExpressionType = wrapper.UnwrappingMethod.ReturnType
@@ -137,7 +137,7 @@ namespace MappingGenerator
 
             }else if(conversion.IsExplicit)
             {
-                return new MappingSource()
+                return new MappingElement()
                 {
                     Expression = (ExpressionSyntax) generator.CastExpression(targetType, sourceAccess),
                     ExpressionType = targetType

@@ -20,7 +20,7 @@ namespace MappingGenerator
         private const string title = "Use local variables as parameters";
         private const string titleWithNamed = "Use local variables as named parameters";
         
-        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create("CS1501", "CS7036");
+        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create("CS1501", "CS7036", "CS1729");
 
         public sealed override FixAllProvider GetFixAllProvider()
         {

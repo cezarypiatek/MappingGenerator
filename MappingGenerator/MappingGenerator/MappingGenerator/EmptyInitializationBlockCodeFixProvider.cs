@@ -43,7 +43,7 @@ namespace MappingGenerator
             var objectCreationExpression = objectInitializer.FindContainer<ObjectCreationExpressionSyntax>();
             var createdObjectType = ModelExtensions.GetTypeInfo(semanticModel, objectCreationExpression).Type;
             var mappingSourceFinder = new LocalScopeMappingSourceFinder(semanticModel, objectInitializer);
-            var propertiesToSet = ObjectHelper.GetPublicPropertySymbols(createdObjectType).Where(x=> x.SetMethod.DeclaredAccessibility == Accessibility.Public);
+            var propertiesToSet = ObjectHelper.GetPublicPropertySymbols(createdObjectType).Where(x=> x.SetMethod?.DeclaredAccessibility == Accessibility.Public);
             var initExpressions = propertiesToSet.Aggregate(objectInitializer.Expressions, (expr, property) =>
             {
                 var mappingSource = mappingSourceFinder.FindMappingSource(property.Name, property.Type);

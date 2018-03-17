@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace MappingGenerator
 {
@@ -43,6 +45,27 @@ namespace MappingGenerator
                 return namedType.ConstraintTypes;
             }
             return new []{typeSymbol};
+        }
+
+        public static bool IsReadonlyProperty(this IPropertySymbol property)
+        {
+            var propertyDeclaration = property.DeclaringSyntaxReferences.Select(x => x.GetSyntax()).OfType<PropertyDeclarationSyntax>().FirstOrDefault();
+            if (propertyDeclaration == null || propertyDeclaration.AccessorList.Accessors.Count > 1)
+            {
+                return false;
+            }
+            return propertyDeclaration.AccessorList.Accessors.SingleOrDefault(IsAutoGetter) != null;
+            
+        }
+
+        private static bool IsSetter(AccessorDeclarationSyntax x)
+        {
+            return x.IsKind(SyntaxKind.SetAccessorDeclaration);
+        }
+
+        private static bool IsAutoGetter(AccessorDeclarationSyntax x)
+        {
+            return x.IsKind(SyntaxKind.GetAccessorDeclaration) && x.Body ==null && x.ExpressionBody == null;
         }
     }
 }

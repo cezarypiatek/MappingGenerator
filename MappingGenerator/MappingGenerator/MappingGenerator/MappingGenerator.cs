@@ -160,11 +160,19 @@ namespace MappingGenerator
             return WrapInReadonlyCollectionIfNecessary(isReadolyCollection, toList, generator);
         }
 
-        private static ITypeSymbol GetElementType(ITypeSymbol collectionType)
+        private ITypeSymbol GetElementType(ITypeSymbol collectionType)
         {
             switch (collectionType)
             {
                 case INamedTypeSymbol namedType:
+                    if (namedType.IsGenericType == false)
+                    {
+                        if (ObjectHelper.IsSystemObject(namedType.BaseType))
+                        {
+                            return namedType.BaseType;
+                        }
+                        return GetElementType(namedType.BaseType);
+                    }
                     return namedType.TypeArguments[0];
                 case IArrayTypeSymbol arrayType:
                     return arrayType.ElementType;
@@ -193,8 +201,8 @@ namespace MappingGenerator
 
         private static bool IsMappingBetweenCollections(ITypeSymbol targetClassSymbol, ITypeSymbol sourceClassSymbol)
         {
-            return (HasInterface(targetClassSymbol, "System.Collections.Generic.ICollection<T>") || targetClassSymbol.Kind == SymbolKind.ArrayType)
-                   && (HasInterface(sourceClassSymbol, "System.Collections.Generic.IEnumerable<T>") || sourceClassSymbol.Kind == SymbolKind.ArrayType);
+            return (HasInterface(targetClassSymbol, "System.Collections.ICollection") || targetClassSymbol.Kind == SymbolKind.ArrayType)
+                   && (HasInterface(sourceClassSymbol, "System.Collections.IEnumerable") || sourceClassSymbol.Kind == SymbolKind.ArrayType);
         }
 
         private ArgumentListSyntax FindMappingConstructorParameters(ITypeSymbol targetType, ITypeSymbol sourceType, ObjectMembersMappingSourceFinder mappingSourceFinder, ExpressionSyntax globalSourceAccessor)

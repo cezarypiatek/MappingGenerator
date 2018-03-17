@@ -70,7 +70,7 @@ namespace MappingGenerator
             }
         }
 
-        private static bool IsSystemObject(ITypeSymbol current)
+        public static bool IsSystemObject(ITypeSymbol current)
         {
             return current.Name == "Object" && current.ContainingNamespace.Name =="System";
         }

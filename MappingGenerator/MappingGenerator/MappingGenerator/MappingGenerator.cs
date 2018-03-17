@@ -23,7 +23,8 @@ namespace MappingGenerator
 
         public IEnumerable<SyntaxNode> MapTypes(ITypeSymbol sourceType, ITypeSymbol targetType,
             SyntaxNode globalSourceAccessor, SyntaxNode globbalTargetAccessor = null, bool targetExists = false,
-            bool generatorContext = false)
+            bool generatorContext = false,
+            bool isConstructorContext = false)
         {
             if (IsMappingBetweenCollections(targetType, sourceType))
             {
@@ -67,7 +68,7 @@ namespace MappingGenerator
             var localTargetIdentifier = targetExists? globbalTargetAccessor: generator.IdentifierName(targetLocalVariableName);
             foreach (var targetProperty in ObjectHelper.GetPublicPropertySymbols(targetType))
             {
-                if (targetProperty.SetMethod?.DeclaredAccessibility != Accessibility.Public && globbalTargetAccessor.Kind() != SyntaxKind.ThisExpression)
+                if (CanBeSet(targetProperty, globbalTargetAccessor, isConstructorContext) == false)
                 {
                     continue;
                 }
@@ -98,6 +99,25 @@ namespace MappingGenerator
             {
                 yield return generator.CompleteAssignmentStatement(globbalTargetAccessor, localTargetIdentifier);
             }
+        }
+
+        private static bool CanBeSet(IPropertySymbol targetProperty, SyntaxNode globbalTargetAccessor, bool isConstructorContext)
+        {
+            var isPrivateField = targetProperty.SetMethod?.DeclaredAccessibility != Accessibility.Public;
+            var isOutsideThisScope = globbalTargetAccessor?.Kind() != SyntaxKind.ThisExpression;
+            var isReadonlyProperty = targetProperty.IsReadonlyProperty();
+
+            if (isPrivateField && isOutsideThisScope)
+            {
+                return false;
+            }
+
+            if (isReadonlyProperty && isConstructorContext == false)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         public IEnumerable<SyntaxNode> Map(MappingElement source, MappingElement target)

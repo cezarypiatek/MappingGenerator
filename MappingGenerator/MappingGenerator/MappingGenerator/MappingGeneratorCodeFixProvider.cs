@@ -69,11 +69,12 @@ namespace MappingGenerator
                 return mappingGenerator.MapTypes(source.Type, targetType,generator.IdentifierName(source.Name));
             }
 
-            if (SymbolHelper.IsUpdateThisObjectFunction(methodSymbol) || SymbolHelper.IsMappingConstructor(methodSymbol))
+            var isMappingConstructor = SymbolHelper.IsMappingConstructor(methodSymbol);
+            if (SymbolHelper.IsUpdateThisObjectFunction(methodSymbol) || isMappingConstructor)
             {
                 var source = methodSymbol.Parameters[0];
                 var targetType = methodSymbol.ContainingType;
-                return mappingGenerator.MapTypes(source.Type, targetType, generator.IdentifierName(source.Name), generator.ThisExpression(), targetExists: true);
+                return mappingGenerator.MapTypes(source.Type, targetType, generator.IdentifierName(source.Name), generator.ThisExpression(), targetExists: true, isConstructorContext: isMappingConstructor);
             }
 
             if (SymbolHelper.IsUpdateParameterFunction(methodSymbol))
@@ -83,11 +84,12 @@ namespace MappingGenerator
                 return mappingGenerator.MapTypes(source.Type, target.Type, generator.IdentifierName(source.Name), generator.IdentifierName(target.Name), targetExists: true);
             }
 
-            if (SymbolHelper.IsMultiParameterUpdateThisObjectFunction(methodSymbol) || SymbolHelper.IsMultiParameterMappingConstructor(methodSymbol))
+            var isMultiParameterConstructor = SymbolHelper.IsMultiParameterUpdateThisObjectFunction(methodSymbol);
+            if (isMultiParameterConstructor || SymbolHelper.IsMultiParameterMappingConstructor(methodSymbol))
             {
                 var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters);
                 return ObjectHelper.GetPublicPropertySymbols(methodSymbol.ContainingType)
-                .Where(property => property.SetMethod!=null)
+                .Where(property => property.SetMethod != null || (property.IsReadonlyProperty() && isMultiParameterConstructor))
                 .Select(property => new
                 {
                     source = sourceFinder.FindMappingSource(property.Name, property.Type),
@@ -97,6 +99,7 @@ namespace MappingGenerator
                         ExpressionType = property.Type
                     }
                 })
+                .Where(x=>x.source!=null)
                 .SelectMany(pair => mappingGenerator.Map(pair.source, pair.target));
             }
             return Enumerable.Empty<SyntaxNode>();

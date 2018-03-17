@@ -25,7 +25,7 @@ namespace MappingGenerator
             this.localSymbols = localSymbols;
         }
 
-        public MappingSource FindMappingSource(string targetName, ITypeSymbol targetType)
+        public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType)
         {
             var candidate= localSymbols.FirstOrDefault(x => x.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase));
             if (candidate != null)
@@ -33,7 +33,7 @@ namespace MappingGenerator
                 var type = GetType(candidate);
                 if (type != null)
                 {
-                    return new MappingSource()
+                    return new MappingElement()
                     {
                         ExpressionType = type,
                         Expression = SyntaxFactory.IdentifierName(candidate.Name)

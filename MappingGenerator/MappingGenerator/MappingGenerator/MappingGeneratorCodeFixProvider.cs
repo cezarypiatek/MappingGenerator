@@ -91,9 +91,13 @@ namespace MappingGenerator
                 .Select(property => new
                 {
                     source = sourceFinder.FindMappingSource(property.Name, property.Type),
-                    target = property
+                    target = new MappingElement()
+                    {
+                        Expression = SyntaxFactory.IdentifierName(property.Name),
+                        ExpressionType = property.Type
+                    }
                 })
-                .SelectMany(pair => mappingGenerator.Map(pair.target, pair.source, generator.IdentifierName(pair.target.Name)));
+                .SelectMany(pair => mappingGenerator.Map(pair.source, pair.target));
             }
             return Enumerable.Empty<SyntaxNode>();
         }

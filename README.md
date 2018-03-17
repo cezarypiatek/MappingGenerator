@@ -11,6 +11,9 @@
 
 You can download it as Visual Studio Extension from [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=54748ff9-45fc-43c2-8ec5-cf7912bc3b84.mappinggenerator).
 
+### Contributing
+Before you start any contributig work, plase read the [contribution guidline](/docs/CONTRIBUTING.md)
+
 ## Main features
 
 ### Generate mapping method body

@@ -12,7 +12,7 @@
 You can download it as Visual Studio Extension from [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=54748ff9-45fc-43c2-8ec5-cf7912bc3b84.mappinggenerator).
 
 ## Further Development
-If you find this extension useful (you feel it helps you on the daily basis) you can support further development by bying me a coffee (it's simple, just click the button below)
+If you find this extension useful (you feel it helps you on the daily basis) you can support further development by bying me a coffee (it's simple, just click the button below). Sometimes it's hard to stay awake till midnight implementing new features, coffee helps me with that. I'm really appreciate for your support.
 
 [![](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/tmAJLYvWy)
 

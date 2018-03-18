@@ -11,6 +11,11 @@
 
 You can download it as Visual Studio Extension from [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=54748ff9-45fc-43c2-8ec5-cf7912bc3b84.mappinggenerator).
 
+## Further Development
+If you find this extension useful (you feel it helps you on the daily basis) you can support further development by bying me a coffee (it's simple, just click the button below)
+
+[![](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/tmAJLYvWy)
+
 ### Contributing
 Before you start any contributig work, plase read the [contribution guidline](/docs/CONTRIBUTING.md)
 
@@ -41,8 +46,9 @@ public void Update(UserDTO source, UserEntity target)
 ```
 ![Generating update method implementation](doc/update_method.gif)
 
+
 #### Mapping Constructor
-Constructor method that takes single parameter
+Constructor method that takes single complex parameter
 
 ```csharp
 public UserDTO(UserEntity user)
@@ -50,8 +56,19 @@ public UserDTO(UserEntity user)
     
 }
 ```
-
 ![Generating mapping constructor implementation](doc/mapping_constructor.gif)
+
+Constructor method that takes more than one parameter
+
+```csharp
+public UserDTO(string firstName, string lastName, int age, int cash)
+{
+}
+```
+
+![Generating multi-parameter constructor](/doc/multiparameterconstructor.gif)
+
+
 
 #### Updating member method
 Void member method that takes single parameter
@@ -63,6 +80,15 @@ public void UpdateWith(UserEntity en)
 ```
 
 ![Generating update member method imeplementation](doc/update_member_method.gif)
+
+Void member method with more than one parameter
+```csharp
+public void Update(string firstName, string lastName, int age)
+{
+}
+```
+![](/doc/multiparameterupdate.gif)
+
 
 ### Generate inline code for fixing Compiler Errors: 
 [CS0029](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-messages/cs0029) Cannot implicitly convert type 'type' to 'type'
@@ -77,8 +103,16 @@ CS7036 There is no argument given that corresponds to the required formal parame
 
 ![CS7036](/doc/splatting.gif)
 
+## Other mappings
 
-## Mapping features
+- Complete empty initialization block
+![Generate initialization bloc](doc/emptyInitialization.gif)
+
+- Provide local accessoble variables as parameters for method and constructor invocation
+![locals as parameters](doc/localsforconstructor.gif)
+
+
+## Mapping rules
 - Mapping Property-To-Property
   ```csharp
   target.FirstName = source.FirstName;

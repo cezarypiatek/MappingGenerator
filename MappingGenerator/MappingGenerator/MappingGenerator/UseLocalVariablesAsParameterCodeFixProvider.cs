@@ -34,16 +34,19 @@ namespace MappingGenerator
             var token = root.FindToken(diagnostic.Location.SourceSpan.Start);
             
             var invocationExpression = token.Parent.FindContainer<InvocationExpressionSyntax>();
-            if (invocationExpression != null && invocationExpression.ArgumentList.Arguments.Count == 0)
+            if (invocationExpression != null)
             {
-                var invocation = new MethodInvocation(invocationExpression);
-                context.RegisterCodeFix(CodeAction.Create(title: title, createChangedDocument: c => UseLocalVariablesAsParameters(context.Document, invocation, false, c), equivalenceKey: title), diagnostic);
-                context.RegisterCodeFix(CodeAction.Create(title: titleWithNamed, createChangedDocument: c => UseLocalVariablesAsParameters(context.Document, invocation, true, c), equivalenceKey: titleWithNamed), diagnostic);
+                if (invocationExpression.ArgumentList.Arguments.Count == 0)
+                {
+                    var invocation = new MethodInvocation(invocationExpression);
+                    context.RegisterCodeFix(CodeAction.Create(title: title, createChangedDocument: c => UseLocalVariablesAsParameters(context.Document, invocation, false, c), equivalenceKey: title), diagnostic);
+                    context.RegisterCodeFix(CodeAction.Create(title: titleWithNamed, createChangedDocument: c => UseLocalVariablesAsParameters(context.Document, invocation, true, c), equivalenceKey: titleWithNamed), diagnostic);
+                }
                 return;
             }
 
             var creationExpression = token.Parent.FindContainer<ObjectCreationExpressionSyntax>();
-            if (creationExpression != null && creationExpression.ArgumentList.Arguments.Count == 0)
+            if (creationExpression != null && creationExpression.ArgumentList?.Arguments.Count == 0)
             {
                 var invocation = new ConstructorInvocation(creationExpression);
                 context.RegisterCodeFix(CodeAction.Create(title: title, createChangedDocument: c => UseLocalVariablesAsParameters(context.Document, invocation, false, c), equivalenceKey: title+"for constructor"), diagnostic);

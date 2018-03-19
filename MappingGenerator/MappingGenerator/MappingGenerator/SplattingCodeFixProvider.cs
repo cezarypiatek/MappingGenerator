@@ -33,16 +33,20 @@ namespace MappingGenerator
             var token = root.FindToken(diagnostic.Location.SourceSpan.Start);
             
             var invocationExpression = token.Parent.FindContainer<InvocationExpressionSyntax>();
-            if (invocationExpression != null && invocationExpression.ArgumentList.Arguments.Count == 1)
+            if (invocationExpression != null)
             {
-                var invocation = new MethodInvocation(invocationExpression);
-                context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with value parameters", createChangedDocument: c => GenerateSplatting(context.Document, invocation, false, c), equivalenceKey: "Generate splatting with value parameters"), diagnostic);
-                context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with named parameters", createChangedDocument: c => GenerateSplatting(context.Document, invocation, true, c), equivalenceKey: "Generate splatting with named parameters"), diagnostic);
+                if (invocationExpression.ArgumentList?.Arguments.Count == 1)
+                {
+                    var invocation = new MethodInvocation(invocationExpression);
+                    context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with value parameters", createChangedDocument: c => GenerateSplatting(context.Document, invocation, false, c), equivalenceKey: "Generate splatting with value parameters"), diagnostic);
+                    context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with named parameters", createChangedDocument: c => GenerateSplatting(context.Document, invocation, true, c), equivalenceKey: "Generate splatting with named parameters"), diagnostic);
+                }
+                
                 return;
             }
 
             var creationExpression = token.Parent.FindContainer<ObjectCreationExpressionSyntax>();
-            if (creationExpression != null && creationExpression.ArgumentList.Arguments.Count == 1)
+            if (creationExpression != null && creationExpression.ArgumentList?.Arguments.Count == 1)
             {
                 var invocation = new ConstructorInvocation(creationExpression);
                 context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with value parameters", createChangedDocument: c => GenerateSplatting(context.Document, invocation, false, c), equivalenceKey: "Generate splatting with value parameters"+"_constructor"), diagnostic);

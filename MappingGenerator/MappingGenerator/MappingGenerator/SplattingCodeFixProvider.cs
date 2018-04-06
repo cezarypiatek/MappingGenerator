@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Composition;
 using System.Collections.Immutable;
@@ -32,25 +33,28 @@ namespace MappingGenerator
             var diagnostic = context.Diagnostics.First();
             var token = root.FindToken(diagnostic.Location.SourceSpan.Start);
             
-            var invocationExpression = token.Parent.FindContainer<InvocationExpressionSyntax>();
-            if (invocationExpression != null)
-            {
-                if (invocationExpression.ArgumentList?.Arguments.Count == 1)
-                {
-                    var invocation = new MethodInvocation(invocationExpression);
-                    context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with value parameters", createChangedDocument: c => GenerateSplatting(context.Document, invocation, false, c), equivalenceKey: "Generate splatting with value parameters"), diagnostic);
-                    context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with named parameters", createChangedDocument: c => GenerateSplatting(context.Document, invocation, true, c), equivalenceKey: "Generate splatting with named parameters"), diagnostic);
-                }
-                
-                return;
-            }
+            var expression = token.Parent.FindNearestContainer<InvocationExpressionSyntax, ObjectCreationExpressionSyntax>();
 
-            var creationExpression = token.Parent.FindContainer<ObjectCreationExpressionSyntax>();
-            if (creationExpression != null && creationExpression.ArgumentList?.Arguments.Count == 1)
+            if (expression != null)
             {
-                var invocation = new ConstructorInvocation(creationExpression);
-                context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with value parameters", createChangedDocument: c => GenerateSplatting(context.Document, invocation, false, c), equivalenceKey: "Generate splatting with value parameters"+"_constructor"), diagnostic);
-                context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with named parameters", createChangedDocument: c => GenerateSplatting(context.Document, invocation, true, c), equivalenceKey: "Generate splatting with named parameters"+"_constructor"), diagnostic);
+                if (expression is ObjectCreationExpressionSyntax creationExpression)
+                {
+                    if (creationExpression.ArgumentList?.Arguments.Count == 1)
+                    {
+                        var invocation = new ConstructorInvocation(creationExpression);
+                        context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with value parameters", createChangedDocument: c => GenerateSplatting(context.Document, invocation, false, c), equivalenceKey: "Generate splatting with value parameters"+"_constructor"), diagnostic);
+                        context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with named parameters", createChangedDocument: c => GenerateSplatting(context.Document, invocation, true, c), equivalenceKey: "Generate splatting with named parameters"+"_constructor"), diagnostic);
+                    }
+                }
+                else if (expression is InvocationExpressionSyntax invocationExpression)
+                {
+                    if (invocationExpression.ArgumentList?.Arguments.Count == 1)
+                    {
+                        var invocation = new MethodInvocation(invocationExpression);
+                        context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with value parameters", createChangedDocument: c => GenerateSplatting(context.Document, invocation, false, c), equivalenceKey: "Generate splatting with value parameters"), diagnostic);
+                        context.RegisterCodeFix(CodeAction.Create(title: "Generate splatting with named parameters", createChangedDocument: c => GenerateSplatting(context.Document, invocation, true, c), equivalenceKey: "Generate splatting with named parameters"), diagnostic);
+                    }
+                }
             }
         }
 

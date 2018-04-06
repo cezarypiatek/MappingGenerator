@@ -105,14 +105,13 @@ namespace MappingGenerator
         {
             var isPrivateField = targetProperty.SetMethod?.DeclaredAccessibility != Accessibility.Public;
             var isOutsideThisScope = globbalTargetAccessor?.Kind() != SyntaxKind.ThisExpression;
-            var isReadonlyProperty = targetProperty.IsReadonlyProperty();
 
-            if (isPrivateField && isOutsideThisScope)
+            if (targetProperty.CanBeSetOnlyFromConstructor() && isConstructorContext == false)
             {
                 return false;
             }
 
-            if (isReadonlyProperty && isConstructorContext == false)
+            if (isPrivateField && isOutsideThisScope)
             {
                 return false;
             }

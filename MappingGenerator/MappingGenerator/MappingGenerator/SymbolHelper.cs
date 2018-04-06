@@ -47,20 +47,19 @@ namespace MappingGenerator
             return new []{typeSymbol};
         }
 
-        public static bool IsReadonlyProperty(this IPropertySymbol property)
+        public static bool CanBeSetOnlyFromConstructor(this IPropertySymbol property)
         {
             var propertyDeclaration = property.DeclaringSyntaxReferences.Select(x => x.GetSyntax()).OfType<PropertyDeclarationSyntax>().FirstOrDefault();
-            if (propertyDeclaration == null || propertyDeclaration.AccessorList.Accessors.Count > 1)
+            if (propertyDeclaration?.AccessorList == null)
             {
                 return false;
             }
-            return propertyDeclaration.AccessorList.Accessors.SingleOrDefault(IsAutoGetter) != null;
-            
-        }
+            if (propertyDeclaration.AccessorList.Accessors.Count > 1)
+            {
+                return true;
+            }
 
-        private static bool IsSetter(AccessorDeclarationSyntax x)
-        {
-            return x.IsKind(SyntaxKind.SetAccessorDeclaration);
+            return propertyDeclaration.AccessorList.Accessors.SingleOrDefault(IsAutoGetter) != null;
         }
 
         private static bool IsAutoGetter(AccessorDeclarationSyntax x)

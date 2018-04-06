@@ -89,7 +89,7 @@ namespace MappingGenerator
             {
                 var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters);
                 return ObjectHelper.GetPublicPropertySymbols(methodSymbol.ContainingType)
-                .Where(property => property.SetMethod != null || (property.IsReadonlyProperty() && isMultiParameterConstructor))
+                .Where(property => property.SetMethod != null || (property.CanBeSetOnlyFromConstructor() && isMultiParameterConstructor))
                 .Select(property => new
                 {
                     source = sourceFinder.FindMappingSource(property.Name, property.Type),

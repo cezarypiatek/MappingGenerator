@@ -54,12 +54,14 @@ namespace MappingGenerator
             {
                 return false;
             }
-            if (propertyDeclaration.AccessorList.Accessors.Count > 1)
+
+            var hasPrivateSetter =  propertyDeclaration.AccessorList.Accessors.Any(x =>x.Keyword.Kind() == SyntaxKind.SetKeyword && x.Modifiers.Any(m => m.Kind() == SyntaxKind.PrivateKeyword));
+            if (hasPrivateSetter)
             {
                 return true;
             }
 
-            return propertyDeclaration.AccessorList.Accessors.SingleOrDefault(IsAutoGetter) != null;
+            return propertyDeclaration.AccessorList.Accessors.Count == 1 && propertyDeclaration.AccessorList.Accessors.SingleOrDefault(IsAutoGetter) != null;
         }
 
         private static bool IsAutoGetter(AccessorDeclarationSyntax x)

@@ -4,17 +4,20 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Editing;
 
 namespace MappingGenerator
 {
     public class LocalScopeMappingSourceFinder:IMappingSourceFinder
     {
         private readonly SemanticModel semanticModel;
+        private readonly SyntaxGenerator generator;
         private readonly IReadOnlyList<ISymbol> localSymbols;
 
-        public LocalScopeMappingSourceFinder(SemanticModel semanticModel, SyntaxNode nodeFromScope)
+        public LocalScopeMappingSourceFinder(SemanticModel semanticModel, SyntaxNode nodeFromScope, SyntaxGenerator generator)
         {
             this.semanticModel = semanticModel;
+            this.generator = generator;
             this.localSymbols = semanticModel.LookupSymbols(nodeFromScope.GetLocation().SourceSpan.Start).Where(x=>x.Kind == SymbolKind.Local || x.Kind == SymbolKind.Parameter).ToList();
         }
 
@@ -33,11 +36,11 @@ namespace MappingGenerator
                 var type = GetType(candidate);
                 if (type != null)
                 {
-                    return new MappingElement()
+                    return new MappingElement(generator, semanticModel)
                     {
                         ExpressionType = type,
                         Expression = SyntaxFactory.IdentifierName(candidate.Name)
-                    };
+                    }.AdjustToType(targetType);
                 }
             }
             return null;

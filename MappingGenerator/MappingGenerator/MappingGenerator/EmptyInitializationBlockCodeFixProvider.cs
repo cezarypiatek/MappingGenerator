@@ -9,6 +9,7 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
+using Microsoft.CodeAnalysis.Formatting;
 
 namespace MappingGenerator
 {
@@ -52,7 +53,7 @@ namespace MappingGenerator
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var objectCreationExpression = objectInitializer.FindContainer<ObjectCreationExpressionSyntax>();
             var createdObjectType = ModelExtensions.GetTypeInfo(semanticModel, objectCreationExpression).Type;
-            var mappingSourceFinder = new LocalScopeMappingSourceFinder(semanticModel, objectInitializer);
+            var mappingSourceFinder = new LocalScopeMappingSourceFinder(semanticModel, objectInitializer, SyntaxGenerator.GetGenerator(document));
             var propertiesToSet = ObjectHelper.GetPublicPropertySymbols(createdObjectType).Where(x => x.SetMethod?.DeclaredAccessibility == Accessibility.Public);
             var initExpressions = propertiesToSet.Aggregate(objectInitializer.Expressions, (expr, property) =>
             {
@@ -83,7 +84,7 @@ namespace MappingGenerator
             var propertiesToSet = ObjectHelper.GetPublicPropertySymbols(createdObjectType).Where(x => x.SetMethod?.DeclaredAccessibility == Accessibility.Public);
             var initExpressions = propertiesToSet.Aggregate(objectInitializer.Expressions, (expr, property) =>
             {
-                var mappingSource = mappingSourceFinder.FindMappingSource2(property.Name, property.Type);
+                var mappingSource = mappingSourceFinder.FindMappingSource(property.Name, property.Type);
                 if (mappingSource != null)
                 {
                     var assignmentExpression = SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, SyntaxFactory.IdentifierName(property.Name), mappingSource.Expression);

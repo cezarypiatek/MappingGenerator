@@ -38,81 +38,8 @@ namespace MappingGenerator
         public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType)
         {
             var mappingSource = FindSource(targetName);
-            if (mappingSource != null && IsUnrappingNeeded(targetType, mappingSource))
-            {
-                return TryToUnwrapp(mappingSource, targetType);
-            }
-            return mappingSource;
+            return mappingSource?.AdjustToType(targetType);
         } 
-        
-        public MappingElement FindMappingSource2(string targetName, ITypeSymbol targetType)
-        {
-            var mappingSource = FindSource(targetName);
-            if (mappingSource != null && IsUnrappingNeeded(targetType, mappingSource))
-            {
-                return TryToUnwrapp(mappingSource, targetType);
-            }
-
-            if (mappingSource != null && mappingSource.ExpressionType.Equals(targetType) == false && ObjectHelper.IsSimpleType(targetType)==false && ObjectHelper.IsSimpleType(mappingSource.ExpressionType)==false)
-            {
-                return TryToCreateMappingExpression(mappingSource, targetType);
-            }
-
-            return mappingSource;
-        }
-
-        private MappingElement TryToCreateMappingExpression(MappingElement mappingSource, ITypeSymbol targetType)
-        {
-            if (targetType is INamedTypeSymbol namedTargetType)
-            {
-                var directlyMappingConstructor = namedTargetType.Constructors.FirstOrDefault(c => c.Parameters.Length == 1 && c.Parameters[0].Type == mappingSource.ExpressionType);
-                if (directlyMappingConstructor != null)
-                {
-                    var constructorParameters = SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument(mappingSource.Expression));
-                    var creationExpression = generator.ObjectCreationExpression(targetType, constructorParameters.Arguments);
-                    return new MappingElement()
-                    {
-                        ExpressionType = targetType,
-                        Expression =  (ExpressionSyntax)creationExpression
-                    };
-                }
-
-                //maybe this is collection-to-collection mapping
-                //maybe there is constructor that accepts parameter matching source properties
-               
-                if (MappingGenerator.IsMappingBetweenCollections(targetType, mappingSource.ExpressionType) == false)
-                {
-                    // map property by property
-                    var subMappingSourceFinder = new ObjectMembersMappingSourceFinder(mappingSource.ExpressionType, mappingSource.Expression, generator, semanticModel);
-                    var propertiesToSet = ObjectHelper.GetPublicPropertySymbols(targetType).Where(x => x.SetMethod?.DeclaredAccessibility == Accessibility.Public);
-                    var assigments =  propertiesToSet.Select(x =>
-                    {
-                        var src = subMappingSourceFinder.FindMappingSource2(x.Name, x.Type);
-                        if (src != null)
-                        {
-                            return SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, SyntaxFactory.IdentifierName(x.Name), src.Expression);
-                        }
-
-                        return null;
-                    }).OfType<ExpressionSyntax>();
-                    
-                    return new MappingElement()
-                    {
-                        ExpressionType = targetType,
-                        Expression = ((ObjectCreationExpressionSyntax)generator.ObjectCreationExpression(targetType)).WithInitializer( SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression,new SeparatedSyntaxList<ExpressionSyntax>().AddRange(assigments)))
-                    };
-                }
-            }
-            return mappingSource;
-        }
-
-
-
-
-        private static bool IsUnrappingNeeded(ITypeSymbol targetType, MappingElement mappingSource)
-        {
-            return targetType != mappingSource.ExpressionType && ObjectHelper.IsSimpleType(targetType);
-        }
 
         private MappingElement FindSource(string targetName)
         {
@@ -120,7 +47,7 @@ namespace MappingGenerator
             var matchedSourceProperty = sourceProperties.Value.FirstOrDefault(x => x.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase));
             if (matchedSourceProperty != null)
             {
-                return new MappingElement()
+                return new MappingElement(generator, semanticModel)
                 {
                     Expression = (ExpressionSyntax) generator.MemberAccessExpression(sourceGlobalAccessor, matchedSourceProperty.Name),
                     ExpressionType = matchedSourceProperty.Type
@@ -139,7 +66,7 @@ namespace MappingGenerator
             if (matchedSourceMethod != null)
             {
                 var sourceMethodAccessor = generator.MemberAccessExpression(sourceGlobalAccessor, matchedSourceMethod.Name);
-                return new MappingElement()
+                return new MappingElement(generator, semanticModel)
                 {
                     Expression = (ExpressionSyntax) generator.InvocationExpression(sourceMethodAccessor),
                     ExpressionType = matchedSourceMethod.ReturnType
@@ -163,7 +90,7 @@ namespace MappingGenerator
                 var subPropertyAccessor = (ExpressionSyntax) generator.MemberAccessExpression(currentAccessor, subProperty.Name);
                 if (targetName.Equals(currentNamePart, StringComparison.OrdinalIgnoreCase))
                 {
-                    return new MappingElement
+                    return new MappingElement(generator, semanticModel)
                     {
                         Expression = subPropertyAccessor,
                         ExpressionType = subProperty.Type
@@ -174,57 +101,8 @@ namespace MappingGenerator
             return null;
         }
 
-        private MappingElement TryToUnwrapp(MappingElement mappingSource, ITypeSymbol targetType)
-        {
-            var sourceAccess = mappingSource.Expression as SyntaxNode;
-            var conversion =  semanticModel.Compilation.ClassifyConversion(mappingSource.ExpressionType, targetType);
-            if (conversion.Exists == false)
-            {
-                var wrapper = GetWrappingInfo(mappingSource.ExpressionType, targetType);
-                if (wrapper.Type == WrapperInfoType.Property)
-                {
-                    return new MappingElement()
-                    {
-                        Expression = (ExpressionSyntax) generator.MemberAccessExpression(sourceAccess, wrapper.UnwrappingProperty.Name),
-                        ExpressionType = wrapper.UnwrappingProperty.Type
-                    };
-                }else if (wrapper.Type == WrapperInfoType.Method)
-                {
-                    var unwrappingMethodAccess = generator.MemberAccessExpression(sourceAccess, wrapper.UnwrappingMethod.Name);
-                    ;
-                    return new MappingElement()
-                    {
-                        Expression = (InvocationExpressionSyntax) generator.InvocationExpression(unwrappingMethodAccess),
-                        ExpressionType = wrapper.UnwrappingMethod.ReturnType
+       
 
-                    };
-                }
-
-            }else if(conversion.IsExplicit)
-            {
-                return new MappingElement()
-                {
-                    Expression = (ExpressionSyntax) generator.CastExpression(targetType, sourceAccess),
-                    ExpressionType = targetType
-                };
-            }
-            return mappingSource;
-        }
-
-        private static WrapperInfo GetWrappingInfo(ITypeSymbol wrapperType, ITypeSymbol wrappedType)
-        {
-            var unwrappingProperties = ObjectHelper.GetUnwrappingProperties(wrapperType, wrappedType).ToList();
-            var unwrappingMethods = ObjectHelper.GetUnwrappingMethods(wrapperType, wrappedType).ToList();
-            if (unwrappingMethods.Count + unwrappingProperties.Count == 1)
-            {
-                if (unwrappingMethods.Count == 1)
-                {
-                    return new WrapperInfo(unwrappingMethods.First());
-                }
-
-                return new WrapperInfo(unwrappingProperties.First());
-            }
-            return new WrapperInfo();
-        }
+      
     }
 }

@@ -198,7 +198,7 @@ namespace MappingGenerator
             return generator.InvocationExpression(accessAsReadonly);
         }
 
-        private static bool IsMappingBetweenCollections(ITypeSymbol targetClassSymbol, ITypeSymbol sourceClassSymbol)
+        public static bool IsMappingBetweenCollections(ITypeSymbol targetClassSymbol, ITypeSymbol sourceClassSymbol)
         {
             return (HasInterface(targetClassSymbol, "System.Collections.ICollection") || targetClassSymbol.Kind == SymbolKind.ArrayType)
                    && (HasInterface(sourceClassSymbol, "System.Collections.IEnumerable") || sourceClassSymbol.Kind == SymbolKind.ArrayType);

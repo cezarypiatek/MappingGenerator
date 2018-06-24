@@ -79,7 +79,7 @@ namespace MappingGenerator
                     continue;
                 }
 
-                var mappingTarget = new MappingElement()
+                var mappingTarget = new MappingElement(generator, semanticModel)
                 {
                     Expression = (ExpressionSyntax)generator.MemberAccessExpression(localTargetIdentifier, targetProperty.Name),
                     ExpressionType = targetProperty.Type

@@ -83,7 +83,7 @@ namespace MappingGenerator
             var propertiesToSet = ObjectHelper.GetPublicPropertySymbols(createdObjectType).Where(x => x.SetMethod?.DeclaredAccessibility == Accessibility.Public);
             var initExpressions = propertiesToSet.Aggregate(objectInitializer.Expressions, (expr, property) =>
             {
-                var mappingSource = mappingSourceFinder.FindMappingSource(property.Name, property.Type);
+                var mappingSource = mappingSourceFinder.FindMappingSource2(property.Name, property.Type);
                 if (mappingSource != null)
                 {
                     var assignmentExpression = SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, SyntaxFactory.IdentifierName(property.Name), mappingSource.Expression);

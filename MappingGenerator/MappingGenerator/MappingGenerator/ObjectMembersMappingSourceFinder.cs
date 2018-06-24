@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MappingGenerator.MethodHelpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -42,7 +43,45 @@ namespace MappingGenerator
                 return TryToUnwrapp(mappingSource, targetType);
             }
             return mappingSource;
+        } 
+        
+        public MappingElement FindMappingSource2(string targetName, ITypeSymbol targetType)
+        {
+            var mappingSource = FindSource(targetName);
+            if (mappingSource != null && IsUnrappingNeeded(targetType, mappingSource))
+            {
+                return TryToUnwrapp(mappingSource, targetType);
+            }
+
+            if (mappingSource != null && mappingSource.ExpressionType.Equals(targetType) == false && ObjectHelper.IsSimpleType(targetType)==false && ObjectHelper.IsSimpleType(mappingSource.ExpressionType)==false)
+            {
+                return TryToCreateMappingExpression(mappingSource, targetType);
+            }
+
+            return mappingSource;
         }
+
+        private MappingElement TryToCreateMappingExpression(MappingElement mappingSource, ITypeSymbol targetType)
+        {
+            if (targetType is INamedTypeSymbol namedTargetType)
+            {
+                var directlyMappingConstructor = namedTargetType.Constructors.FirstOrDefault(c => c.Parameters.Length == 1 && c.Parameters[0].Type == mappingSource.ExpressionType);
+                if (directlyMappingConstructor != null)
+                {
+                    var constructorParameters = SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument(mappingSource.Expression));
+                    var creationExpression = generator.ObjectCreationExpression(targetType, constructorParameters.Arguments);
+                    return new MappingElement()
+                    {
+                        ExpressionType = targetType,
+                        Expression =  (ExpressionSyntax)creationExpression
+                    };
+                }
+            }
+            return mappingSource;
+        }
+
+
+
 
         private static bool IsUnrappingNeeded(ITypeSymbol targetType, MappingElement mappingSource)
         {

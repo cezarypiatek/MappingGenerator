@@ -76,6 +76,32 @@ namespace MappingGenerator
                         Expression =  (ExpressionSyntax)creationExpression
                     };
                 }
+
+                //maybe this is collection-to-collection mapping
+                //maybe there is constructor that accepts parameter matching source properties
+               
+                if (MappingGenerator.IsMappingBetweenCollections(targetType, mappingSource.ExpressionType) == false)
+                {
+                    // map property by property
+                    var subMappingSourceFinder = new ObjectMembersMappingSourceFinder(mappingSource.ExpressionType, mappingSource.Expression, generator, semanticModel);
+                    var propertiesToSet = ObjectHelper.GetPublicPropertySymbols(targetType).Where(x => x.SetMethod?.DeclaredAccessibility == Accessibility.Public);
+                    var assigments =  propertiesToSet.Select(x =>
+                    {
+                        var src = subMappingSourceFinder.FindMappingSource2(x.Name, x.Type);
+                        if (src != null)
+                        {
+                            return SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, SyntaxFactory.IdentifierName(x.Name), src.Expression);
+                        }
+
+                        return null;
+                    }).OfType<ExpressionSyntax>();
+                    
+                    return new MappingElement()
+                    {
+                        ExpressionType = targetType,
+                        Expression = ((ObjectCreationExpressionSyntax)generator.ObjectCreationExpression(targetType)).WithInitializer( SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression,new SeparatedSyntaxList<ExpressionSyntax>().AddRange(assigments)))
+                    };
+                }
             }
             return mappingSource;
         }

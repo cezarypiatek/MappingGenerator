@@ -81,5 +81,11 @@ namespace MappingGenerator
         {
             return type.IsValueType || SimpleTypes.Contains(type.Name);
         }
+
+        public static bool HasInterface(ITypeSymbol xt, string interfaceName)
+        {
+            return xt.OriginalDefinition.AllInterfaces.Any(x => x.ToDisplayString() == interfaceName);
+        }
     }
+
 }

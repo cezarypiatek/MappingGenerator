@@ -26,7 +26,7 @@ namespace MappingGenerator
             bool generatorContext = false,
             bool isConstructorContext = false)
         {
-            if (IsMappingBetweenCollections(targetType, sourceType))
+            if (MappingHelper.IsMappingBetweenCollections(targetType, sourceType))
             {
                 var collectionMapping = MapCollections(globalSourceAccessor, sourceType, targetType);
                 if (globbalTargetAccessor == null)
@@ -121,7 +121,7 @@ namespace MappingGenerator
 
         public IEnumerable<SyntaxNode> Map(MappingElement source, MappingElement target)
         {
-            if (IsMappingBetweenCollections(target.ExpressionType, source.ExpressionType))
+            if (MappingHelper.IsMappingBetweenCollections(target.ExpressionType, source.ExpressionType))
             {
                 var collectionMapping = MapCollections(source.Expression, source.ExpressionType, target.ExpressionType);
                 yield return generator.CompleteAssignmentStatement(target.Expression, collectionMapping);
@@ -144,8 +144,8 @@ namespace MappingGenerator
         private SyntaxNode MapCollections(SyntaxNode sourceAccess, ITypeSymbol sourceListType, ITypeSymbol targetListType)
         {
             var isReadolyCollection = targetListType.Name == "ReadOnlyCollection";
-            var sourceListElementType = GetElementType(sourceListType);
-            var targetListElementType = GetElementType(targetListType);
+            var sourceListElementType = MappingHelper.GetElementType(sourceListType);
+            var targetListElementType = MappingHelper.GetElementType(targetListType);
             if (ObjectHelper.IsSimpleType(sourceListElementType) || sourceListElementType == targetListElementType)
             {
                 var toListInvocation = AddMaterializeCollectionInvocation(generator, sourceAccess, targetListType);
@@ -158,27 +158,7 @@ namespace MappingGenerator
             var toList = AddMaterializeCollectionInvocation(generator, selectInvocation, targetListType);
             return WrapInReadonlyCollectionIfNecessary(isReadolyCollection, toList, generator);
         }
-
-        private ITypeSymbol GetElementType(ITypeSymbol collectionType)
-        {
-            switch (collectionType)
-            {
-                case INamedTypeSymbol namedType:
-                    if (namedType.IsGenericType == false)
-                    {
-                        if (ObjectHelper.IsSystemObject(namedType.BaseType))
-                        {
-                            return namedType.BaseType;
-                        }
-                        return GetElementType(namedType.BaseType);
-                    }
-                    return namedType.TypeArguments[0];
-                case IArrayTypeSymbol arrayType:
-                    return arrayType.ElementType;
-                default:
-                    throw new NotSupportedException("Unknown collection type");
-            }
-        }
+      
 
         private static SyntaxNode AddMaterializeCollectionInvocation(SyntaxGenerator generator, SyntaxNode sourceAccess, ITypeSymbol targetListType)
         {
@@ -196,12 +176,6 @@ namespace MappingGenerator
 
             var accessAsReadonly = generator.MemberAccessExpression(node, "AsReadOnly");
             return generator.InvocationExpression(accessAsReadonly);
-        }
-
-        public static bool IsMappingBetweenCollections(ITypeSymbol targetClassSymbol, ITypeSymbol sourceClassSymbol)
-        {
-            return (HasInterface(targetClassSymbol, "System.Collections.ICollection") || targetClassSymbol.Kind == SymbolKind.ArrayType)
-                   && (HasInterface(sourceClassSymbol, "System.Collections.IEnumerable") || sourceClassSymbol.Kind == SymbolKind.ArrayType);
         }
 
         private ArgumentListSyntax FindMappingConstructorParameters(ITypeSymbol targetType, ITypeSymbol sourceType, ObjectMembersMappingSourceFinder mappingSourceFinder, ExpressionSyntax globalSourceAccessor)
@@ -237,11 +211,6 @@ namespace MappingGenerator
             }
 
             return proposalLocalName;
-        }
-
-        private static bool HasInterface(ITypeSymbol xt, string interfaceName)
-        {
-            return xt.OriginalDefinition.AllInterfaces.Any(x => x.ToDisplayString() == interfaceName);
         }
     }
 }

@@ -92,7 +92,7 @@ namespace MappingGenerator
                 }
                 return expr;
             });
-            return await document.ReplaceNodes(objectInitializer, objectInitializer.WithExpressions(initExpressions), cancellationToken);
+            return await document.ReplaceNodes(objectInitializer, objectInitializer.WithExpressions(initExpressions).FixInitializerExpressionFormatting(), cancellationToken);
         }
     }
 }

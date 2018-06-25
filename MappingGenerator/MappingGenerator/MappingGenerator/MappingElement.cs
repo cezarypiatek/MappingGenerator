@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -29,20 +30,20 @@ namespace MappingGenerator
             
             if (this.ExpressionType.Equals(targetType) == false && ObjectHelper.IsSimpleType(targetType)==false && ObjectHelper.IsSimpleType(this.ExpressionType)==false)
             {
-                return TryToCreateMappingExpression(targetType);
+                return TryToCreateMappingExpression(this, targetType);
             }
 
             return this;
         }
 
-        private MappingElement TryToCreateMappingExpression(ITypeSymbol targetType)
+        private  MappingElement TryToCreateMappingExpression(MappingElement source, ITypeSymbol targetType)
         {
             if (targetType is INamedTypeSymbol namedTargetType)
             {
-                var directlyMappingConstructor = namedTargetType.Constructors.FirstOrDefault(c => c.Parameters.Length == 1 && c.Parameters[0].Type == this.ExpressionType);
+                var directlyMappingConstructor = namedTargetType.Constructors.FirstOrDefault(c => c.Parameters.Length == 1 && c.Parameters[0].Type.Equals(source.ExpressionType));
                 if (directlyMappingConstructor != null)
                 {
-                    var constructorParameters = SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument(this.Expression));
+                    var constructorParameters = SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument(source.Expression));
                     var creationExpression = generator.ObjectCreationExpression(targetType, constructorParameters.Arguments);
                     return new MappingElement(generator, semanticModel)
                     {
@@ -53,11 +54,19 @@ namespace MappingGenerator
 
                 //maybe this is collection-to-collection mapping
                 //maybe there is constructor that accepts parameter matching source properties
-               
-                if (MappingGenerator.IsMappingBetweenCollections(targetType, this.ExpressionType) == false)
+
+                if (MappingHelper.IsMappingBetweenCollections(targetType, source.ExpressionType))
+                {
+                    return new MappingElement(generator, semanticModel)
+                    {
+                        ExpressionType = targetType,
+                        Expression = MapCollections(source.Expression, source.ExpressionType, targetType) as ExpressionSyntax
+                    };
+                }
+                else
                 {
                     // map property by property
-                    var subMappingSourceFinder = new ObjectMembersMappingSourceFinder(this.ExpressionType, this.Expression, generator, semanticModel);
+                    var subMappingSourceFinder = new ObjectMembersMappingSourceFinder(source.ExpressionType, source.Expression, generator, semanticModel);
                     var propertiesToSet = ObjectHelper.GetPublicPropertySymbols(targetType).Where(x => x.SetMethod?.DeclaredAccessibility == Accessibility.Public);
                     var assigments =  propertiesToSet.Select(x =>
                     {
@@ -69,11 +78,12 @@ namespace MappingGenerator
 
                         return null;
                     }).OfType<ExpressionSyntax>();
-                    
+
+                    var initializerExpressionSyntax = SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression,new SeparatedSyntaxList<ExpressionSyntax>().AddRange(assigments)).FixInitializerExpressionFormatting();
                     return new MappingElement(generator, semanticModel)
                     {
                         ExpressionType = targetType,
-                        Expression = ((ObjectCreationExpressionSyntax)generator.ObjectCreationExpression(targetType)).WithInitializer( SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression,new SeparatedSyntaxList<ExpressionSyntax>().AddRange(assigments)))
+                        Expression = ((ObjectCreationExpressionSyntax)generator.ObjectCreationExpression(targetType)).WithInitializer( initializerExpressionSyntax)
                     };
                 }
             }
@@ -102,7 +112,7 @@ namespace MappingGenerator
                 }else if (wrapper.Type == WrapperInfoType.Method)
                 {
                     var unwrappingMethodAccess = generator.MemberAccessExpression(sourceAccess, wrapper.UnwrappingMethod.Name);
-                    ;
+                    
                     return new MappingElement(generator, semanticModel)
                     {
                         Expression = (InvocationExpressionSyntax) generator.InvocationExpression(unwrappingMethodAccess),
@@ -136,6 +146,72 @@ namespace MappingGenerator
                 return new WrapperInfo(unwrappingProperties.First());
             }
             return new WrapperInfo();
+        }
+
+
+        private SyntaxNode MapCollections(SyntaxNode sourceAccess, ITypeSymbol sourceListType, ITypeSymbol targetListType)
+        {
+            
+            var isReadolyCollection = targetListType.Name == "ReadOnlyCollection";
+            var sourceListElementType = MappingHelper.GetElementType(sourceListType);
+            var targetListElementType = MappingHelper.GetElementType(targetListType);
+            if (ObjectHelper.IsSimpleType(sourceListElementType) || sourceListElementType.Equals(targetListElementType))
+            {
+                var toListInvocation = AddMaterializeCollectionInvocation(generator, sourceAccess, targetListType);
+                return WrapInReadonlyCollectionIfNecessary(isReadolyCollection, toListInvocation, generator);
+            }
+            var selectAccess = generator.MemberAccessExpression(sourceAccess, "Select");
+            var lambdaParameterName = ToSingularLocalVariableName(ToLocalVariableName(sourceListElementType.Name));
+            var listElementMappingStm = TryToCreateMappingExpression(new MappingElement(generator, semanticModel)
+                {
+                    ExpressionType = sourceListElementType,
+                    Expression = generator.IdentifierName(lambdaParameterName) as ExpressionSyntax
+                },
+                targetListElementType);
+            
+            var selectInvocation = generator.InvocationExpression(selectAccess, generator.ValueReturningLambdaExpression(lambdaParameterName,listElementMappingStm.Expression));
+            var toList = AddMaterializeCollectionInvocation(generator, selectInvocation, targetListType);
+            return WrapInReadonlyCollectionIfNecessary(isReadolyCollection, toList, generator);
+        }
+
+        private static char[] FobiddenSigns = new[] {'.', '[', ']', '(', ')'};
+
+        private static string ToLocalVariableName(string proposalLocalName)
+        {
+            var withoutForbiddenSigns = string.Join("",proposalLocalName.Trim().Split(FobiddenSigns).Select(x=>
+            {
+                var cleanElement = x.Trim();
+                return $"{cleanElement.Substring(0, 1).ToUpper()}{cleanElement.Substring(1)}";
+            }));
+            return $"{withoutForbiddenSigns.Substring(0, 1).ToLower()}{withoutForbiddenSigns.Substring(1)}";
+        }
+        
+        private static string ToSingularLocalVariableName(string proposalLocalName)
+        {
+            if (proposalLocalName.EndsWith("s"))
+            {
+                return proposalLocalName.Substring(0, proposalLocalName.Length - 1);
+            }
+
+            return proposalLocalName;
+        }
+
+        private static SyntaxNode AddMaterializeCollectionInvocation(SyntaxGenerator generator, SyntaxNode sourceAccess, ITypeSymbol targetListType)
+        {
+            var materializeFunction =  targetListType.Kind == SymbolKind.ArrayType? "ToArray": "ToList";
+            var toListAccess = generator.MemberAccessExpression(sourceAccess, materializeFunction );
+            return generator.InvocationExpression(toListAccess);
+        }
+
+        private static SyntaxNode WrapInReadonlyCollectionIfNecessary(bool isReadonly, SyntaxNode node, SyntaxGenerator generator)
+        {
+            if (isReadonly == false)
+            {
+                return node;
+            }
+
+            var accessAsReadonly = generator.MemberAccessExpression(node, "AsReadOnly");
+            return generator.InvocationExpression(accessAsReadonly);
         }
     }
 }

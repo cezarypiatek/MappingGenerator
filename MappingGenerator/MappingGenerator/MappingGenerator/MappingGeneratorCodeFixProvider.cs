@@ -66,7 +66,9 @@ namespace MappingGenerator
             {
                 var source = methodSymbol.Parameters[0];
                 var targetType = methodSymbol.ReturnType;
-                return mappingGenerator.MapTypes(source.Type, targetType,generator.IdentifierName(source.Name));
+                var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator, semanticModel);
+                var objectCreationExpressionSyntax = MappingHelper.CreateObjectCreationExpressionWithInitializer(targetType, sourceFinder, generator, semanticModel);
+                return new[] { generator.ReturnStatement(objectCreationExpressionSyntax) };
             }
 
             var isMappingConstructor = SymbolHelper.IsMappingConstructor(methodSymbol);

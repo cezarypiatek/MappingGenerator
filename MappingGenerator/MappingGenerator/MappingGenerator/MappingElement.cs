@@ -78,23 +78,10 @@ namespace MappingGenerator
                     };
                 }
                 
-                var propertiesToSet = ObjectHelper.GetPublicPropertySymbols(targetType).Where(x => x.SetMethod?.DeclaredAccessibility == Accessibility.Public);
-                var assigments =  propertiesToSet.Select(x =>
-                {
-                    var src = subMappingSourceFinder.FindMappingSource(x.Name, x.Type);
-                    if (src != null)
-                    {
-                        return SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, SyntaxFactory.IdentifierName(x.Name), src.Expression);
-                    }
-
-                    return null;
-                }).OfType<ExpressionSyntax>();
-
-                var initializerExpressionSyntax = SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression,new SeparatedSyntaxList<ExpressionSyntax>().AddRange(assigments)).FixInitializerExpressionFormatting();
                 return new MappingElement(generator, semanticModel)
                 {
                     ExpressionType = targetType,
-                    Expression = ((ObjectCreationExpressionSyntax)generator.ObjectCreationExpression(targetType)).WithInitializer( initializerExpressionSyntax)
+                    Expression = MappingHelper.CreateObjectCreationExpressionWithInitializer(targetType, subMappingSourceFinder, generator, semanticModel)
                 };
             }
             return this;

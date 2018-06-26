@@ -1,3 +1,4 @@
+using System;
 using System.Composition;
 using System.Collections.Immutable;
 using System.Linq;
@@ -9,7 +10,6 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
-using Microsoft.CodeAnalysis.Formatting;
 
 namespace MappingGenerator
 {
@@ -51,48 +51,27 @@ namespace MappingGenerator
         private async Task<Document> InitizalizeWithLocals(Document document, InitializerExpressionSyntax objectInitializer, CancellationToken cancellationToken)
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var objectCreationExpression = objectInitializer.FindContainer<ObjectCreationExpressionSyntax>();
-            var createdObjectType = ModelExtensions.GetTypeInfo(semanticModel, objectCreationExpression).Type;
             var mappingSourceFinder = new LocalScopeMappingSourceFinder(semanticModel, objectInitializer, SyntaxGenerator.GetGenerator(document));
-            var propertiesToSet = ObjectHelper.GetPublicPropertySymbols(createdObjectType).Where(x => x.SetMethod?.DeclaredAccessibility == Accessibility.Public);
-            var initExpressions = propertiesToSet.Aggregate(objectInitializer.Expressions, (expr, property) =>
-            {
-                var mappingSource = mappingSourceFinder.FindMappingSource(property.Name, property.Type);
-                if (mappingSource != null)
-                {
-                    var assignmentExpression = SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, SyntaxFactory.IdentifierName(property.Name), mappingSource.Expression);
-                    return expr.Add(assignmentExpression);
-                }
-                return expr;
-            });
-            return await document.ReplaceNodes(objectInitializer, objectInitializer.WithExpressions(initExpressions), cancellationToken);
+            return await ReplaceEmptyInitializationBlock(document, objectInitializer, cancellationToken, semanticModel, mappingSourceFinder);
         }
 
-        private async Task<Document> InitizalizeWithLambdaParameter(Document document,
-            ParenthesizedLambdaExpressionSyntax lambdaSyntax, InitializerExpressionSyntax objectInitializer,
-            CancellationToken cancellationToken)
+        private async Task<Document> InitizalizeWithLambdaParameter(Document document, ParenthesizedLambdaExpressionSyntax lambdaSyntax, InitializerExpressionSyntax objectInitializer, CancellationToken cancellationToken)
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var objectCreationExpression = objectInitializer.FindContainer<ObjectCreationExpressionSyntax>();
-            var createdObjectType = ModelExtensions.GetTypeInfo(semanticModel, objectCreationExpression).Type;
             var generator = SyntaxGenerator.GetGenerator(document);
 
             var lambdaSymbol = semanticModel.GetSymbolInfo(lambdaSyntax).Symbol as IMethodSymbol;
             var firstArgument = lambdaSymbol.Parameters.First();
-
             var mappingSourceFinder = new ObjectMembersMappingSourceFinder(firstArgument.Type, generator.IdentifierName(firstArgument.Name), generator, semanticModel);
-            var propertiesToSet = ObjectHelper.GetPublicPropertySymbols(createdObjectType).Where(x => x.SetMethod?.DeclaredAccessibility == Accessibility.Public);
-            var initExpressions = propertiesToSet.Aggregate(objectInitializer.Expressions, (expr, property) =>
-            {
-                var mappingSource = mappingSourceFinder.FindMappingSource(property.Name, property.Type);
-                if (mappingSource != null)
-                {
-                    var assignmentExpression = SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, SyntaxFactory.IdentifierName(property.Name), mappingSource.Expression);
-                    return expr.Add(assignmentExpression);
-                }
-                return expr;
-            });
-            return await document.ReplaceNodes(objectInitializer, objectInitializer.WithExpressions(initExpressions).FixInitializerExpressionFormatting(), cancellationToken);
+            return await ReplaceEmptyInitializationBlock(document, objectInitializer, cancellationToken, semanticModel, mappingSourceFinder);
+        }
+
+        private static async Task<Document> ReplaceEmptyInitializationBlock(Document document, InitializerExpressionSyntax objectInitializer, CancellationToken cancellationToken, SemanticModel semanticModel,  IMappingSourceFinder mappingSourceFinder)
+        {
+            var oldObjCreation = objectInitializer.FindContainer<ObjectCreationExpressionSyntax>();
+            var createdObjectType = ModelExtensions.GetTypeInfo(semanticModel, oldObjCreation).Type;
+            var newObjectCreation = oldObjCreation.AddInitializerWithMapping(mappingSourceFinder,createdObjectType);
+            return await document.ReplaceNodes(oldObjCreation, newObjectCreation, cancellationToken);
         }
     }
 }

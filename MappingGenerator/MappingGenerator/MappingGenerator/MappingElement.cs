@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using MappingGenerator.MethodHelpers;
 using Microsoft.CodeAnalysis;
@@ -172,7 +171,7 @@ namespace MappingGenerator
                 return WrapInReadonlyCollectionIfNecessary(isReadolyCollection, toListInvocation, generator);
             }
             var selectAccess = generator.MemberAccessExpression(sourceAccess, "Select");
-            var lambdaParameterName = ToSingularLocalVariableName(ToLocalVariableName(sourceListElementType.Name));
+            var lambdaParameterName = CreateLambdaParameterName(sourceAccess);
             var listElementMappingStm = TryToCreateMappingExpression(new MappingElement(generator, semanticModel)
                 {
                     ExpressionType = sourceListElementType,
@@ -183,6 +182,12 @@ namespace MappingGenerator
             var selectInvocation = generator.InvocationExpression(selectAccess, generator.ValueReturningLambdaExpression(lambdaParameterName,listElementMappingStm.Expression));
             var toList = AddMaterializeCollectionInvocation(generator, selectInvocation, targetListType);
             return WrapInReadonlyCollectionIfNecessary(isReadolyCollection, toList, generator);
+        }
+
+        private static string CreateLambdaParameterName(SyntaxNode sourceList)
+        {
+            var localVariableName = ToLocalVariableName(sourceList.ToFullString());
+            return ToSingularLocalVariableName(localVariableName);
         }
 
         private static char[] FobiddenSigns = new[] {'.', '[', ']', '(', ')'};

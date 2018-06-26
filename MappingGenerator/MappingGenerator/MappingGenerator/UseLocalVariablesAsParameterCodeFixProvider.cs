@@ -59,14 +59,14 @@ namespace MappingGenerator
         private async Task<Document> UseLocalVariablesAsParameters(Document document, IInvocation invocation, bool generateNamedParameters, CancellationToken cancellationToken)
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var mappingSourceFinder = new LocalScopeMappingSourceFinder(semanticModel, invocation.SourceNode);
+            var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
+            var mappingSourceFinder = new LocalScopeMappingSourceFinder(semanticModel, invocation.SourceNode, syntaxGenerator);
             var overloadParameterSets = invocation.GetOverloadParameterSets(semanticModel);
             if (overloadParameterSets != null)
             {
                 var parametersMatch = MethodHelper.FindBestParametersMatch(mappingSourceFinder, overloadParameterSets);
                 if (parametersMatch != null)
                 {
-                    var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
                     var argumentList = parametersMatch.ToArgumentListSyntax(syntaxGenerator, generateNamedParameters);
                     return await  document.ReplaceNodes(invocation.SourceNode, invocation.WithArgumentList(argumentList), cancellationToken);
                 }

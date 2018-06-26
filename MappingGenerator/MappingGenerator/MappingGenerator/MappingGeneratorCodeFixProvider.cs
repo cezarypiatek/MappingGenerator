@@ -93,7 +93,7 @@ namespace MappingGenerator
                 .Select(property => new
                 {
                     source = sourceFinder.FindMappingSource(property.Name, property.Type),
-                    target = new MappingElement()
+                    target = new MappingElement(generator, semanticModel)
                     {
                         Expression = SyntaxFactory.IdentifierName(property.Name),
                         ExpressionType = property.Type

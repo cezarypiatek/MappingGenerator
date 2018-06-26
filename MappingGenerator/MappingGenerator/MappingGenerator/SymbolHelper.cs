@@ -10,6 +10,10 @@ namespace MappingGenerator
     {
         public static bool IsUpdateParameterFunction(IMethodSymbol methodSymbol)
         {
+            if (methodSymbol.MethodKind == MethodKind.Constructor)
+            {
+                return false;
+            }
             return methodSymbol.Parameters.Length == 2 && methodSymbol.ReturnsVoid;
         }
 

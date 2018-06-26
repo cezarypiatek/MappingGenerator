@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using MappingGenerator.MethodHelpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -40,6 +41,7 @@ namespace MappingGenerator
         {
             if (targetType is INamedTypeSymbol namedTargetType)
             {
+
                 var directlyMappingConstructor = namedTargetType.Constructors.FirstOrDefault(c => c.Parameters.Length == 1 && c.Parameters[0].Type.Equals(source.ExpressionType));
                 if (directlyMappingConstructor != null)
                 {
@@ -52,9 +54,6 @@ namespace MappingGenerator
                     };
                 }
 
-                //maybe this is collection-to-collection mapping
-                //maybe there is constructor that accepts parameter matching source properties
-
                 if (MappingHelper.IsMappingBetweenCollections(targetType, source.ExpressionType))
                 {
                     return new MappingElement(generator, semanticModel)
@@ -63,29 +62,41 @@ namespace MappingGenerator
                         Expression = MapCollections(source.Expression, source.ExpressionType, targetType) as ExpressionSyntax
                     };
                 }
-                else
+
+                var subMappingSourceFinder = new ObjectMembersMappingSourceFinder(source.ExpressionType, source.Expression, generator, semanticModel);
+
+                //maybe there is constructor that accepts parameter matching source properties
+                var constructorOverloadParameterSets = namedTargetType.Constructors.Select(x=>x.Parameters);
+                var matchedOverload =  MethodHelper.FindBestParametersMatch(subMappingSourceFinder, constructorOverloadParameterSets);
+
+                if (matchedOverload != null)
                 {
-                    // map property by property
-                    var subMappingSourceFinder = new ObjectMembersMappingSourceFinder(source.ExpressionType, source.Expression, generator, semanticModel);
-                    var propertiesToSet = ObjectHelper.GetPublicPropertySymbols(targetType).Where(x => x.SetMethod?.DeclaredAccessibility == Accessibility.Public);
-                    var assigments =  propertiesToSet.Select(x =>
-                    {
-                        var src = subMappingSourceFinder.FindMappingSource(x.Name, x.Type);
-                        if (src != null)
-                        {
-                            return SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, SyntaxFactory.IdentifierName(x.Name), src.Expression);
-                        }
-
-                        return null;
-                    }).OfType<ExpressionSyntax>();
-
-                    var initializerExpressionSyntax = SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression,new SeparatedSyntaxList<ExpressionSyntax>().AddRange(assigments)).FixInitializerExpressionFormatting();
+                    var creationExpression = generator.ObjectCreationExpression(targetType, matchedOverload.ToArgumentListSyntax(generator).Arguments);
                     return new MappingElement(generator, semanticModel)
                     {
                         ExpressionType = targetType,
-                        Expression = ((ObjectCreationExpressionSyntax)generator.ObjectCreationExpression(targetType)).WithInitializer( initializerExpressionSyntax)
+                        Expression =  (ExpressionSyntax)creationExpression
                     };
                 }
+                
+                var propertiesToSet = ObjectHelper.GetPublicPropertySymbols(targetType).Where(x => x.SetMethod?.DeclaredAccessibility == Accessibility.Public);
+                var assigments =  propertiesToSet.Select(x =>
+                {
+                    var src = subMappingSourceFinder.FindMappingSource(x.Name, x.Type);
+                    if (src != null)
+                    {
+                        return SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, SyntaxFactory.IdentifierName(x.Name), src.Expression);
+                    }
+
+                    return null;
+                }).OfType<ExpressionSyntax>();
+
+                var initializerExpressionSyntax = SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression,new SeparatedSyntaxList<ExpressionSyntax>().AddRange(assigments)).FixInitializerExpressionFormatting();
+                return new MappingElement(generator, semanticModel)
+                {
+                    ExpressionType = targetType,
+                    Expression = ((ObjectCreationExpressionSyntax)generator.ObjectCreationExpression(targetType)).WithInitializer( initializerExpressionSyntax)
+                };
             }
             return this;
         }

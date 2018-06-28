@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Composition;
 using System.Collections.Immutable;
 using System.Linq;
@@ -7,9 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CodeActions;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Editing;
 
 namespace MappingGenerator
 {
@@ -55,44 +52,33 @@ namespace MappingGenerator
 
         private async Task<Document> GenerateExplicitConversion(Document document, AssignmentExpressionSyntax assignmentExpression, CancellationToken cancellationToken)
         {
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
-            var mappingGenerator = new MappingGenerator(syntaxGenerator, semanticModel);
-            var sourceType = semanticModel.GetTypeInfo(assignmentExpression.Right).Type;
-            var destimationType = semanticModel.GetTypeInfo(assignmentExpression.Left).Type;
-            //WARN: cheap speaculation, no idea how to deal with it in more generic way
-            var targetExists = assignmentExpression.Left.Kind() == SyntaxKind.IdentifierName && semanticModel.GetSymbolInfo(assignmentExpression.Left).Symbol.Kind != SymbolKind.Property;
-            var mappingStatements = mappingGenerator.MapTypes(sourceType, destimationType, assignmentExpression.Right, assignmentExpression.Left, targetExists: targetExists).ToList();
-            var assignmentStatement = assignmentExpression.Parent;
-            return await ReplaceStatement(document, assignmentStatement, mappingStatements, cancellationToken);
+            var mappingEngine = await MappingEngine.Create(document, cancellationToken);
+            var sourceType = mappingEngine.GetExpressionTypeInfo(assignmentExpression.Right).Type;
+            var destimationType = mappingEngine.GetExpressionTypeInfo(assignmentExpression.Left).Type;
+            var mappingExpression = mappingEngine.MapExpression(assignmentExpression.Right, sourceType, destimationType); 
+            return await ReplaceNode(document, assignmentExpression, assignmentExpression.WithRight(mappingExpression), cancellationToken);
         }
 
         private async Task<Document> GenerateExplicitConversion(Document document, ReturnStatementSyntax returnStatement, CancellationToken cancellationToken)
         {
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
-            var mappingGenerator = new MappingGenerator(syntaxGenerator, semanticModel);
-            var returnExpressionType = semanticModel.GetTypeInfo(returnStatement.Expression);
-            var mappingStatements = mappingGenerator.MapTypes(returnExpressionType.Type, returnExpressionType.ConvertedType, returnStatement.Expression);
-            return await ReplaceStatement(document, returnStatement, mappingStatements, cancellationToken);
+            var mappingEngine = await MappingEngine.Create(document, cancellationToken);
+            var returnExpressionTypeInfo = mappingEngine.GetExpressionTypeInfo(returnStatement.Expression);
+            var mappingExpression = mappingEngine.MapExpression(returnStatement.Expression, returnExpressionTypeInfo.Type, returnExpressionTypeInfo.ConvertedType); 
+            return await ReplaceNode(document, returnStatement, returnStatement.WithExpression(mappingExpression), cancellationToken);
         }
 
         private async Task<Document> GenerateExplicitConversion(Document document, YieldStatementSyntax yieldStatement, CancellationToken cancellationToken)
         {
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
-            var mappingGenerator = new MappingGenerator(syntaxGenerator, semanticModel);
-            var yieldExpressionType = semanticModel.GetTypeInfo(yieldStatement.Expression);
-            var mappingStatements = mappingGenerator.MapTypes(yieldExpressionType.Type, yieldExpressionType.ConvertedType, yieldStatement.Expression, generatorContext: true);
-            return await ReplaceStatement(document, yieldStatement, mappingStatements, cancellationToken);
+            var mappingEngine = await MappingEngine.Create(document, cancellationToken);
+            var returnExpressionTypeInfo = mappingEngine.GetExpressionTypeInfo(yieldStatement.Expression);
+            var mappingExpression = mappingEngine.MapExpression(yieldStatement.Expression, returnExpressionTypeInfo.Type, returnExpressionTypeInfo.ConvertedType); 
+            return await ReplaceNode(document, yieldStatement, yieldStatement.WithExpression(mappingExpression), cancellationToken);
         }
 
-        private static async Task<Document> ReplaceStatement(Document document, SyntaxNode statement, IEnumerable<SyntaxNode> newStatements, CancellationToken cancellationToken)
+        private static async Task<Document> ReplaceNode(Document document, SyntaxNode oldNode, SyntaxNode newNode, CancellationToken cancellationToken)
         {
             var root = await document.GetSyntaxRootAsync(cancellationToken);
-            var newRoot = statement.Parent.Kind() == SyntaxKind.Block
-                ? root.ReplaceNode(statement, newStatements)
-                : root.ReplaceNode(statement, SyntaxFactory.Block(newStatements.OfType<StatementSyntax>()));
+            var newRoot = root.ReplaceNode(oldNode, newNode);
             return document.WithSyntaxRoot(newRoot);
         }
 
@@ -100,6 +86,7 @@ namespace MappingGenerator
         {
             switch (node)
             {
+                //TODO EqualsValueClauseSyntax - Type1 v = vOfType2
                     case AssignmentExpressionSyntax assignmentStatement:
                         return assignmentStatement;
                     case ReturnStatementSyntax returnStatement:

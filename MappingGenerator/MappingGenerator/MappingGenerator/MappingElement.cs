@@ -38,35 +38,42 @@ namespace MappingGenerator
 
         private  MappingElement TryToCreateMappingExpression(MappingElement source, ITypeSymbol targetType)
         {
-            if (targetType is INamedTypeSymbol namedTargetType)
+            //TODO: If source expression is method or constructor invocation then we should extract local variable and use it im mappings as a reference
+            var namedTargetType = targetType as INamedTypeSymbol;
+            
+            if (namedTargetType != null)
             {
-
                 var directlyMappingConstructor = namedTargetType.Constructors.FirstOrDefault(c => c.Parameters.Length == 1 && c.Parameters[0].Type.Equals(source.ExpressionType));
                 if (directlyMappingConstructor != null)
                 {
-                    var constructorParameters = SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument(source.Expression));
-                    var creationExpression = generator.ObjectCreationExpression(targetType, constructorParameters.Arguments);
+                    var constructorParameters = SyntaxFactory.ArgumentList()
+                        .AddArguments(SyntaxFactory.Argument(source.Expression));
+                    var creationExpression =
+                        generator.ObjectCreationExpression(targetType, constructorParameters.Arguments);
                     return new MappingElement(generator, semanticModel)
                     {
                         ExpressionType = targetType,
-                        Expression =  (ExpressionSyntax)creationExpression
+                        Expression = (ExpressionSyntax) creationExpression
                     };
                 }
+            }
 
-                if (MappingHelper.IsMappingBetweenCollections(targetType, source.ExpressionType))
+            if (MappingHelper.IsMappingBetweenCollections(targetType, source.ExpressionType))
+            {
+                return new MappingElement(generator, semanticModel)
                 {
-                    return new MappingElement(generator, semanticModel)
-                    {
-                        ExpressionType = targetType,
-                        Expression = MapCollections(source.Expression, source.ExpressionType, targetType) as ExpressionSyntax
-                    };
-                }
+                    ExpressionType = targetType,
+                    Expression = MapCollections(source.Expression, source.ExpressionType, targetType) as ExpressionSyntax
+                };
+            }
 
-                var subMappingSourceFinder = new ObjectMembersMappingSourceFinder(source.ExpressionType, source.Expression, generator, semanticModel);
+            var subMappingSourceFinder = new ObjectMembersMappingSourceFinder(source.ExpressionType, source.Expression, generator, semanticModel);
 
+            if (namedTargetType != null)
+            {
                 //maybe there is constructor that accepts parameter matching source properties
-                var constructorOverloadParameterSets = namedTargetType.Constructors.Select(x=>x.Parameters);
-                var matchedOverload =  MethodHelper.FindBestParametersMatch(subMappingSourceFinder, constructorOverloadParameterSets);
+                var constructorOverloadParameterSets = namedTargetType.Constructors.Select(x => x.Parameters);
+                var matchedOverload = MethodHelper.FindBestParametersMatch(subMappingSourceFinder, constructorOverloadParameterSets);
 
                 if (matchedOverload != null)
                 {
@@ -74,17 +81,17 @@ namespace MappingGenerator
                     return new MappingElement(generator, semanticModel)
                     {
                         ExpressionType = targetType,
-                        Expression =  (ExpressionSyntax)creationExpression
+                        Expression = (ExpressionSyntax) creationExpression
                     };
                 }
-                
-                return new MappingElement(generator, semanticModel)
-                {
-                    ExpressionType = targetType,
-                    Expression = MappingHelper.CreateObjectCreationExpressionWithInitializer(targetType, subMappingSourceFinder, generator, semanticModel)
-                };
             }
-            return this;
+
+
+            return new MappingElement(generator, semanticModel)
+            {
+                ExpressionType = targetType,
+                Expression = MappingHelper.CreateObjectCreationExpressionWithInitializer(targetType, subMappingSourceFinder, generator, semanticModel)
+            };
         }
 
         private bool IsUnrappingNeeded(ITypeSymbol targetType)
@@ -173,15 +180,21 @@ namespace MappingGenerator
 
         private static string CreateLambdaParameterName(SyntaxNode sourceList)
         {
-            var localVariableName = ToLocalVariableName(sourceList.ToFullString());
-            return ToSingularLocalVariableName(localVariableName);
+            var originalName = sourceList.ToFullString();
+            var localVariableName = ToLocalVariableName(originalName);
+            var finalName = ToSingularLocalVariableName(localVariableName);
+            if (originalName == finalName)
+            {
+                return $"{finalName}Element";
+            }
+            return finalName;
         }
 
         private static char[] FobiddenSigns = new[] {'.', '[', ']', '(', ')'};
 
         private static string ToLocalVariableName(string proposalLocalName)
         {
-            var withoutForbiddenSigns = string.Join("",proposalLocalName.Trim().Split(FobiddenSigns).Select(x=>
+            var withoutForbiddenSigns = string.Join("",proposalLocalName.Trim().Split(FobiddenSigns).Where(x=> string.IsNullOrWhiteSpace(x) == false).Select(x=>
             {
                 var cleanElement = x.Trim();
                 return $"{cleanElement.Substring(0, 1).ToUpper()}{cleanElement.Substring(1)}";

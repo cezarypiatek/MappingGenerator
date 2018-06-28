@@ -54,13 +54,11 @@ namespace MappingGenerator
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var methodSymbol = semanticModel.GetDeclaredSymbol(methodSyntax);
             var generator = SyntaxGenerator.GetGenerator(document);
-            var mappingGenerator = new MappingGenerator(generator, semanticModel);
-            var mappingExpressions = GenerateMappingCode(methodSymbol, generator, mappingGenerator, semanticModel);
+            var mappingExpressions = GenerateMappingCode(methodSymbol, generator, semanticModel);
             return await document.ReplaceNodes(methodSyntax.Body, ((BaseMethodDeclarationSyntax) generator.MethodDeclaration(methodSymbol, mappingExpressions)).Body, cancellationToken);
         }
 
-        private static IEnumerable<SyntaxNode> GenerateMappingCode(IMethodSymbol methodSymbol,
-            SyntaxGenerator generator, MappingGenerator mappingGenerator, SemanticModel semanticModel)
+        private static IEnumerable<SyntaxNode> GenerateMappingCode(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
         {
             if (SymbolHelper.IsPureMappingFunction(methodSymbol))
             {
@@ -71,40 +69,70 @@ namespace MappingGenerator
                 return new[] { generator.ReturnStatement(objectCreationExpressionSyntax) };
             }
 
-            var isMappingConstructor = SymbolHelper.IsMappingConstructor(methodSymbol);
-            if (SymbolHelper.IsUpdateThisObjectFunction(methodSymbol) || isMappingConstructor)
-            {
-                var source = methodSymbol.Parameters[0];
-                var targetType = methodSymbol.ContainingType;
-                return mappingGenerator.MapTypes(source.Type, targetType, generator.IdentifierName(source.Name), generator.ThisExpression(), targetExists: true, isConstructorContext: isMappingConstructor);
-            }
-
             if (SymbolHelper.IsUpdateParameterFunction(methodSymbol))
             {
                 var source = methodSymbol.Parameters[0];
                 var target = methodSymbol.Parameters[1];
-                return mappingGenerator.MapTypes(source.Type, target.Type, generator.IdentifierName(source.Name), generator.IdentifierName(target.Name), targetExists: true);
+                var targets = ObjectHelper.GetFieldsThaCanBeSetPublicly(target.Type);
+                var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator, semanticModel);
+                return MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder, generator.IdentifierName(target.Name));
             }
 
-            var isMultiParameterConstructor = SymbolHelper.IsMultiParameterUpdateThisObjectFunction(methodSymbol);
-            if (isMultiParameterConstructor || SymbolHelper.IsMultiParameterMappingConstructor(methodSymbol))
+            if (SymbolHelper.IsUpdateThisObjectFunction(methodSymbol))
             {
-                var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters);
-                return ObjectHelper.GetPublicPropertySymbols(methodSymbol.ContainingType)
-                .Where(property => property.SetMethod != null || (property.CanBeSetOnlyFromConstructor() && isMultiParameterConstructor))
-                .Select(property => new
+                var source = methodSymbol.Parameters[0];
+                var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator, semanticModel);
+                var targets = ObjectHelper.GetFieldsThaCanBeSetPrivately(methodSymbol.ContainingType);
+                return MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder);
+            }
+
+            if (SymbolHelper.IsMultiParameterUpdateThisObjectFunction(methodSymbol))
+            {
+                var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters, generator);
+                var targets = ObjectHelper.GetFieldsThaCanBeSetPrivately(methodSymbol.ContainingType);
+                return MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder);
+            }
+
+            if (SymbolHelper.IsMappingConstructor(methodSymbol))
+            {
+                var source = methodSymbol.Parameters[0];
+                var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator, semanticModel);
+                var targets = ObjectHelper.GetFieldsThaCanBeSetFromConstructor(methodSymbol.ContainingType);
+                return MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder);
+            }
+
+            if (SymbolHelper.IsMultiParameterMappingConstructor(methodSymbol))
+            {
+                var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters, generator);
+                var targets = ObjectHelper.GetFieldsThaCanBeSetFromConstructor(methodSymbol.ContainingType);
+                return MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder);
+            }
+            return Enumerable.Empty<SyntaxNode>();
+        }
+
+        private static IEnumerable<SyntaxNode> MapUsingSimpleAssigment(SyntaxGenerator generator, SemanticModel semanticModel, IEnumerable<IPropertySymbol> targets, IMappingSourceFinder sourceFinder,  SyntaxNode gloablTargetAccessor = null)
+        {
+            return targets.Select(property => new
                 {
                     source = sourceFinder.FindMappingSource(property.Name, property.Type),
                     target = new MappingElement(generator, semanticModel)
                     {
-                        Expression = SyntaxFactory.IdentifierName(property.Name),
+                        Expression = (ExpressionSyntax) CreateAccessPropertyExpression(gloablTargetAccessor, property, generator),
                         ExpressionType = property.Type
                     }
                 })
                 .Where(x=>x.source!=null)
-                .SelectMany(pair => mappingGenerator.Map(pair.source, pair.target));
+                .Select(pair => generator.CompleteAssignmentStatement(pair.target.Expression, pair.source.Expression)).ToList();
+        }
+
+        private static SyntaxNode CreateAccessPropertyExpression(SyntaxNode gloablTargetAccessor,
+            IPropertySymbol property, SyntaxGenerator generator)
+        {
+            if (gloablTargetAccessor == null)
+            {
+                return SyntaxFactory.IdentifierName(property.Name);
             }
-            return Enumerable.Empty<SyntaxNode>();
+            return generator.MemberAccessExpression(gloablTargetAccessor, property.Name);
         }
     }
 }

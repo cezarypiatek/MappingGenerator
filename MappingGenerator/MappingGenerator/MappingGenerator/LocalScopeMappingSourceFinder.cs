@@ -22,10 +22,11 @@ namespace MappingGenerator
         }
 
 
-        public LocalScopeMappingSourceFinder(SemanticModel semanticModel, IReadOnlyList<ISymbol> localSymbols)
+        public LocalScopeMappingSourceFinder(SemanticModel semanticModel, IReadOnlyList<ISymbol> localSymbols, SyntaxGenerator generator)
         {
             this.semanticModel = semanticModel;
             this.localSymbols = localSymbols;
+            this.generator = generator;
         }
 
         public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType)

@@ -10,20 +10,33 @@ namespace MappingGenerator
     {
         public static bool IsUpdateParameterFunction(IMethodSymbol methodSymbol)
         {
-            if (methodSymbol.MethodKind == MethodKind.Constructor)
+            if (IsConstructor(methodSymbol))
             {
                 return false;
             }
             return methodSymbol.Parameters.Length == 2 && methodSymbol.ReturnsVoid;
         }
 
+        private static bool IsConstructor(IMethodSymbol methodSymbol)
+        {
+            return methodSymbol.MethodKind == MethodKind.Constructor;
+        }
+
         public static bool IsUpdateThisObjectFunction(IMethodSymbol methodSymbol)
         {
+            if (IsConstructor(methodSymbol))
+            {
+                return false;
+            }
             return methodSymbol.Parameters.Length == 1 && methodSymbol.ReturnsVoid;
         }
         
         public static bool IsMultiParameterUpdateThisObjectFunction(IMethodSymbol methodSymbol)
         {
+            if (IsConstructor(methodSymbol))
+            {
+                return false;
+            }
             return methodSymbol.Parameters.Length > 1 && methodSymbol.ReturnsVoid;
         }
 
@@ -51,6 +64,28 @@ namespace MappingGenerator
             return new []{typeSymbol};
         }
 
+        public static bool CanBeSetPrivately(this IPropertySymbol property)
+        {
+            var propertyDeclaration = property.DeclaringSyntaxReferences.Select(x => x.GetSyntax()).OfType<PropertyDeclarationSyntax>().FirstOrDefault();
+            if (propertyDeclaration?.AccessorList == null)
+            {
+                return false;
+            }
+
+            return HasPrivateSetter(propertyDeclaration) || HasPublicSetter(propertyDeclaration);
+        } 
+        
+        public static bool CanBeSetPublicly(this IPropertySymbol property)
+        {
+            var propertyDeclaration = property.DeclaringSyntaxReferences.Select(x => x.GetSyntax()).OfType<PropertyDeclarationSyntax>().FirstOrDefault();
+            if (propertyDeclaration?.AccessorList == null)
+            {
+                return false;
+            }
+
+            return HasPublicSetter(propertyDeclaration);
+        }
+
         public static bool CanBeSetOnlyFromConstructor(this IPropertySymbol property)
         {
             var propertyDeclaration = property.DeclaringSyntaxReferences.Select(x => x.GetSyntax()).OfType<PropertyDeclarationSyntax>().FirstOrDefault();
@@ -59,13 +94,22 @@ namespace MappingGenerator
                 return false;
             }
 
-            var hasPrivateSetter =  propertyDeclaration.AccessorList.Accessors.Any(x =>x.Keyword.Kind() == SyntaxKind.SetKeyword && x.Modifiers.Any(m => m.Kind() == SyntaxKind.PrivateKeyword));
-            if (hasPrivateSetter)
+            if (HasPrivateSetter(propertyDeclaration))
             {
-                return true;
+                return false;
             }
 
             return propertyDeclaration.AccessorList.Accessors.Count == 1 && propertyDeclaration.AccessorList.Accessors.SingleOrDefault(IsAutoGetter) != null;
+        }
+
+        private static bool HasPrivateSetter(PropertyDeclarationSyntax propertyDeclaration)
+        {
+            return propertyDeclaration.AccessorList.Accessors.Any(x =>x.Keyword.Kind() == SyntaxKind.SetKeyword && x.Modifiers.Any(m => m.Kind() == SyntaxKind.PrivateKeyword));
+        } 
+        
+        private static bool HasPublicSetter(PropertyDeclarationSyntax propertyDeclaration)
+        {
+            return propertyDeclaration.AccessorList.Accessors.Any(x =>x.Keyword.Kind() == SyntaxKind.SetKeyword && x.Modifiers.Any() == false);
         }
 
         private static bool IsAutoGetter(AccessorDeclarationSyntax x)

@@ -86,6 +86,24 @@ namespace MappingGenerator
         {
             return xt.OriginalDefinition.AllInterfaces.Any(x => x.ToDisplayString() == interfaceName);
         }
+
+        public static IEnumerable<IPropertySymbol> GetFieldsThaCanBeSetFromConstructor(ITypeSymbol type)
+        {
+            return ObjectHelper.GetPublicPropertySymbols(type)
+                .Where(property => property.SetMethod != null || property.CanBeSetOnlyFromConstructor());
+        }
+        
+        public static IEnumerable<IPropertySymbol> GetFieldsThaCanBeSetPublicly(ITypeSymbol type)
+        {
+            return ObjectHelper.GetPublicPropertySymbols(type)
+                .Where(property => property.SetMethod != null && property.CanBeSetPublicly());
+        }
+        
+        public static IEnumerable<IPropertySymbol> GetFieldsThaCanBeSetPrivately(ITypeSymbol type)
+        {
+            return ObjectHelper.GetPublicPropertySymbols(type)
+                .Where(property => property.SetMethod != null && property.CanBeSetPrivately());
+        }
     }
 
 }

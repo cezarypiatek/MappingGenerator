@@ -64,10 +64,16 @@ namespace MappingGenerator
             {
                 var source = methodSymbol.Parameters[0];
                 var targetType = methodSymbol.ReturnType;
-                var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator, semanticModel);
-                var objectCreationExpressionSyntax = MappingHelper.CreateObjectCreationExpressionWithInitializer(targetType, sourceFinder, generator, semanticModel);
-                return new[] { generator.ReturnStatement(objectCreationExpressionSyntax) };
+                var mapping = new MappingElement(generator, semanticModel)
+                {
+                    ExpressionType = source.Type,
+                    Expression = (ExpressionSyntax) generator.IdentifierName(source.Name),
+
+                }.AdjustToType(targetType);
+                return new[] { generator.ReturnStatement(mapping.Expression) };
             }
+
+            //TODO: Pure mapping with multiple parameters
 
             if (SymbolHelper.IsUpdateParameterFunction(methodSymbol))
             {

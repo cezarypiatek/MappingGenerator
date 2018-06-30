@@ -11,7 +11,7 @@ namespace MappingGenerator
     {
         public const string DiagnosticId = "EmptyInitializationBlock";
         internal static readonly LocalizableString Title = "Initialization with local accessible variables can be generated";
-        internal static readonly LocalizableString MessageFormat = "Initialization with local accessible variables can be generated";
+        public static readonly LocalizableString MessageFormat = "Initialization with local accessible variables can be generated";
         internal const string Category = "Usage";
 
         internal static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Info, true);

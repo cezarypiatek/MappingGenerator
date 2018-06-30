@@ -9,6 +9,12 @@
     <Compile Remove="EmptyInitializationBlock\TestCasesData\001_CompleteInitializationBlockWithLocals_FIXED.cs" />
     <Compile Remove="EmptyInitializationBlock\TestCasesData\002_CompleteInitializationBlockWithLambdaParameter.cs" />
     <Compile Remove="EmptyInitializationBlock\TestCasesData\002_CompleteInitializationBlockWithLambdaParameter_FIXED.cs" />
+    <Compile Remove="Splatting\TestCaseData\001_SplattingInMethodInvocation.cs" />
+    <Compile Remove="Splatting\TestCaseData\001_SplattingInMethodInvocationWithNamedParameters_FIXED.cs" />
+    <Compile Remove="Splatting\TestCaseData\001_SplattingInMethodInvocation_FIXED.cs" />
+    <Compile Remove="Splatting\TestCaseData\002_SplattingInConstructorInvocation.cs" />
+    <Compile Remove="Splatting\TestCaseData\002_SplattingInConstructorInvocationWithNamedParameters_FIXED.cs" />
+    <Compile Remove="Splatting\TestCaseData\002_SplattingInConstructorInvocation_FIXED.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -16,6 +22,12 @@
     <None Include="EmptyInitializationBlock\TestCasesData\001_CompleteInitializationBlockWithLocals.cs" />
     <None Include="EmptyInitializationBlock\TestCasesData\002_CompleteInitializationBlockWithLambdaParameter.cs" />
     <None Include="EmptyInitializationBlock\TestCasesData\002_CompleteInitializationBlockWithLambdaParameter_FIXED.cs" />
+    <None Include="Splatting\TestCaseData\001_SplattingInMethodInvocation_FIXED.cs" />
+    <None Include="Splatting\TestCaseData\002_SplattingInConstructorInvocation_FIXED.cs" />
+    <None Include="Splatting\TestCaseData\002_SplattingInConstructorInvocationWithNamedParameters_FIXED.cs" />
+    <None Include="Splatting\TestCaseData\002_SplattingInConstructorInvocation.cs" />
+    <None Include="Splatting\TestCaseData\001_SplattingInMethodInvocation.cs" />
+    <None Include="Splatting\TestCaseData\001_SplattingInMethodInvocationWithNamedParameters_FIXED.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,12 +47,21 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>EmptyInitializationBlockTestCases.resx</DependentUpon>
     </Compile>
+    <Compile Update="Splatting\SplattingTestCases.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>SplattingTestCases.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Update="EmptyInitializationBlock\EmptyInitializationBlockTestCases.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>EmptyInitializationBlockTestCases.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Splatting\SplattingTestCases.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>SplattingTestCases.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 

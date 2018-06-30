@@ -15,6 +15,20 @@
     <Compile Remove="ExplicitConversions\TestCaseData\002_ExplicitConversionForInvalidReturn_FIXED.cs" />
     <Compile Remove="ExplicitConversions\TestCaseData\003_ExplicitConversionForInvalidYield.cs" />
     <Compile Remove="ExplicitConversions\TestCaseData\003_ExplicitConversionForInvalidYield_FIXED.cs" />
+    <Compile Remove="MappingGenerator\TestCaseData\001_PureMappingMethod.cs" />
+    <Compile Remove="MappingGenerator\TestCaseData\001_PureMappingMethod_FIXED.cs" />
+    <Compile Remove="MappingGenerator\TestCaseData\002_PureMappingMethodWithGenerics.cs" />
+    <Compile Remove="MappingGenerator\TestCaseData\002_PureMappingMethodWithGenerics_FIXED.cs" />
+    <Compile Remove="MappingGenerator\TestCaseData\003_MappingFromOneToAnotherParameter.cs" />
+    <Compile Remove="MappingGenerator\TestCaseData\003_MappingFromOneToAnotherParameter_FIXED.cs" />
+    <Compile Remove="MappingGenerator\TestCaseData\004_UpdateThisObjectWithSingleParameter.cs" />
+    <Compile Remove="MappingGenerator\TestCaseData\004_UpdateThisObjectWithSingleParameter_FIXED.cs" />
+    <Compile Remove="MappingGenerator\TestCaseData\005_UpdateThisObjectWithMultipleParameters.cs" />
+    <Compile Remove="MappingGenerator\TestCaseData\005_UpdateThisObjectWithMultipleParameters_FIXED.cs" />
+    <Compile Remove="MappingGenerator\TestCaseData\006_ConstructorWithSingleParameter.cs" />
+    <Compile Remove="MappingGenerator\TestCaseData\006_ConstructorWithSingleParameter_FIXED.cs" />
+    <Compile Remove="MappingGenerator\TestCaseData\007_ConstructorWithMultipleParameters.cs" />
+    <Compile Remove="MappingGenerator\TestCaseData\007_ConstructorWithMultipleParameters_FIXED.cs" />
     <Compile Remove="Splatting\TestCaseData\001_SplattingInMethodInvocation.cs" />
     <Compile Remove="Splatting\TestCaseData\001_SplattingInMethodInvocationWithNamedParameters_FIXED.cs" />
     <Compile Remove="Splatting\TestCaseData\001_SplattingInMethodInvocation_FIXED.cs" />
@@ -40,6 +54,20 @@
     <None Include="ExplicitConversions\TestCaseData\002_ExplicitConversionForInvalidReturn_FIXED.cs" />
     <None Include="ExplicitConversions\TestCaseData\003_ExplicitConversionForInvalidYield.cs" />
     <None Include="ExplicitConversions\TestCaseData\003_ExplicitConversionForInvalidYield_FIXED.cs" />
+    <None Include="MappingGenerator\TestCaseData\001_PureMappingMethod.cs" />
+    <None Include="MappingGenerator\TestCaseData\001_PureMappingMethod_FIXED.cs" />
+    <None Include="MappingGenerator\TestCaseData\002_PureMappingMethodWithGenerics.cs" />
+    <None Include="MappingGenerator\TestCaseData\002_PureMappingMethodWithGenerics_FIXED.cs" />
+    <None Include="MappingGenerator\TestCaseData\003_MappingFromOneToAnotherParameter.cs" />
+    <None Include="MappingGenerator\TestCaseData\003_MappingFromOneToAnotherParameter_FIXED.cs" />
+    <None Include="MappingGenerator\TestCaseData\004_UpdateThisObjectWithSingleParameter.cs" />
+    <None Include="MappingGenerator\TestCaseData\004_UpdateThisObjectWithSingleParameter_FIXED.cs" />
+    <None Include="MappingGenerator\TestCaseData\005_UpdateThisObjectWithMultipleParameters.cs" />
+    <None Include="MappingGenerator\TestCaseData\005_UpdateThisObjectWithMultipleParameters_FIXED.cs" />
+    <None Include="MappingGenerator\TestCaseData\006_ConstructorWithSingleParameter.cs" />
+    <None Include="MappingGenerator\TestCaseData\006_ConstructorWithSingleParameter_FIXED.cs" />
+    <None Include="MappingGenerator\TestCaseData\007_ConstructorWithMultipleParameters.cs" />
+    <None Include="MappingGenerator\TestCaseData\007_ConstructorWithMultipleParameters_FIXED.cs" />
     <None Include="Splatting\TestCaseData\001_SplattingInMethodInvocation_FIXED.cs" />
     <None Include="Splatting\TestCaseData\002_SplattingInConstructorInvocation_FIXED.cs" />
     <None Include="Splatting\TestCaseData\002_SplattingInConstructorInvocationWithNamedParameters_FIXED.cs" />
@@ -76,6 +104,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>ExplicitConversionTestCases.resx</DependentUpon>
     </Compile>
+    <Compile Update="MappingGenerator\MappingGeneratorTestCases.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>MappingGeneratorTestCases.resx</DependentUpon>
+    </Compile>
     <Compile Update="Splatting\SplattingTestCases.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -96,6 +129,10 @@
     <EmbeddedResource Update="ExplicitConversions\ExplicitConversionTestCases.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ExplicitConversionTestCases.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="MappingGenerator\MappingGeneratorTestCases.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>MappingGeneratorTestCases.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="Splatting\SplattingTestCases.resx">
       <Generator>ResXFileCodeGenerator</Generator>

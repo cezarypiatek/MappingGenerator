@@ -157,6 +157,8 @@ namespace TestHelper
             var document = CreateDocument(oldSource, language);
             var compilerDiagnostics = GetCompilerDiagnostics(document);
             
+            Assert.IsTrue(compilerDiagnostics.Any(x => x.Id == diagnosticId), $"There is no issue reported for {diagnosticId}");
+
             foreach (var diagnosticToFix in compilerDiagnostics.Where(x => x.Id == diagnosticId))
             {
                 var actions = new List<CodeAction>();

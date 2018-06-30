@@ -20,7 +20,9 @@ namespace MappingGenerator
     {
         private const string title = "Generate splatting";
 
-        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create("CS7036");
+        public const string CS7036 = nameof(CS7036);
+
+        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(CS7036);
 
         public sealed override FixAllProvider GetFixAllProvider()
         {

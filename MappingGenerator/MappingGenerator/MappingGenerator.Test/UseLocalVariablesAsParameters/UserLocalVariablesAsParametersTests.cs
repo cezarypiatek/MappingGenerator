@@ -1,7 +1,6 @@
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestHelper;
-using MappingGenerator.Test.Splatting;
 using MappingGenerator.Test.UseLocalVariablesAsParameters;
 
 namespace MappingGenerator.Test

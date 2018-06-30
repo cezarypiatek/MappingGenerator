@@ -2,7 +2,7 @@
 
 namespace MappingGenerator.Test.Helpers
 {
-    public class DiagnosticHelper
+    public static class DiagnosticHelper
     {
         public static DiagnosticResultLocation[] LocationFromTestFile(int row, int column)
         {

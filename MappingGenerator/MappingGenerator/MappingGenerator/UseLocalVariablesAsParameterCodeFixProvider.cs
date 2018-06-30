@@ -19,8 +19,24 @@ namespace MappingGenerator
     {
         private const string title = "Use local variables as parameters";
         private const string titleWithNamed = "Use local variables as named parameters";
+
+        /// <summary>
+        /// No overload for method 'method' takes 'number' arguments
+        /// </summary>
+        public const string CS1501 = nameof(CS1501);
         
-        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create("CS1501", "CS7036", "CS1729");
+        
+        /// <summary>
+        /// There is no argument given that corresponds to the required formal parameter 
+        /// </summary>
+        public const string CS7036 = nameof(CS7036);
+        
+        /// <summary>
+        /// type' does not contain a constructor that takes 'number' arguments.
+        /// </summary>
+        public const string CS1729 = nameof(CS1729);
+
+        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(CS1501, CS7036, CS1729);
 
         public sealed override FixAllProvider GetFixAllProvider()
         {

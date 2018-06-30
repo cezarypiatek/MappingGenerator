@@ -5,6 +5,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="EmptyInitializationBlock\TestCasesData\001_CompleteInitializationBlockWithLocals.cs" />
+    <Compile Remove="EmptyInitializationBlock\TestCasesData\001_CompleteInitializationBlockWithLocals_FIXED.cs" />
+    <Compile Remove="EmptyInitializationBlock\TestCasesData\002_CompleteInitializationBlockWithLambdaParameter.cs" />
+    <Compile Remove="EmptyInitializationBlock\TestCasesData\002_CompleteInitializationBlockWithLambdaParameter_FIXED.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="EmptyInitializationBlock\TestCasesData\001_CompleteInitializationBlockWithLocals_FIXED.cs" />
+    <None Include="EmptyInitializationBlock\TestCasesData\001_CompleteInitializationBlockWithLocals.cs" />
+    <None Include="EmptyInitializationBlock\TestCasesData\002_CompleteInitializationBlockWithLambdaParameter.cs" />
+    <None Include="EmptyInitializationBlock\TestCasesData\002_CompleteInitializationBlockWithLambdaParameter_FIXED.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="2.8.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="1.1.18" />
@@ -13,6 +27,21 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MappingGenerator\MappingGenerator.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="EmptyInitializationBlock\EmptyInitializationBlockTestCases.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>EmptyInitializationBlockTestCases.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="EmptyInitializationBlock\EmptyInitializationBlockTestCases.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>EmptyInitializationBlockTestCases.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

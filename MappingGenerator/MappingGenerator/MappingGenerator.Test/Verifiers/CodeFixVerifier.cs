@@ -156,8 +156,13 @@ namespace TestHelper
         {
             var document = CreateDocument(oldSource, language);
             var compilerDiagnostics = GetCompilerDiagnostics(document);
+
+            if (compilerDiagnostics.Any(x => x.Id == diagnosticId) == false)
+            {
+                var reportedIssues = compilerDiagnostics.Select(x => x.Id).ToList();
+                Assert.Fail($"There is no issue reported for {diagnosticId}. Reported issues: {string.Join(',', reportedIssues)}");
+            }
             
-            Assert.IsTrue(compilerDiagnostics.Any(x => x.Id == diagnosticId), $"There is no issue reported for {diagnosticId}");
 
             foreach (var diagnosticToFix in compilerDiagnostics.Where(x => x.Id == diagnosticId))
             {

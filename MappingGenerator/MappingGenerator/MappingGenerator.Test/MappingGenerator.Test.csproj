@@ -9,6 +9,12 @@
     <Compile Remove="EmptyInitializationBlock\TestCasesData\001_CompleteInitializationBlockWithLocals_FIXED.cs" />
     <Compile Remove="EmptyInitializationBlock\TestCasesData\002_CompleteInitializationBlockWithLambdaParameter.cs" />
     <Compile Remove="EmptyInitializationBlock\TestCasesData\002_CompleteInitializationBlockWithLambdaParameter_FIXED.cs" />
+    <Compile Remove="ExplicitConversions\TestCaseData\001_ExplicitConversionForInvalidAssigment.cs" />
+    <Compile Remove="ExplicitConversions\TestCaseData\001_ExplicitConversionForInvalidAssigment_FIXED.cs" />
+    <Compile Remove="ExplicitConversions\TestCaseData\002_ExplicitConversionForInvalidReturn.cs" />
+    <Compile Remove="ExplicitConversions\TestCaseData\002_ExplicitConversionForInvalidReturn_FIXED.cs" />
+    <Compile Remove="ExplicitConversions\TestCaseData\003_ExplicitConversionForInvalidYield.cs" />
+    <Compile Remove="ExplicitConversions\TestCaseData\003_ExplicitConversionForInvalidYield_FIXED.cs" />
     <Compile Remove="Splatting\TestCaseData\001_SplattingInMethodInvocation.cs" />
     <Compile Remove="Splatting\TestCaseData\001_SplattingInMethodInvocationWithNamedParameters_FIXED.cs" />
     <Compile Remove="Splatting\TestCaseData\001_SplattingInMethodInvocation_FIXED.cs" />
@@ -28,6 +34,12 @@
     <None Include="EmptyInitializationBlock\TestCasesData\001_CompleteInitializationBlockWithLocals.cs" />
     <None Include="EmptyInitializationBlock\TestCasesData\002_CompleteInitializationBlockWithLambdaParameter.cs" />
     <None Include="EmptyInitializationBlock\TestCasesData\002_CompleteInitializationBlockWithLambdaParameter_FIXED.cs" />
+    <None Include="ExplicitConversions\TestCaseData\001_ExplicitConversionForInvalidAssigment.cs" />
+    <None Include="ExplicitConversions\TestCaseData\001_ExplicitConversionForInvalidAssigment_FIXED.cs" />
+    <None Include="ExplicitConversions\TestCaseData\002_ExplicitConversionForInvalidReturn.cs" />
+    <None Include="ExplicitConversions\TestCaseData\002_ExplicitConversionForInvalidReturn_FIXED.cs" />
+    <None Include="ExplicitConversions\TestCaseData\003_ExplicitConversionForInvalidYield.cs" />
+    <None Include="ExplicitConversions\TestCaseData\003_ExplicitConversionForInvalidYield_FIXED.cs" />
     <None Include="Splatting\TestCaseData\001_SplattingInMethodInvocation_FIXED.cs" />
     <None Include="Splatting\TestCaseData\002_SplattingInConstructorInvocation_FIXED.cs" />
     <None Include="Splatting\TestCaseData\002_SplattingInConstructorInvocationWithNamedParameters_FIXED.cs" />
@@ -59,6 +71,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>EmptyInitializationBlockTestCases.resx</DependentUpon>
     </Compile>
+    <Compile Update="ExplicitConversions\ExplicitConversionTestCases.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ExplicitConversionTestCases.resx</DependentUpon>
+    </Compile>
     <Compile Update="Splatting\SplattingTestCases.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -75,6 +92,10 @@
     <EmbeddedResource Update="EmptyInitializationBlock\EmptyInitializationBlockTestCases.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>EmptyInitializationBlockTestCases.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="ExplicitConversions\ExplicitConversionTestCases.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ExplicitConversionTestCases.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="Splatting\SplattingTestCases.resx">
       <Generator>ResXFileCodeGenerator</Generator>

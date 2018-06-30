@@ -14,10 +14,12 @@ namespace MappingGenerator
     public class ExplicitConversionCodeFixProvider : CodeFixProvider
     {
         private const string title = "Generate explicit conversion";
-    
+        public const string CS0029 = nameof(CS0029);
+        public const string CS0266 = nameof(CS0266);
+
         public sealed override ImmutableArray<string> FixableDiagnosticIds
         {
-            get { return ImmutableArray.Create( "CS0029", "CS0266"); }
+            get { return ImmutableArray.Create( CS0029, CS0266); }
         }
 
         public sealed override FixAllProvider GetFixAllProvider()

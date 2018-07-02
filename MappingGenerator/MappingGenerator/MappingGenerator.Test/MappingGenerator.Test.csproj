@@ -9,6 +9,8 @@
     <Compile Remove="EmptyInitializationBlock\TestCasesData\001_CompleteInitializationBlockWithLocals_FIXED.cs" />
     <Compile Remove="EmptyInitializationBlock\TestCasesData\002_CompleteInitializationBlockWithLambdaParameter.cs" />
     <Compile Remove="EmptyInitializationBlock\TestCasesData\002_CompleteInitializationBlockWithLambdaParameter_FIXED.cs" />
+    <Compile Remove="EmptyInitializationBlock\TestCasesData\003_CompleteInitializationBlockWithSompleLambdaParameter.cs" />
+    <Compile Remove="EmptyInitializationBlock\TestCasesData\003_CompleteInitializationBlockWithSompleLambdaParameter_FIXED.cs" />
     <Compile Remove="ExplicitConversions\TestCaseData\001_ExplicitConversionForInvalidAssigment.cs" />
     <Compile Remove="ExplicitConversions\TestCaseData\001_ExplicitConversionForInvalidAssigment_FIXED.cs" />
     <Compile Remove="ExplicitConversions\TestCaseData\002_ExplicitConversionForInvalidReturn.cs" />
@@ -46,6 +48,8 @@
   <ItemGroup>
     <None Include="EmptyInitializationBlock\TestCasesData\001_CompleteInitializationBlockWithLocals_FIXED.cs" />
     <None Include="EmptyInitializationBlock\TestCasesData\001_CompleteInitializationBlockWithLocals.cs" />
+    <None Include="EmptyInitializationBlock\TestCasesData\003_CompleteInitializationBlockWithSompleLambdaParameter_FIXED.cs" />
+    <None Include="EmptyInitializationBlock\TestCasesData\003_CompleteInitializationBlockWithSompleLambdaParameter.cs" />
     <None Include="EmptyInitializationBlock\TestCasesData\002_CompleteInitializationBlockWithLambdaParameter.cs" />
     <None Include="EmptyInitializationBlock\TestCasesData\002_CompleteInitializationBlockWithLambdaParameter_FIXED.cs" />
     <None Include="ExplicitConversions\TestCaseData\001_ExplicitConversionForInvalidAssigment.cs" />

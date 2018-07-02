@@ -37,16 +37,19 @@ namespace MappingGenerator
             {
                 return;
             }
-             context.RegisterCodeFix(CodeAction.Create(title: TitleForLocal, createChangedDocument: c => InitizalizeWithLocals(context.Document, objectInitializer, c), equivalenceKey: TitleForLocal), diagnostic);
+            
+            context.RegisterCodeFix(CodeAction.Create(title: TitleForLocal, createChangedDocument: c => InitizalizeWithLocals(context.Document, objectInitializer, c), equivalenceKey: TitleForLocal), diagnostic);
 
-            var lambda = objectInitializer.Parent.FindContainer<ParenthesizedLambdaExpressionSyntax>();
-            if (lambda == null || lambda.ParameterList.Parameters.Count != 1)
+            var lambda = objectInitializer.Parent.FindContainer<LambdaExpressionSyntax>();
+
+            switch (lambda)
             {
-                return;
+                case ParenthesizedLambdaExpressionSyntax parenthesizedLambda when  parenthesizedLambda.ParameterList.Parameters.Count == 1:
+                case SimpleLambdaExpressionSyntax _:
+                    context.RegisterCodeFix(CodeAction.Create(title: TitleForLambda, createChangedDocument: c => InitizalizeWithLambdaParameter(context.Document, lambda, objectInitializer, c), equivalenceKey: TitleForLambda), diagnostic);
+                    break;
             }
-            context.RegisterCodeFix(CodeAction.Create(title: TitleForLambda, createChangedDocument: c => InitizalizeWithLambdaParameter(context.Document, lambda, objectInitializer, c), equivalenceKey: TitleForLambda), diagnostic);
         }
-
 
         private async Task<Document> InitizalizeWithLocals(Document document, InitializerExpressionSyntax objectInitializer, CancellationToken cancellationToken)
         {
@@ -55,7 +58,7 @@ namespace MappingGenerator
             return await ReplaceEmptyInitializationBlock(document, objectInitializer, cancellationToken, semanticModel, mappingSourceFinder);
         }
 
-        private async Task<Document> InitizalizeWithLambdaParameter(Document document, ParenthesizedLambdaExpressionSyntax lambdaSyntax, InitializerExpressionSyntax objectInitializer, CancellationToken cancellationToken)
+        private async Task<Document> InitizalizeWithLambdaParameter(Document document, LambdaExpressionSyntax lambdaSyntax, InitializerExpressionSyntax objectInitializer, CancellationToken cancellationToken)
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var generator = SyntaxGenerator.GetGenerator(document);

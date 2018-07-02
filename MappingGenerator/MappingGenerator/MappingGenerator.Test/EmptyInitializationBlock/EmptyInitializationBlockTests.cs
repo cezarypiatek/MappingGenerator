@@ -45,6 +45,24 @@ namespace MappingGenerator.Test
 
             var fixtest = EmptyInitializationBlockTestCases._002_CompleteInitializationBlockWithLambdaParameter_FIXED;
             VerifyCSharpFix(test, fixtest, 1);
+        }   
+        
+        [TestMethod]
+        public void should_be_able_to_generate_initialization_block_from_simple_lambda_parameter()
+        {
+            var test =  EmptyInitializationBlockTestCases._003_CompleteInitializationBlockWithSompleLambdaParameter;
+            var expected = new DiagnosticResult
+            {
+                Id = EmptyInitializationBlockAnalyzer.DiagnosticId,
+                Message = EmptyInitializationBlockAnalyzer.MessageFormat.ToString(),
+                Severity = DiagnosticSeverity.Info,
+                Locations = DiagnosticHelper.LocationFromTestFile(12, 68)
+            };
+
+            VerifyCSharpDiagnostic(test, expected);
+
+            var fixtest = EmptyInitializationBlockTestCases._003_CompleteInitializationBlockWithSompleLambdaParameter_FIXED;
+            VerifyCSharpFix(test, fixtest, 1);
         }
         
 

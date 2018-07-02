@@ -128,7 +128,7 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
         ///   Looks up a localized string similar to using System;
         ///using System.Linq.Expressions;
         ///
-        ///namespace MappingGenerator.Test.TestCases2
+        ///namespace MappingGenerator.Test.EmptyInitializationBlock.TestCasesData
         ///{
         ///    public class UserDTO
         ///    {
@@ -146,7 +146,7 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
         ///
         ///    public class Mapper
         ///    {
-        ///        public Expression&lt;Func&lt;User [rest of string was truncated]&quot;;.
+        ///        [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _002_CompleteInitializationBlockWithLambdaParameter {
             get {
@@ -158,7 +158,7 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
         ///   Looks up a localized string similar to using System;
         ///using System.Linq.Expressions;
         ///
-        ///namespace MappingGenerator.Test.TestCases2
+        ///namespace MappingGenerator.Test.EmptyInitializationBlock.TestCasesData
         ///{
         ///    public class UserDTO
         ///    {
@@ -176,11 +176,67 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
         ///
         ///    public class Mapper
         ///    {
-        ///        public Expression&lt;Func&lt;User [rest of string was truncated]&quot;;.
+        ///        [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _002_CompleteInitializationBlockWithLambdaParameter_FIXED {
             get {
                 return ResourceManager.GetString("_002_CompleteInitializationBlockWithLambdaParameter_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Linq;
+        ///using System.Linq.Expressions;
+        ///
+        ///namespace MappingGenerator.Test.EmptyInitializationBlock.TestCasesData
+        ///{
+        ///    public class Mapper
+        ///    {
+        ///        public IList&lt;UserDTO&gt; Map(IList&lt;UserEntity&gt; entities)
+        ///        {
+        ///            return entities.Select(x =&gt; new UserDTO() { }).ToList();
+        ///        }
+        ///    }
+        ///
+        ///    public class UserDTO
+        ///    {
+        ///        public string FirstName { get; set; }
+        ///        public string LastName { get; set; }
+        ///        pub [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _003_CompleteInitializationBlockWithSompleLambdaParameter {
+            get {
+                return ResourceManager.GetString("_003_CompleteInitializationBlockWithSompleLambdaParameter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Linq;
+        ///using System.Linq.Expressions;
+        ///
+        ///namespace MappingGenerator.Test.EmptyInitializationBlock.TestCasesData
+        ///{
+        ///    public class Mapper
+        ///    {
+        ///        public IList&lt;UserDTO&gt; Map(IList&lt;UserEntity&gt; entities)
+        ///        {
+        ///            return entities.Select(x =&gt; new UserDTO() { }).ToList();
+        ///        }
+        ///    }
+        ///
+        ///    public class UserDTO
+        ///    {
+        ///        public string FirstName { get; set; }
+        ///        public string LastName { get; set; }
+        ///        pub [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _003_CompleteInitializationBlockWithSompleLambdaParameter_FIXED {
+            get {
+                return ResourceManager.GetString("_003_CompleteInitializationBlockWithSompleLambdaParameter_FIXED", resourceCulture);
             }
         }
     }

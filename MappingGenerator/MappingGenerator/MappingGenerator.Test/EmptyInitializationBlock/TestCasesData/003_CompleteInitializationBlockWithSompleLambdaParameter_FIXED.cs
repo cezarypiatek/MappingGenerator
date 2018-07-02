@@ -1,0 +1,34 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+
+namespace MappingGenerator.Test.EmptyInitializationBlock.TestCasesData
+{
+    public class Mapper
+    {
+        public IList<UserDTO> Map(IList<UserEntity> entities)
+        {
+            return entities.Select((UserEntity x) => new UserDTO()
+            {
+                FirstName = x.FirstName,
+                LastName = x.LastName,
+                Age = x.Age
+            }).ToList();
+        }
+    }
+
+    public class UserDTO
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public int Age { get; set; }
+    }
+
+    public class UserEntity
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public int Age { get; set; }
+    }
+}

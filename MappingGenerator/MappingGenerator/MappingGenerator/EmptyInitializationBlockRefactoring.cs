@@ -17,6 +17,7 @@ namespace MappingGenerator
     {
         private const string TitleForLocal = "Initialize with local variables";
         private const string TitleForLambda = "Initialize with lambda parameter";
+        private const string TitleForScaffolding = "Initialize with sample values";
 
         public sealed override async Task ComputeRefactoringsAsync(CodeRefactoringContext context)
         {
@@ -26,6 +27,7 @@ namespace MappingGenerator
             if (objectInitializer != null && objectInitializer.Expressions.Count == 0)
             {
                 context.RegisterRefactoring(CodeAction.Create(title: TitleForLocal, createChangedDocument: c => InitializeWithLocals(context.Document, objectInitializer, c), equivalenceKey: TitleForLocal));
+                context.RegisterRefactoring(CodeAction.Create(title: TitleForScaffolding, createChangedDocument: c => InitializeWithDefaults(context.Document, objectInitializer, c), equivalenceKey: TitleForScaffolding));
 
                 var lambda = objectInitializer.Parent.FindContainer<LambdaExpressionSyntax>();
 
@@ -66,6 +68,14 @@ namespace MappingGenerator
             var createdObjectType = ModelExtensions.GetTypeInfo(semanticModel, oldObjCreation).Type;
             var newObjectCreation = oldObjCreation.AddInitializerWithMapping(mappingSourceFinder, createdObjectType, semanticModel, syntaxGenerator);
             return await document.ReplaceNodes(oldObjCreation, newObjectCreation, cancellationToken);
+        }
+
+        private async Task<Document> InitializeWithDefaults(Document document, InitializerExpressionSyntax objectInitializer, CancellationToken cancellationToken)
+        {
+            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+            var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
+            var mappingSourceFinder = new ScaffoldingSourceFinder(syntaxGenerator);
+            return await ReplaceEmptyInitializationBlock(document, objectInitializer, cancellationToken, semanticModel, mappingSourceFinder, syntaxGenerator);
         }
     }
 }

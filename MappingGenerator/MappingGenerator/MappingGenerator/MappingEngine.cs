@@ -60,7 +60,7 @@ namespace MappingGenerator
                 return new MappingElement()
                 {
                     ExpressionType = element.ExpressionType,
-                    Expression = element.Expression.WithTrailingTrivia(SyntaxFactory.Comment(" /* Stop recursing mapping */"))
+                    Expression = element.Expression.WithTrailingTrivia(SyntaxFactory.Comment(" /* Stop recursive mapping */"))
                 };
             }
 

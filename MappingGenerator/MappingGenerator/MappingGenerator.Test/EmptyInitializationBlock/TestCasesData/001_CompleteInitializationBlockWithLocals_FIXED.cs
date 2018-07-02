@@ -19,7 +19,6 @@ namespace MappingGenerator.Test.TestCases
             var lastName = "Piatek";
 
             var x = new UserDTO()
-
             {
                 FirstName = firstName,
                 LastName = lastName,

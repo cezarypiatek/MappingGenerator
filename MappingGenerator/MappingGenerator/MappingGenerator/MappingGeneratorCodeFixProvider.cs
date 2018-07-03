@@ -81,7 +81,7 @@ namespace MappingGenerator
                 var target = methodSymbol.Parameters[1];
                 var targets = ObjectHelper.GetFieldsThaCanBeSetPublicly(target.Type);
                 var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator, semanticModel);
-                return MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder, generator.IdentifierName(target.Name));
+                return MappingHelper.MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder, generator.IdentifierName(target.Name));
             }
 
             if (SymbolHelper.IsUpdateThisObjectFunction(methodSymbol))
@@ -89,14 +89,14 @@ namespace MappingGenerator
                 var source = methodSymbol.Parameters[0];
                 var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator, semanticModel);
                 var targets = ObjectHelper.GetFieldsThaCanBeSetPrivately(methodSymbol.ContainingType);
-                return MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder);
+                return MappingHelper.MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder);
             }
 
             if (SymbolHelper.IsMultiParameterUpdateThisObjectFunction(methodSymbol))
             {
                 var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters, generator);
                 var targets = ObjectHelper.GetFieldsThaCanBeSetPrivately(methodSymbol.ContainingType);
-                return MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder);
+                return MappingHelper.MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder);
             }
 
             if (SymbolHelper.IsMappingConstructor(methodSymbol))
@@ -104,41 +104,16 @@ namespace MappingGenerator
                 var source = methodSymbol.Parameters[0];
                 var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator, semanticModel);
                 var targets = ObjectHelper.GetFieldsThaCanBeSetFromConstructor(methodSymbol.ContainingType);
-                return MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder);
+                return MappingHelper.MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder);
             }
 
             if (SymbolHelper.IsMultiParameterMappingConstructor(methodSymbol))
             {
                 var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters, generator);
                 var targets = ObjectHelper.GetFieldsThaCanBeSetFromConstructor(methodSymbol.ContainingType);
-                return MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder);
+                return MappingHelper.MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder);
             }
             return Enumerable.Empty<SyntaxNode>();
-        }
-
-        private static IEnumerable<SyntaxNode> MapUsingSimpleAssigment(SyntaxGenerator generator, SemanticModel semanticModel, IEnumerable<IPropertySymbol> targets, IMappingSourceFinder sourceFinder,  SyntaxNode gloablTargetAccessor = null)
-        {
-            return targets.Select(property => new
-                {
-                    source = sourceFinder.FindMappingSource(property.Name, property.Type),
-                    target = new MappingElement(generator, semanticModel)
-                    {
-                        Expression = (ExpressionSyntax) CreateAccessPropertyExpression(gloablTargetAccessor, property, generator),
-                        ExpressionType = property.Type
-                    }
-                })
-                .Where(x=>x.source!=null)
-                .Select(pair => generator.CompleteAssignmentStatement(pair.target.Expression, pair.source.Expression)).ToList();
-        }
-
-        private static SyntaxNode CreateAccessPropertyExpression(SyntaxNode gloablTargetAccessor,
-            IPropertySymbol property, SyntaxGenerator generator)
-        {
-            if (gloablTargetAccessor == null)
-            {
-                return SyntaxFactory.IdentifierName(property.Name);
-            }
-            return generator.MemberAccessExpression(gloablTargetAccessor, property.Name);
         }
     }
 }

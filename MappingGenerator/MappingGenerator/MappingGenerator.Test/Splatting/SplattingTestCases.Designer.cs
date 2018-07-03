@@ -105,7 +105,7 @@ namespace MappingGenerator.Test.Splatting {
         ///        public void DoSomething()
         ///        {
         ///            var user = new UserDTO();
-        ///            ProceessUser(firstName: user.FirstName, lastName: user.LastName, age: user.Age);
+        ///            ProceessUser(user.FirstName, user.LastName, user.Age);
         ///        }
         ///
         ///        public void ProceessUser(string firstName, string lastName, int age)
@@ -117,7 +117,7 @@ namespace MappingGenerator.Test.Splatting {
         ///
         ///    public class UserDTO
         ///    {
-        ///        public [rest of string was truncated]&quot;;.
+        ///        public string FirstName { get; s [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _001_SplattingInMethodInvocation_FIXED {
             get {
@@ -204,7 +204,7 @@ namespace MappingGenerator.Test.Splatting {
         ///        public void DoSomething()
         ///        {
         ///            var user = new UserDTO();
-        ///            new SampleClass(firstName: user.FirstName, lastName: user.LastName, age: user.Age);
+        ///            new SampleClass(user.FirstName, user.LastName, user.Age);
         ///        }
         ///    }
         ///
@@ -217,7 +217,8 @@ namespace MappingGenerator.Test.Splatting {
         ///    }
         ///
         ///
-        ///    pu [rest of string was truncated]&quot;;.
+        ///    public class UserDTO
+        ///    {        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _002_SplattingInConstructorInvocation_FIXED {
             get {
@@ -255,6 +256,68 @@ namespace MappingGenerator.Test.Splatting {
         internal static string _002_SplattingInConstructorInvocationWithNamedParameters_FIXED {
             get {
                 return ResourceManager.GetString("_002_SplattingInConstructorInvocationWithNamedParameters_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///
+        ///namespace MappingGenerator.Test.Splatting.TestCaseData
+        ///{
+        ///    class TestMapper
+        ///    {
+        ///        public void DoSomething()
+        ///        {
+        ///            var user = new UserDTO();
+        ///            UserProcessor.ProceessUser(user);
+        ///        }
+        ///
+        ///        public void ProceessUser(string firstName, string lastName, int age)
+        ///        {
+        ///
+        ///        }
+        ///    }
+        ///
+        ///    public class UserProcessor
+        ///    {
+        ///        public void ProceessUser(string firstName, string [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _003_SplattingWithBestOverloadMatch {
+            get {
+                return ResourceManager.GetString("_003_SplattingWithBestOverloadMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///
+        ///namespace MappingGenerator.Test.Splatting.TestCaseData
+        ///{
+        ///    class TestMapper
+        ///    {
+        ///        public void DoSomething()
+        ///        {
+        ///            var user = new UserDTO();
+        ///            UserProcessor.ProceessUser(user);
+        ///        }
+        ///
+        ///        public void ProceessUser(string firstName, string lastName, int age)
+        ///        {
+        ///
+        ///        }
+        ///    }
+        ///
+        ///    public class UserProcessor
+        ///    {
+        ///        public void ProceessUser(string firstName, string [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _003_SplattingWithBestOverloadMatch_FIXED {
+            get {
+                return ResourceManager.GetString("_003_SplattingWithBestOverloadMatch_FIXED", resourceCulture);
             }
         }
     }

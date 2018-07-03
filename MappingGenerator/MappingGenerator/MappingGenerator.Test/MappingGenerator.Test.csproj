@@ -37,6 +37,8 @@
     <Compile Remove="Splatting\TestCaseData\002_SplattingInConstructorInvocation.cs" />
     <Compile Remove="Splatting\TestCaseData\002_SplattingInConstructorInvocationWithNamedParameters_FIXED.cs" />
     <Compile Remove="Splatting\TestCaseData\002_SplattingInConstructorInvocation_FIXED.cs" />
+    <Compile Remove="Splatting\TestCaseData\003_SplattingWithBestOverloadMatch.cs" />
+    <Compile Remove="Splatting\TestCaseData\003_SplattingWithBestOverloadMatch_FIXED.cs" />
     <Compile Remove="UseLocalVariablesAsParameters\TestCaseData\001_UserLocaVariablesToCompleteMethodInvocation.cs" />
     <Compile Remove="UseLocalVariablesAsParameters\TestCaseData\001_UserLocaVariablesToCompleteMethodInvocationWithNamedParameters_Fixed.cs" />
     <Compile Remove="UseLocalVariablesAsParameters\TestCaseData\001_UserLocaVariablesToCompleteMethodInvocation_Fixed.cs" />
@@ -72,6 +74,8 @@
     <None Include="MappingGenerator\TestCaseData\006_ConstructorWithSingleParameter_FIXED.cs" />
     <None Include="MappingGenerator\TestCaseData\007_ConstructorWithMultipleParameters.cs" />
     <None Include="MappingGenerator\TestCaseData\007_ConstructorWithMultipleParameters_FIXED.cs" />
+    <None Include="Splatting\TestCaseData\003_SplattingWithBestOverloadMatch_FIXED.cs" />
+    <None Include="Splatting\TestCaseData\003_SplattingWithBestOverloadMatch.cs" />
     <None Include="Splatting\TestCaseData\001_SplattingInMethodInvocation_FIXED.cs" />
     <None Include="Splatting\TestCaseData\002_SplattingInConstructorInvocation_FIXED.cs" />
     <None Include="Splatting\TestCaseData\002_SplattingInConstructorInvocationWithNamedParameters_FIXED.cs" />

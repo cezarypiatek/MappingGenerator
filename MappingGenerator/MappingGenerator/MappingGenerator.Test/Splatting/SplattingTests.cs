@@ -30,6 +30,12 @@ namespace MappingGenerator.Test
         public void should_be_able_to_generate_splatting_for_constructor_invocation_with_named_parameters()
         {
             VerifyCSharpFix(SplattingTestCases._002_SplattingInConstructorInvocation, SplattingTestCases._002_SplattingInConstructorInvocationWithNamedParameters_FIXED, SplattingCodeFixProvider.CS7036, 1);
+        }  
+        
+        [TestMethod]
+        public void should_be_able_to_generate_splatting_for_best_method_overload()
+        {
+            VerifyCSharpFix(SplattingTestCases._003_SplattingWithBestOverloadMatch, SplattingTestCases._003_SplattingWithBestOverloadMatch_FIXED, SplattingCodeFixProvider.CS1501, 1);
         }
 
         protected override CodeFixProvider GetCSharpCodeFixProvider()

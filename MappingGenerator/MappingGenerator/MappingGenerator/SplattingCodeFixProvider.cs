@@ -18,11 +18,11 @@ namespace MappingGenerator
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(SplattingCodeFixProvider)), Shared]
     public class SplattingCodeFixProvider : CodeFixProvider
     {
-        private const string title = "Generate splatting";
 
         public const string CS7036 = nameof(CS7036);
+        public const string CS1501 = nameof(CS1501);
 
-        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(CS7036);
+        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(CS7036, CS1501);
 
         public sealed override FixAllProvider GetFixAllProvider()
         {

@@ -2,25 +2,11 @@
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace MappingGenerator.MethodHelpers
 {
     public static class MethodHelper
     {
-        public static IEnumerable<ImmutableArray<IParameterSymbol>> GetOverloadParameterSets(IMethodSymbol methodSymbol, SemanticModel semanticModel)
-        {
-            var overloadParameterSets = methodSymbol.DeclaringSyntaxReferences.Select(ds =>
-            {
-                var overloadDeclaration = (MethodDeclarationSyntax) ds.GetSyntax();
-                var overloadMethod = semanticModel.GetDeclaredSymbol(overloadDeclaration);
-                return overloadMethod.Parameters;
-            });
-            return overloadParameterSets;
-        }
-       
-
         public static MatchedParameterList FindBestParametersMatch(IMappingSourceFinder mappingSourceFinder, IEnumerable<ImmutableArray<IParameterSymbol>> overloadParameterSets)
         {
             return overloadParameterSets.Select(x=> FindArgumentsMatch(x, mappingSourceFinder))

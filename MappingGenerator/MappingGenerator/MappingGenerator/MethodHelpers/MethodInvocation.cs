@@ -20,11 +20,7 @@ namespace MappingGenerator.MethodHelpers
         public IEnumerable<ImmutableArray<IParameterSymbol>> GetOverloadParameterSets(SemanticModel semanticModel)
         {
             var methodSymbol = semanticModel.GetSymbolInfo(invocationExpression).CandidateSymbols.OfType<IMethodSymbol>().FirstOrDefault();
-            if (methodSymbol == null)
-            {
-                return null;
-            }
-            return MethodHelper.GetOverloadParameterSets(methodSymbol, semanticModel);
+            return methodSymbol?.ContainingType.GetMembers(methodSymbol.Name).OfType<IMethodSymbol>().Select(x => x.Parameters).ToList();
         }
 
         public SyntaxNode WithArgumentList(ArgumentListSyntax argumentListSyntax)

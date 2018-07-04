@@ -17,16 +17,14 @@ namespace MappingGenerator
         private readonly ITypeSymbol sourceType;
         private readonly SyntaxNode sourceGlobalAccessor;
         private readonly SyntaxGenerator generator;
-        private readonly SemanticModel semanticModel;
         private readonly Lazy<IReadOnlyList<IPropertySymbol>> sourceProperties;
         private readonly Lazy<IReadOnlyList<IMethodSymbol>> sourceMethods;
 
-        public ObjectMembersMappingSourceFinder(ITypeSymbol sourceType, SyntaxNode sourceGlobalAccessor, SyntaxGenerator generator, SemanticModel semanticModel)
+        public ObjectMembersMappingSourceFinder(ITypeSymbol sourceType, SyntaxNode sourceGlobalAccessor, SyntaxGenerator generator)
         {
             this.sourceType = sourceType;
             this.sourceGlobalAccessor = sourceGlobalAccessor;
             this.generator = generator;
-            this.semanticModel = semanticModel;
             this.sourceProperties = new Lazy<IReadOnlyList<IPropertySymbol>>(() => ObjectHelper.GetPublicPropertySymbols(sourceType)
                 .Where(property => property.GetMethod!=null)
                 .ToList());
@@ -36,7 +34,7 @@ namespace MappingGenerator
         public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType)
         {
             var mappingSource = FindSource(targetName);
-            return mappingSource?.AdjustToType(targetType);
+            return mappingSource;
         } 
 
         private MappingElement FindSource(string targetName)
@@ -45,7 +43,7 @@ namespace MappingGenerator
             var matchedSourceProperty = sourceProperties.Value.FirstOrDefault(x => x.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase));
             if (matchedSourceProperty != null)
             {
-                return new MappingElement(generator, semanticModel)
+                return new MappingElement()
                 {
                     Expression = (ExpressionSyntax) generator.MemberAccessExpression(sourceGlobalAccessor, matchedSourceProperty.Name),
                     ExpressionType = matchedSourceProperty.Type
@@ -64,7 +62,7 @@ namespace MappingGenerator
             if (matchedSourceMethod != null)
             {
                 var sourceMethodAccessor = generator.MemberAccessExpression(sourceGlobalAccessor, matchedSourceMethod.Name);
-                return new MappingElement(generator, semanticModel)
+                return new MappingElement()
                 {
                     Expression = (ExpressionSyntax) generator.InvocationExpression(sourceMethodAccessor),
                     ExpressionType = matchedSourceMethod.ReturnType
@@ -88,7 +86,7 @@ namespace MappingGenerator
                 var subPropertyAccessor = (ExpressionSyntax) generator.MemberAccessExpression(currentAccessor, subProperty.Name);
                 if (targetName.Equals(currentNamePart, StringComparison.OrdinalIgnoreCase))
                 {
-                    return new MappingElement(generator, semanticModel)
+                    return new MappingElement()
                     {
                         Expression = subPropertyAccessor,
                         ExpressionType = subProperty.Type

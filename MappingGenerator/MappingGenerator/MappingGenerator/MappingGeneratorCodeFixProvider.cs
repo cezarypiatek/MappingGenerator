@@ -60,17 +60,14 @@ namespace MappingGenerator
 
         private static IEnumerable<SyntaxNode> GenerateMappingCode(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
         {
+            var mappingEngine = new MappingEngine(semanticModel, generator);
+
             if (SymbolHelper.IsPureMappingFunction(methodSymbol))
             {
                 var source = methodSymbol.Parameters[0];
                 var targetType = methodSymbol.ReturnType;
-                var mapping = new MappingElement(generator, semanticModel)
-                {
-                    ExpressionType = source.Type,
-                    Expression = (ExpressionSyntax) generator.IdentifierName(source.Name),
-
-                }.AdjustToType(targetType);
-                return new[] { generator.ReturnStatement(mapping.Expression) };
+                var newExpression = mappingEngine.MapExpression((ExpressionSyntax) generator.IdentifierName(source.Name), source.Type, targetType);
+                return new[] { generator.ReturnStatement(newExpression)};
             }
 
             //TODO: Pure mapping with multiple parameters
@@ -80,21 +77,21 @@ namespace MappingGenerator
                 var source = methodSymbol.Parameters[0];
                 var target = methodSymbol.Parameters[1];
                 var targets = ObjectHelper.GetFieldsThaCanBeSetPublicly(target.Type);
-                var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator, semanticModel);
+                var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator);
                 return MappingHelper.MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder, generator.IdentifierName(target.Name));
             }
 
             if (SymbolHelper.IsUpdateThisObjectFunction(methodSymbol))
             {
                 var source = methodSymbol.Parameters[0];
-                var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator, semanticModel);
+                var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator);
                 var targets = ObjectHelper.GetFieldsThaCanBeSetPrivately(methodSymbol.ContainingType);
                 return MappingHelper.MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder);
             }
 
             if (SymbolHelper.IsMultiParameterUpdateThisObjectFunction(methodSymbol))
             {
-                var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters, generator);
+                var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters);
                 var targets = ObjectHelper.GetFieldsThaCanBeSetPrivately(methodSymbol.ContainingType);
                 return MappingHelper.MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder);
             }
@@ -102,14 +99,14 @@ namespace MappingGenerator
             if (SymbolHelper.IsMappingConstructor(methodSymbol))
             {
                 var source = methodSymbol.Parameters[0];
-                var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator, semanticModel);
+                var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator);
                 var targets = ObjectHelper.GetFieldsThaCanBeSetFromConstructor(methodSymbol.ContainingType);
                 return MappingHelper.MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder);
             }
 
             if (SymbolHelper.IsMultiParameterMappingConstructor(methodSymbol))
             {
-                var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters, generator);
+                var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters);
                 var targets = ObjectHelper.GetFieldsThaCanBeSetFromConstructor(methodSymbol.ContainingType);
                 return MappingHelper.MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder);
             }

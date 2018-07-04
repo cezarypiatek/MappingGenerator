@@ -4,29 +4,24 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Editing;
 
 namespace MappingGenerator
 {
     public class LocalScopeMappingSourceFinder:IMappingSourceFinder
     {
         private readonly SemanticModel semanticModel;
-        private readonly SyntaxGenerator generator;
         private readonly IReadOnlyList<ISymbol> localSymbols;
 
-        public LocalScopeMappingSourceFinder(SemanticModel semanticModel, SyntaxNode nodeFromScope, SyntaxGenerator generator)
+        public LocalScopeMappingSourceFinder(SemanticModel semanticModel, SyntaxNode nodeFromScope)
         {
             this.semanticModel = semanticModel;
-            this.generator = generator;
             this.localSymbols = semanticModel.LookupSymbols(nodeFromScope.GetLocation().SourceSpan.Start).Where(x=>x.Kind == SymbolKind.Local || x.Kind == SymbolKind.Parameter).ToList();
         }
 
-
-        public LocalScopeMappingSourceFinder(SemanticModel semanticModel, IReadOnlyList<ISymbol> localSymbols, SyntaxGenerator generator)
+        public LocalScopeMappingSourceFinder(SemanticModel semanticModel, IReadOnlyList<ISymbol> localSymbols)
         {
             this.semanticModel = semanticModel;
             this.localSymbols = localSymbols;
-            this.generator = generator;
         }
 
         public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType)
@@ -37,11 +32,11 @@ namespace MappingGenerator
                 var type = GetType(candidate);
                 if (type != null)
                 {
-                    return new MappingElement(generator, semanticModel)
+                    return new MappingElement()
                     {
                         ExpressionType = type,
                         Expression = SyntaxFactory.IdentifierName(candidate.Name)
-                    }.AdjustToType(targetType);
+                    };
                 }
             }
             return null;

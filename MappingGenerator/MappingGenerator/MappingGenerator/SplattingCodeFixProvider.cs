@@ -67,11 +67,12 @@ namespace MappingGenerator
             if (overloadParameterSets != null)
             {
                 var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
+                var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator);
                 var invalidArgumentList = invocation.Arguments;
                 var parametersMatch = FindParametersMatch(invalidArgumentList, overloadParameterSets, semanticModel, syntaxGenerator);
                 if (parametersMatch != null)
                 {
-                    var argumentList = parametersMatch.ToArgumentListSyntax(syntaxGenerator, generateNamedParameters);
+                    var argumentList = parametersMatch.ToArgumentListSyntax(mappingEngine, generateNamedParameters);
                     return await document.ReplaceNodes(invocation.SourceNode, invocation.WithArgumentList(argumentList), cancellationToken);
                 
                 }
@@ -91,7 +92,7 @@ namespace MappingGenerator
         {
             var invalidArgument = invalidArgumentList.Arguments.First();
             var sourceType = semanticModel.GetTypeInfo(invalidArgument.Expression).Type;
-            return new ObjectMembersMappingSourceFinder(sourceType, invalidArgument.Expression, syntaxGenerator, semanticModel);
+            return new ObjectMembersMappingSourceFinder(sourceType, invalidArgument.Expression, syntaxGenerator);
         }
     }
 }

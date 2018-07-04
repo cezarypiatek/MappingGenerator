@@ -22,7 +22,7 @@ namespace MappingGenerator.MethodHelpers
             foreach (var parameter in parameters)
             {
                 var mappingSource = mappingSourceFinder.FindMappingSource(parameter.Name, parameter.Type);
-                matchedArgumentList.AddMatch(parameter, mappingSource?.Expression);
+                matchedArgumentList.AddMatch(parameter, mappingSource);
             }
             return matchedArgumentList;
         }

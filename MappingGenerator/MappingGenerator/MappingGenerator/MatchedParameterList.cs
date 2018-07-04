@@ -25,31 +25,32 @@ namespace MappingGenerator
 
         private List<MatchedParameter> Matches { get; } = new List<MatchedParameter>();
 
-        public void AddMatch(IParameterSymbol parameter, ExpressionSyntax matchedExpression=null)
+        public void AddMatch(IParameterSymbol parameter, MappingElement  mappingSrc=null)
         {
             Matches.Add(new MatchedParameter()
             {
                 Parameter = parameter,
-                MatchedExpression = matchedExpression
+                Source = mappingSrc
             });
             
-            if (matchedExpression != null)
+            if (mappingSrc?.Expression != null)
             {
                 MatchedCount++;
             }
         }
 
-        public ArgumentListSyntax ToArgumentListSyntax(SyntaxGenerator generator, bool generateNamedParameters=true)
+        public ArgumentListSyntax ToArgumentListSyntax(MappingEngine mappingEngine, bool generateNamedParameters = true)
         {
             return Matches.Aggregate(SyntaxFactory.ArgumentList(), (list, match) =>
             {
-                if (match.MatchedExpression == null && match.Parameter.IsOptional)
+                if (match.Source?.Expression == null && match.Parameter.IsOptional)
                 {
                     generateNamedParameters = true;
                     return list;
                 }
 
-                var expression = match.MatchedExpression ?? (ExpressionSyntax)generator.DefaultExpression(match.Parameter.Type);
+                var parameterType = match.Parameter.Type;
+                var expression = mappingEngine.MapExpression(match.Source, parameterType)?.Expression ?? mappingEngine.CreateDefaultExpression(parameterType);
                 var argument = generateNamedParameters
                     ? SyntaxFactory.Argument(SyntaxFactory.NameColon(match.Parameter.Name), SyntaxFactory.Token(SyntaxKind.None), expression)
                     : SyntaxFactory.Argument(expression);
@@ -60,7 +61,7 @@ namespace MappingGenerator
         class MatchedParameter
         {
             public IParameterSymbol Parameter { get; set; }
-            public ExpressionSyntax MatchedExpression { get; set; }
+            public MappingElement Source { get; set; }
         }
     }
 }

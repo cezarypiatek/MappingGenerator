@@ -62,17 +62,22 @@ namespace MappingGenerator
 
         public static IEnumerable<ExpressionSyntax> MapUsingSimpleAssigment(SyntaxGenerator generator, SemanticModel semanticModel, IEnumerable<IPropertySymbol> targets, IMappingSourceFinder sourceFinder,  SyntaxNode gloablTargetAccessor = null)
         {
+            var mappingEngie = new MappingEngine(semanticModel, generator);
             return targets.Select(property => new
                 {
                     source = sourceFinder.FindMappingSource(property.Name, property.Type),
-                    target = new MappingElement(generator, semanticModel)
+                    target = new MappingElement()
                     {
                         Expression = (ExpressionSyntax) CreateAccessPropertyExpression(gloablTargetAccessor, property, generator),
                         ExpressionType = property.Type
                     }
                 })
                 .Where(x=>x.source!=null)
-                .Select(pair => (ExpressionSyntax) generator.AssignmentStatement(pair.target.Expression, pair.source.Expression)).ToList();
+                .Select(pair =>
+                {
+                    var sourceExpression = mappingEngie.MapExpression(pair.source, pair.target.ExpressionType).Expression;
+                    return (ExpressionSyntax) generator.AssignmentStatement(pair.target.Expression, sourceExpression);
+                }).ToList();
         }
 
         private static SyntaxNode CreateAccessPropertyExpression(SyntaxNode gloablTargetAccessor, IPropertySymbol property, SyntaxGenerator generator)

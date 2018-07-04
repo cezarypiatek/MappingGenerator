@@ -160,4 +160,10 @@
   <data name="_007_ConstructorWithMultipleParameters_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>TestCaseData\007_ConstructorWithMultipleParameters_FIXED.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="_008_StopRecursingMapping" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\008_StopRecursingMapping.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_008_StopRecursingMapping_Fixed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\008_StopRecursingMapping_Fixed.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

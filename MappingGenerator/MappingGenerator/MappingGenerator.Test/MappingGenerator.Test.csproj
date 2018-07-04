@@ -31,6 +31,8 @@
     <Compile Remove="MappingGenerator\TestCaseData\006_ConstructorWithSingleParameter_FIXED.cs" />
     <Compile Remove="MappingGenerator\TestCaseData\007_ConstructorWithMultipleParameters.cs" />
     <Compile Remove="MappingGenerator\TestCaseData\007_ConstructorWithMultipleParameters_FIXED.cs" />
+    <Compile Remove="MappingGenerator\TestCaseData\008_StopRecursingMapping.cs" />
+    <Compile Remove="MappingGenerator\TestCaseData\008_StopRecursingMapping_Fixed.cs" />
     <Compile Remove="Splatting\TestCaseData\001_SplattingInMethodInvocation.cs" />
     <Compile Remove="Splatting\TestCaseData\001_SplattingInMethodInvocationWithNamedParameters_FIXED.cs" />
     <Compile Remove="Splatting\TestCaseData\001_SplattingInMethodInvocation_FIXED.cs" />
@@ -74,6 +76,8 @@
     <None Include="MappingGenerator\TestCaseData\006_ConstructorWithSingleParameter_FIXED.cs" />
     <None Include="MappingGenerator\TestCaseData\007_ConstructorWithMultipleParameters.cs" />
     <None Include="MappingGenerator\TestCaseData\007_ConstructorWithMultipleParameters_FIXED.cs" />
+    <None Include="MappingGenerator\TestCaseData\008_StopRecursingMapping.cs" />
+    <None Include="MappingGenerator\TestCaseData\008_StopRecursingMapping_Fixed.cs" />
     <None Include="Splatting\TestCaseData\003_SplattingWithBestOverloadMatch_FIXED.cs" />
     <None Include="Splatting\TestCaseData\003_SplattingWithBestOverloadMatch.cs" />
     <None Include="Splatting\TestCaseData\001_SplattingInMethodInvocation_FIXED.cs" />

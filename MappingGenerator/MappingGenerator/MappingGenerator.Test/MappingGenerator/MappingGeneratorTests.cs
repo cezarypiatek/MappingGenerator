@@ -52,6 +52,12 @@ namespace MappingGenerator.Test.Mapping
         public void should_be_able_to_generate_mapping_constructor_with_multiple_parameters()
         {
             VerifyMapper(_007_ConstructorWithMultipleParameters, _007_ConstructorWithMultipleParameters_FIXED, LocationFromTestFile(25, 17));
+        } 
+        
+        [TestMethod]
+        public void should_be_able_to_generate_mapping_for_recursive_types()
+        {
+            VerifyMapper(_008_StopRecursingMapping, _008_StopRecursingMapping_Fixed, LocationFromTestFile(11, 25));
         }
 
         private void VerifyMapper(string test, string fixtest, DiagnosticResultLocation[] locations)

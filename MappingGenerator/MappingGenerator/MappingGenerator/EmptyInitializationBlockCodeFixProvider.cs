@@ -55,7 +55,7 @@ namespace MappingGenerator
         {
             var generator = SyntaxGenerator.GetGenerator(document);
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var mappingSourceFinder = new LocalScopeMappingSourceFinder(semanticModel, objectInitializer, SyntaxGenerator.GetGenerator(document));
+            var mappingSourceFinder = new LocalScopeMappingSourceFinder(semanticModel, objectInitializer);
             return await ReplaceEmptyInitializationBlock(document, objectInitializer, cancellationToken, semanticModel, mappingSourceFinder, generator);
         }
 
@@ -66,7 +66,7 @@ namespace MappingGenerator
 
             var lambdaSymbol = semanticModel.GetSymbolInfo(lambdaSyntax).Symbol as IMethodSymbol;
             var firstArgument = lambdaSymbol.Parameters.First();
-            var mappingSourceFinder = new ObjectMembersMappingSourceFinder(firstArgument.Type, generator.IdentifierName(firstArgument.Name), generator, semanticModel);
+            var mappingSourceFinder = new ObjectMembersMappingSourceFinder(firstArgument.Type, generator.IdentifierName(firstArgument.Name), generator);
             return await ReplaceEmptyInitializationBlock(document, objectInitializer, cancellationToken, semanticModel, mappingSourceFinder, generator);
         }
 

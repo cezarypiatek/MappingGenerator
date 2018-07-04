@@ -76,14 +76,15 @@ namespace MappingGenerator
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
-            var mappingSourceFinder = new LocalScopeMappingSourceFinder(semanticModel, invocation.SourceNode, syntaxGenerator);
+            var mappingSourceFinder = new LocalScopeMappingSourceFinder(semanticModel, invocation.SourceNode);
             var overloadParameterSets = invocation.GetOverloadParameterSets(semanticModel);
             if (overloadParameterSets != null)
             {
+                var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator);
                 var parametersMatch = MethodHelper.FindBestParametersMatch(mappingSourceFinder, overloadParameterSets);
                 if (parametersMatch != null)
                 {
-                    var argumentList = parametersMatch.ToArgumentListSyntax(syntaxGenerator, generateNamedParameters);
+                    var argumentList = parametersMatch.ToArgumentListSyntax(mappingEngine, generateNamedParameters);
                     return await  document.ReplaceNodes(invocation.SourceNode, invocation.WithArgumentList(argumentList), cancellationToken);
                 }
             }

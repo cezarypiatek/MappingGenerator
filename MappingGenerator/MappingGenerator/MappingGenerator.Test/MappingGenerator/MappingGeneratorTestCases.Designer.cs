@@ -79,9 +79,8 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///    public class UserDTO
         ///    {
         ///        public string FirstName { get;  }
-        ///        public string LastName { get; set; }
-        ///        public int Age { get; set; }
-        ///     [rest of string was truncated]&quot;;.
+        ///        public string LastName { get; private set; }
+        ///        public int Age { get; set; [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _001_PureMappingMethod {
             get {
@@ -101,16 +100,13 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///    {
         ///        public static UserDTO Map(UserEntity entity)
         ///        {
-        ///            throw new NotImplementedException();
-        ///        }
-        ///    }
-        ///
-        ///    public class UserDTO
-        ///    {
-        ///        public string FirstName { get;  }
-        ///        public string LastName { get; set; }
-        ///        public int Age { get; set; }
-        ///     [rest of string was truncated]&quot;;.
+        ///            return new UserDTO()
+        ///            {
+        ///                Age = entity.Age,
+        ///                Debs = entity.Debs.Select(entityDeb =&gt; new AccountDTO()
+        ///                {
+        ///                    BankName = entityDeb.BankName,
+        ///       [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _001_PureMappingMethod_FIXED {
             get {
@@ -119,13 +115,25 @@ namespace MappingGenerator.Test.MappingGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         ///{
-        ///    public class 002_PureMappingMethodWithGenerics
+        ///    public class TestMapper
         ///    {
-        ///        
+        ///        public static TDto Map&lt;TDto, TEntity&gt;(TEntity entity) where TDto: UserDTO, new() where TEntity: UserEntity
+        ///        {
+        ///            throw new NotImplementedException();
+        ///        }
         ///    }
-        ///}.
+        ///
+        ///    public class UserDTO
+        ///    {
+        ///        public string FirstName { get;  }
+        ///        public string Last [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _002_PureMappingMethodWithGenerics {
             get {
@@ -134,13 +142,22 @@ namespace MappingGenerator.Test.MappingGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         ///{
-        ///    public class 002_PureMappingMethodWithGenerics_FIXED
+        ///    public class TestMapper
         ///    {
-        ///        
-        ///    }
-        ///}.
+        ///        public static TDto Map&lt;TDto, TEntity&gt;(TEntity entity) where TDto: UserDTO, new() where TEntity: UserEntity
+        ///        {
+        ///            return new TDto()
+        ///            {
+        ///                Age = entity.Age,
+        ///                Debs = entity.Debs.Select(entityDeb =&gt; new AccountDTO()
+        ///                {        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _002_PureMappingMethodWithGenerics_FIXED {
             get {
@@ -149,13 +166,26 @@ namespace MappingGenerator.Test.MappingGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         ///{
-        ///    public class 003_MappingFromOneToAnotherParameter
+        ///    public class TestMapper
         ///    {
-        ///        
+        ///        public static void Map(UserEntity src, UserDTO dst)
+        ///        {
+        ///            throw new NotImplementedException();
+        ///        }
         ///    }
-        ///}.
+        ///
+        ///    public class UserDTO
+        ///    {
+        ///        public string FirstName { get;  }
+        ///        public string LastName { get; private set; }
+        ///        public int Age { ge [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _003_MappingFromOneToAnotherParameter {
             get {
@@ -164,13 +194,24 @@ namespace MappingGenerator.Test.MappingGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         ///{
-        ///    public class 003_MappingFromOneToAnotherParameter_FIXED
+        ///    public class TestMapper
         ///    {
-        ///        
-        ///    }
-        ///}.
+        ///        public static void Map(UserEntity src, UserDTO dst)
+        ///        {
+        ///            dst.Age = src.Age;
+        ///            dst.Debs = src.Debs.Select(srcDeb =&gt; new AccountDTO()
+        ///            {
+        ///                BankName = srcDeb.BankName,
+        ///                Number = srcDeb.Number
+        ///            }).ToList();
+        ///   [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _003_MappingFromOneToAnotherParameter_FIXED {
             get {
@@ -179,13 +220,22 @@ namespace MappingGenerator.Test.MappingGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         ///{
-        ///    public class 004_UpdateThisObjectWithSingleParameter
+        ///    public class UserDTO
         ///    {
-        ///        
-        ///    }
-        ///}.
+        ///        public string FirstName { get; }
+        ///        public string LastName { get; private set; }
+        ///        public int Age { get; set; }
+        ///        public int Cash { get;}
+        ///        public AccountDTO Account { get; private set; }
+        ///        public List&lt;AccountDTO&gt; Debs { get; set; }
+        ///        public UserSourceD [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _004_UpdateThisObjectWithSingleParameter {
             get {
@@ -194,13 +244,22 @@ namespace MappingGenerator.Test.MappingGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         ///{
-        ///    public class 004_UpdateThisObjectWithSingleParameter_FIXED
+        ///    public class UserDTO
         ///    {
-        ///        
-        ///    }
-        ///}.
+        ///        public string FirstName { get; }
+        ///        public string LastName { get; private set; }
+        ///        public int Age { get; set; }
+        ///        public int Cash { get;}
+        ///        public AccountDTO Account { get; private set; }
+        ///        public List&lt;AccountDTO&gt; Debs { get; set; }
+        ///        public UserSourceD [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _004_UpdateThisObjectWithSingleParameter_FIXED {
             get {
@@ -239,13 +298,22 @@ namespace MappingGenerator.Test.MappingGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         ///{
-        ///    public class 006_ConstructorWithSingleParameter
+        ///    public class UserDTO
         ///    {
-        ///        
-        ///    }
-        ///}.
+        ///        public string FirstName { get; }
+        ///        public string LastName { get; private set; }
+        ///        public int Age { get; set; }
+        ///        public int Cash { get;}
+        ///        public AccountDTO Account { get; private set; }
+        ///        public List&lt;AccountDTO&gt; Debs { get; set; }
+        ///        public UserSourceD [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _006_ConstructorWithSingleParameter {
             get {
@@ -254,13 +322,22 @@ namespace MappingGenerator.Test.MappingGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         ///{
-        ///    public class 006_ConstructorWithSingleParameter_FIXED
+        ///    public class UserDTO
         ///    {
-        ///        
-        ///    }
-        ///}.
+        ///        public string FirstName { get; }
+        ///        public string LastName { get; private set; }
+        ///        public int Age { get; set; }
+        ///        public int Cash { get;}
+        ///        public AccountDTO Account { get; private set; }
+        ///        public List&lt;AccountDTO&gt; Debs { get; set; }
+        ///        public UserSourceD [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _006_ConstructorWithSingleParameter_FIXED {
             get {
@@ -269,13 +346,22 @@ namespace MappingGenerator.Test.MappingGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         ///{
-        ///    public class 006_ConstructorWithMultipleParameters
+        ///    public class UserDTO
         ///    {
-        ///        
-        ///    }
-        ///}.
+        ///        public string FirstName { get; }
+        ///        public string LastName { get; private set; }
+        ///        public int Age { get; set; }
+        ///        public int Cash { get;}
+        ///        public AccountDTO Account { get; private set; }
+        ///        public List&lt;AccountDTO&gt; Debs { get; set; }
+        ///        public UserSourceD [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _007_ConstructorWithMultipleParameters {
             get {
@@ -284,17 +370,86 @@ namespace MappingGenerator.Test.MappingGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         ///{
-        ///    public class 007_ConstructorWithMultipleParameters_FIXED
+        ///    public class UserDTO
         ///    {
-        ///        
-        ///    }
-        ///}.
+        ///        public string FirstName { get; }
+        ///        public string LastName { get; private set; }
+        ///        public int Age { get; set; }
+        ///        public int Cash { get;}
+        ///        public AccountDTO Account { get; private set; }
+        ///        public List&lt;AccountDTO&gt; Debs { get; set; }
+        ///        public UserSourceD [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _007_ConstructorWithMultipleParameters_FIXED {
             get {
                 return ResourceManager.GetString("_007_ConstructorWithMultipleParameters_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class Model1Vm
+        ///    {
+        ///        public int Id { get; set; }
+        ///        public List&lt;Model2Vm&gt; Model2s { get; set; }
+        ///
+        ///        public Model1Vm Map(Model1 src)
+        ///        {
+        ///            throw new NotImplementedException();
+        ///        }
+        ///    }
+        ///
+        ///    public class Model2Vm
+        ///    {
+        ///        public int Id { get; set; }
+        ///        public Model1Vm Model1 { get; set; }
+        ///
+        ///        public string Label [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _008_StopRecursingMapping {
+            get {
+                return ResourceManager.GetString("_008_StopRecursingMapping", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class Model1Vm
+        ///    {
+        ///        public int Id { get; set; }
+        ///        public List&lt;Model2Vm&gt; Model2s { get; set; }
+        ///
+        ///        public Model1Vm Map(Model1 src)
+        ///        {
+        ///            throw new NotImplementedException();
+        ///        }
+        ///    }
+        ///
+        ///    public class Model2Vm
+        ///    {
+        ///        public int Id { get; set; }
+        ///        public Model1Vm Model1 { get; set; }
+        ///
+        ///        public string Label [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _008_StopRecursingMapping_Fixed {
+            get {
+                return ResourceManager.GetString("_008_StopRecursingMapping_Fixed", resourceCulture);
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MappingGenerator.MethodHelpers;
@@ -42,11 +43,25 @@ namespace MappingGenerator
             return MapExpression(mappingSource, destinationType).Expression;
         }
 
-        public MappingElement MapExpression(MappingElement element, ITypeSymbol targetType)
+        public MappingElement MapExpression(MappingElement element, ITypeSymbol targetType, MappingPath mappingPath = null)
         {
             if (element == null)
             {
                 return null;
+            }
+
+            if (mappingPath == null)
+            {
+                mappingPath = new MappingPath();
+            }
+
+            if (mappingPath.AddToMapped(element.ExpressionType) == false)
+            {
+                return new MappingElement()
+                {
+                    ExpressionType = element.ExpressionType,
+                    Expression = element.Expression.WithTrailingTrivia(SyntaxFactory.Comment(" /* Stop recursing mapping */"))
+                };
             }
 
             if (IsUnrappingNeeded(targetType, element))
@@ -57,13 +72,13 @@ namespace MappingGenerator
             
             if (element.ExpressionType.Equals(targetType) == false && ObjectHelper.IsSimpleType(targetType)==false && ObjectHelper.IsSimpleType(element.ExpressionType)==false)
             {
-                return TryToCreateMappingExpression(element, targetType);
+                return TryToCreateMappingExpression(element, targetType, mappingPath);
             }
 
             return element;
         }
 
-        private  MappingElement TryToCreateMappingExpression(MappingElement source, ITypeSymbol targetType)
+        private MappingElement TryToCreateMappingExpression(MappingElement source, ITypeSymbol targetType, MappingPath mappingPath)
         {
             //TODO: If source expression is method or constructor invocation then we should extract local variable and use it im mappings as a reference
             var namedTargetType = targetType as INamedTypeSymbol;
@@ -73,10 +88,8 @@ namespace MappingGenerator
                 var directlyMappingConstructor = namedTargetType.Constructors.FirstOrDefault(c => c.Parameters.Length == 1 && c.Parameters[0].Type.Equals(source.ExpressionType));
                 if (directlyMappingConstructor != null)
                 {
-                    var constructorParameters = SyntaxFactory.ArgumentList()
-                        .AddArguments(SyntaxFactory.Argument(source.Expression));
-                    var creationExpression =
-                        syntaxGenerator.ObjectCreationExpression(targetType, constructorParameters.Arguments);
+                    var constructorParameters = SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument(source.Expression));
+                    var creationExpression = syntaxGenerator.ObjectCreationExpression(targetType, constructorParameters.Arguments);
                     return new MappingElement()
                     {
                         ExpressionType = targetType,
@@ -90,7 +103,7 @@ namespace MappingGenerator
                 return new MappingElement()
                 {
                     ExpressionType = targetType,
-                    Expression = MapCollections(source.Expression, source.ExpressionType, targetType) as ExpressionSyntax
+                    Expression = MapCollections(source.Expression, source.ExpressionType, targetType, mappingPath.Clone()) as ExpressionSyntax
                 };
             }
 
@@ -117,7 +130,7 @@ namespace MappingGenerator
             return new MappingElement()
             {
                 ExpressionType = targetType,
-                Expression = MappingHelper.CreateObjectCreationExpressionWithInitializer(targetType, subMappingSourceFinder, syntaxGenerator, semanticModel)
+                Expression = ((ObjectCreationExpressionSyntax) syntaxGenerator.ObjectCreationExpression(targetType)).AddInitializerWithMapping(subMappingSourceFinder, targetType, semanticModel, syntaxGenerator, mappingPath)
             };
         }
 
@@ -180,9 +193,8 @@ namespace MappingGenerator
         }
 
 
-        private SyntaxNode MapCollections(SyntaxNode sourceAccess, ITypeSymbol sourceListType, ITypeSymbol targetListType)
+        private SyntaxNode MapCollections(SyntaxNode sourceAccess, ITypeSymbol sourceListType, ITypeSymbol targetListType, MappingPath mappingPath)
         {
-            
             var isReadolyCollection = targetListType.Name == "ReadOnlyCollection";
             var sourceListElementType = MappingHelper.GetElementType(sourceListType);
             var targetListElementType = MappingHelper.GetElementType(targetListType);
@@ -193,12 +205,12 @@ namespace MappingGenerator
             }
             var selectAccess = syntaxGenerator.MemberAccessExpression(sourceAccess, "Select");
             var lambdaParameterName = CreateLambdaParameterName(sourceAccess);
-            var listElementMappingStm = TryToCreateMappingExpression(new MappingElement()
+            var listElementMappingStm = MapExpression(new MappingElement()
                 {
                     ExpressionType = sourceListElementType,
                     Expression = syntaxGenerator.IdentifierName(lambdaParameterName) as ExpressionSyntax
                 },
-                targetListElementType);
+                targetListElementType, mappingPath);
             
             var selectInvocation = syntaxGenerator.InvocationExpression(selectAccess, syntaxGenerator.ValueReturningLambdaExpression(lambdaParameterName,listElementMappingStm.Expression));
             var toList = AddMaterializeCollectionInvocation(syntaxGenerator, selectInvocation, targetListType);
@@ -260,6 +272,36 @@ namespace MappingGenerator
         public ExpressionSyntax CreateDefaultExpression(ITypeSymbol typeSymbol)
         {
             return (ExpressionSyntax) syntaxGenerator.DefaultExpression(typeSymbol);
+        }
+    }
+
+    public class MappingPath
+    {
+        private List<ITypeSymbol> mapped;
+
+        private MappingPath(List<ITypeSymbol> mapped)
+        {
+            this.mapped = mapped;
+        }
+
+        public MappingPath()
+        {
+            this.mapped = new List<ITypeSymbol>();
+        }
+
+        public bool AddToMapped(ITypeSymbol newType)
+        {
+            if (mapped.Contains(newType))
+            {
+                return false;
+            }
+            mapped.Add(newType);
+            return true;
+        }
+
+        public MappingPath Clone()
+        {
+            return new MappingPath(this.mapped.ToList());
         }
     }
 }

@@ -50,18 +50,25 @@ namespace MappingGenerator
 
         public static ObjectCreationExpressionSyntax AddInitializerWithMapping(
             this ObjectCreationExpressionSyntax objectCreationExpression, IMappingSourceFinder mappingSourceFinder,
-            ITypeSymbol createdObjectTyp, SemanticModel semanticModel, SyntaxGenerator syntaxGenerator)
+            ITypeSymbol createdObjectTyp, SemanticModel semanticModel, SyntaxGenerator syntaxGenerator,
+            MappingPath mappingPath=null)
         {
             var propertiesToSet = ObjectHelper.GetFieldsThaCanBeSetPublicly(createdObjectTyp);
-            var assigments = MapUsingSimpleAssigment(syntaxGenerator, semanticModel, propertiesToSet, mappingSourceFinder);
+            var assigments = MapUsingSimpleAssigment(syntaxGenerator, semanticModel, propertiesToSet, mappingSourceFinder, mappingPath);
 
             var initializerExpressionSyntax = SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression,new SeparatedSyntaxList<ExpressionSyntax>().AddRange(assigments)).FixInitializerExpressionFormatting(objectCreationExpression);
             return objectCreationExpression.WithInitializer(initializerExpressionSyntax);
         }
 
 
-        public static IEnumerable<ExpressionSyntax> MapUsingSimpleAssigment(SyntaxGenerator generator, SemanticModel semanticModel, IEnumerable<IPropertySymbol> targets, IMappingSourceFinder sourceFinder,  SyntaxNode gloablTargetAccessor = null)
+        public static IEnumerable<ExpressionSyntax> MapUsingSimpleAssigment(SyntaxGenerator generator,
+            SemanticModel semanticModel, IEnumerable<IPropertySymbol> targets, IMappingSourceFinder sourceFinder,
+            MappingPath mappingPath =null, SyntaxNode gloablTargetAccessor = null)
         {
+            if (mappingPath == null)
+            {
+                mappingPath = new MappingPath();
+            }
             var mappingEngie = new MappingEngine(semanticModel, generator);
             return targets.Select(property => new
                 {
@@ -75,7 +82,7 @@ namespace MappingGenerator
                 .Where(x=>x.source!=null)
                 .Select(pair =>
                 {
-                    var sourceExpression = mappingEngie.MapExpression(pair.source, pair.target.ExpressionType).Expression;
+                    var sourceExpression = mappingEngie.MapExpression(pair.source, pair.target.ExpressionType, mappingPath.Clone()).Expression;
                     return (ExpressionSyntax) generator.AssignmentStatement(pair.target.Expression, sourceExpression);
                 }).ToList();
         }
@@ -87,12 +94,6 @@ namespace MappingGenerator
                 return SyntaxFactory.IdentifierName(property.Name);
             }
             return generator.MemberAccessExpression(gloablTargetAccessor, property.Name);
-        }
-
-
-        public static ObjectCreationExpressionSyntax CreateObjectCreationExpressionWithInitializer(ITypeSymbol targetType, IMappingSourceFinder subMappingSourceFinder, SyntaxGenerator syntaxGenerator, SemanticModel semanticModel)
-        {
-            return ((ObjectCreationExpressionSyntax) syntaxGenerator.ObjectCreationExpression(targetType)).AddInitializerWithMapping(subMappingSourceFinder, targetType, semanticModel, syntaxGenerator);
         }
     }
 }

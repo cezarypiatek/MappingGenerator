@@ -78,7 +78,7 @@ namespace MappingGenerator
                 var target = methodSymbol.Parameters[1];
                 var targets = ObjectHelper.GetFieldsThaCanBeSetPublicly(target.Type);
                 var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator);
-                return MappingHelper.MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder, generator.IdentifierName(target.Name));
+                return MappingHelper.MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder, gloablTargetAccessor: generator.IdentifierName(target.Name));
             }
 
             if (SymbolHelper.IsUpdateThisObjectFunction(methodSymbol))

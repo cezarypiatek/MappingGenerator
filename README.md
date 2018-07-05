@@ -33,7 +33,7 @@ public UserDTO Map(UserEntity entity)
 }
 ```
 
-![Generating pure mapping method implementation](doc/pure_mapping_method.gif)
+![Generating pure mapping method implementation](doc/pure_mapping_method_newone.gif)
 
 
 #### Updating method

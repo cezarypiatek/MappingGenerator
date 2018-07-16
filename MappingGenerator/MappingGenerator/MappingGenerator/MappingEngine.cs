@@ -205,19 +205,25 @@ namespace MappingGenerator
             }
             var selectAccess = syntaxGenerator.MemberAccessExpression(sourceAccess, "Select");
             var lambdaParameterName = CreateLambdaParameterName(sourceAccess);
-            var listElementMappingStm = MapExpression(new MappingElement()
-                {
-                    ExpressionType = sourceListElementType,
-                    Expression = syntaxGenerator.IdentifierName(lambdaParameterName) as ExpressionSyntax
-                },
-                targetListElementType, mappingPath);
-            
-            var selectInvocation = syntaxGenerator.InvocationExpression(selectAccess, syntaxGenerator.ValueReturningLambdaExpression(lambdaParameterName,listElementMappingStm.Expression));
+            var mappingLambda = CreateMappingLambda(lambdaParameterName, sourceListElementType, targetListElementType, mappingPath);
+	        var selectInvocation = syntaxGenerator.InvocationExpression(selectAccess, mappingLambda);
             var toList = AddMaterializeCollectionInvocation(syntaxGenerator, selectInvocation, targetListType);
             return WrapInReadonlyCollectionIfNecessary(isReadolyCollection, toList, syntaxGenerator);
         }
 
-        private static string CreateLambdaParameterName(SyntaxNode sourceList)
+	    public SyntaxNode CreateMappingLambda(string lambdaParameterName, ITypeSymbol sourceListElementType, ITypeSymbol targetListElementType, MappingPath mappingPath)
+	    {
+		    var listElementMappingStm = MapExpression(new MappingElement()
+			    {
+				    ExpressionType = sourceListElementType,
+				    Expression = syntaxGenerator.IdentifierName(lambdaParameterName) as ExpressionSyntax
+			    },
+			    targetListElementType, mappingPath);
+
+		    return syntaxGenerator.ValueReturningLambdaExpression(lambdaParameterName, listElementMappingStm.Expression);
+	    }
+
+	    private static string CreateLambdaParameterName(SyntaxNode sourceList)
         {
             var originalName = sourceList.ToFullString();
             var localVariableName = ToLocalVariableName(originalName);

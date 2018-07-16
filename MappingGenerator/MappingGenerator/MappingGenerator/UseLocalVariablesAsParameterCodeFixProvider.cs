@@ -9,6 +9,7 @@ using MappingGenerator.MethodHelpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 
@@ -19,6 +20,7 @@ namespace MappingGenerator
     {
         private const string title = "Use local variables as parameters";
         private const string titleWithNamed = "Use local variables as named parameters";
+        private const string titleWitSelect = "Create mapping lambda";
 
         /// <summary>
         /// No overload for method 'method' takes 'number' arguments
@@ -57,8 +59,15 @@ namespace MappingGenerator
                     if (invocationExpression.ArgumentList.Arguments.Count == 0)
                     {
                         var invocation = new MethodInvocation(invocationExpression);
-                        context.RegisterCodeFix(CodeAction.Create(title: title, createChangedDocument: c => UseLocalVariablesAsParameters(context.Document, invocation, false, c), equivalenceKey: title), diagnostic);
-                        context.RegisterCodeFix(CodeAction.Create(title: titleWithNamed, createChangedDocument: c => UseLocalVariablesAsParameters(context.Document, invocation, true, c), equivalenceKey: titleWithNamed), diagnostic);
+                        if (invocationExpression.Expression is MemberAccessExpressionSyntax mae && mae.Name.ToFullString() == "Select")
+                        {
+                            context.RegisterCodeFix(CodeAction.Create(title: titleWitSelect, createChangedDocument: c => CreateMappingLambda(context.Document, invocation,  c), equivalenceKey: titleWitSelect), diagnostic);
+                        }
+                        else
+                        {
+                            context.RegisterCodeFix(CodeAction.Create(title: title, createChangedDocument: c => UseLocalVariablesAsParameters(context.Document, invocation, false, c), equivalenceKey: title), diagnostic);
+                            context.RegisterCodeFix(CodeAction.Create(title: titleWithNamed, createChangedDocument: c => UseLocalVariablesAsParameters(context.Document, invocation, true, c), equivalenceKey: titleWithNamed), diagnostic);
+                        }
                     }
                 }else if (expression is ObjectCreationExpressionSyntax creationExpression)
                 {
@@ -70,6 +79,32 @@ namespace MappingGenerator
                     }
                 }
             }
+        }
+
+        private static async Task<Document> CreateMappingLambda(Document document, MethodInvocation invocation, CancellationToken cancellationToken)
+        {
+            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+            var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
+            var methodInvocationSymbol = semanticModel.GetSymbolInfo(invocation.SourceNode);
+            var mappingOverload = methodInvocationSymbol.CandidateSymbols.OfType<IMethodSymbol>().FirstOrDefault(c => c.Parameters.Length == 1 && c.Parameters[0].Type.Name == "Func");
+            if (mappingOverload == null)
+            {
+                return document;
+            }
+
+            var sourceElementType = ((INamedTypeSymbol)mappingOverload.Parameters[0].Type).TypeArguments[0];
+            var targetElementType = GetExpressionType(semanticModel, invocation.SourceNode);
+            var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator);
+            var mappingLambda = mappingEngine.CreateMappingLambda("x", sourceElementType, targetElementType, new MappingPath());
+            return await document.ReplaceNodes(invocation.SourceNode, invocation.WithArgumentList(SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument((ExpressionSyntax)mappingLambda))), cancellationToken);
+        }
+
+        private static ITypeSymbol GetExpressionType(SemanticModel semanticModel, SyntaxNode sourceNodeParent)
+        {
+            var typeInfo = semanticModel.GetTypeInfo(sourceNodeParent);
+            if (typeInfo.ConvertedType != null && typeInfo.ConvertedType.Kind != SymbolKind.ErrorType && typeInfo.ConvertedType is INamedTypeSymbol nt)
+                return nt.TypeArguments[0];
+            return GetExpressionType(semanticModel, sourceNodeParent.Parent);
         }
 
         private async Task<Document> UseLocalVariablesAsParameters(Document document, IInvocation invocation, bool generateNamedParameters, CancellationToken cancellationToken)

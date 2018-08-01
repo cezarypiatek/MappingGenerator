@@ -128,23 +128,23 @@ CS7036 There is no argument given that corresponds to the required formal parame
   ```
 - Mapping complex property
   ```csharp
- target.MainAddress = new AddressDTO(){
-    BuildingNo = source.MainAddress.BuildingNo,
-    City = source.MainAddress.City,
-    FlatNo = source.MainAddress.FlatNo,
-    Street = source.MainAddress.Street,
-    ZipCode = source.MainAddress.ZipCode
-};
+   target.MainAddress = new AddressDTO(){
+  	BuildingNo = source.MainAddress.BuildingNo,
+  	City = source.MainAddress.City,
+  	FlatNo = source.MainAddress.FlatNo,
+  	Street = source.MainAddress.Street,
+  	ZipCode = source.MainAddress.ZipCode
+  };
   ```
 - Mapping collections
   ```csharp
- target.Addresses = source.Addresses.Select(sourceAddresse => new AddressDTO(){
+  target.Addresses = source.Addresses.Select(sourceAddresse => new AddressDTO(){
     BuildingNo = sourceAddresse.BuildingNo,
     City = sourceAddresse.City,
     FlatNo = sourceAddresse.FlatNo,
     Street = sourceAddresse.Street,
     ZipCode = sourceAddresse.ZipCode
-}).ToList().AsReadOnly();
+  }).ToList().AsReadOnly();
   ```
 - Unwrapping wrappers 
   ```csharp

@@ -82,9 +82,9 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
         ///            var lastName = &quot;Piatek&quot;;
         ///
         ///            var x = new UserDTO()
-        ///            {
+        ///            [|{
         ///
-        ///            } [rest of string was truncated]&quot;;.
+        ///            [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _001_CompleteInitializationBlockWithLocals {
             get {
@@ -114,9 +114,8 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
         ///            var lastName = &quot;Piatek&quot;;
         ///
         ///            var x = new UserDTO()
-        ///
         ///            {
-        ///              [rest of string was truncated]&quot;;.
+        ///                [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _001_CompleteInitializationBlockWithLocals_FIXED {
             get {
@@ -196,15 +195,14 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
         ///    {
         ///        public IList&lt;UserDTO&gt; Map(IList&lt;UserEntity&gt; entities)
         ///        {
-        ///            return entities.Select(x =&gt; new UserDTO() { }).ToList();
+        ///            return entities.Select((UserEntity x) =&gt; new UserDTO() { }).ToList();
         ///        }
         ///    }
         ///
         ///    public class UserDTO
         ///    {
         ///        public string FirstName { get; set; }
-        ///        public string LastName { get; set; }
-        ///        pub [rest of string was truncated]&quot;;.
+        ///        public string LastName { get; set; } [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _003_CompleteInitializationBlockWithSompleLambdaParameter {
             get {
@@ -224,15 +222,13 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
         ///    {
         ///        public IList&lt;UserDTO&gt; Map(IList&lt;UserEntity&gt; entities)
         ///        {
-        ///            return entities.Select(x =&gt; new UserDTO() { }).ToList();
-        ///        }
-        ///    }
-        ///
-        ///    public class UserDTO
-        ///    {
-        ///        public string FirstName { get; set; }
-        ///        public string LastName { get; set; }
-        ///        pub [rest of string was truncated]&quot;;.
+        ///            return entities.Select((UserEntity x) =&gt; new UserDTO()
+        ///            {
+        ///                FirstName = x.FirstName,
+        ///                LastName = x.LastName,
+        ///                Age = x.Age
+        ///            }).ToList();
+        ///        [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _003_CompleteInitializationBlockWithSompleLambdaParameter_FIXED {
             get {

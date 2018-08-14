@@ -119,21 +119,21 @@
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="_001_CompleteInitializationBlockWithLocals" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCasesData\001_CompleteInitializationBlockWithLocals.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCasesData\001_CompleteInitializationBlockWithLocals.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_001_CompleteInitializationBlockWithLocals_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCasesData\001_CompleteInitializationBlockWithLocals_FIXED.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCasesData\001_CompleteInitializationBlockWithLocals_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_002_CompleteInitializationBlockWithLambdaParameter" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCasesData\002_CompleteInitializationBlockWithLambdaParameter.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCasesData\002_CompleteInitializationBlockWithLambdaParameter.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_002_CompleteInitializationBlockWithLambdaParameter_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCasesData\002_CompleteInitializationBlockWithLambdaParameter_FIXED.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCasesData\002_CompleteInitializationBlockWithLambdaParameter_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_003_CompleteInitializationBlockWithSompleLambdaParameter" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCasesData\003_CompleteInitializationBlockWithSompleLambdaParameter.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCasesData\003_CompleteInitializationBlockWithSompleLambdaParameter.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_003_CompleteInitializationBlockWithSompleLambdaParameter_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCasesData\003_CompleteInitializationBlockWithSompleLambdaParameter_FIXED.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCasesData\003_CompleteInitializationBlockWithSompleLambdaParameter_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
 </root>

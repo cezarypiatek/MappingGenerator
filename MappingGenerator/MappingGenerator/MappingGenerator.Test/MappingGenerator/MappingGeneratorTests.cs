@@ -1,37 +1,37 @@
 ﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.CodeRefactorings;
 using NUnit.Framework;
+using RoslynNUnitLight;
 using TestHelper;
 using static MappingGenerator.Test.Helpers.DiagnosticHelper;
 using static MappingGenerator.Test.MappingGenerator.MappingGeneratorTestCases;
 
 namespace MappingGenerator.Test.Mapping
 {
-    public class MappingGeneratorTests: CodeFixVerifier
+    public class MappingGeneratorTests:  CodeRefactoringTestFixture
     {
         [Test]
         public void should_be_able_to_generate_pure_mapping_method()
         {
-            VerifyMapper(_001_PureMappingMethod, _001_PureMappingMethod_FIXED, LocationFromTestFile(10, 31));
+            TestCodeRefactoring(_001_PureMappingMethod, _001_PureMappingMethod_FIXED);
         }
 
         [Test]
         public void should_be_able_to_generate_pure_mapping_method_for_generic_types()
         {
-            VerifyMapper(_002_PureMappingMethodWithGenerics, _002_PureMappingMethodWithGenerics_FIXED, LocationFromTestFile(10, 28));
+            TestCodeRefactoring(_002_PureMappingMethodWithGenerics, _002_PureMappingMethodWithGenerics_FIXED);
         }
 
         [Test]
         public void should_be_able_to_generate_mapping_from_one_parameter_to_another()
         {
-            VerifyMapper(_003_MappingFromOneToAnotherParameter, _003_MappingFromOneToAnotherParameter_FIXED, LocationFromTestFile(10, 28));
+            TestCodeRefactoring(_003_MappingFromOneToAnotherParameter, _003_MappingFromOneToAnotherParameter_FIXED);
         }
 
         [Test]
         public void should_be_able_to_generate_update_this_object_function_with_single_parameter()
         {
-            VerifyMapper(_004_UpdateThisObjectWithSingleParameter, _004_UpdateThisObjectWithSingleParameter_FIXED, LocationFromTestFile(25, 21));
+            TestCodeRefactoring(_004_UpdateThisObjectWithSingleParameter, _004_UpdateThisObjectWithSingleParameter_FIXED);
         }
 
         //TODO: Function not implemented yet
@@ -44,43 +44,30 @@ namespace MappingGenerator.Test.Mapping
         [Test]
         public void should_be_able_to_generate_mapping_constructor_with_single_parameter()
         {
-            VerifyMapper(_006_ConstructorWithSingleParameter, _006_ConstructorWithSingleParameter_FIXED, LocationFromTestFile(25, 17));
+            DiagnosticResultLocation[] locations = LocationFromTestFile(25, 17);
+            TestCodeRefactoring(_006_ConstructorWithSingleParameter, _006_ConstructorWithSingleParameter_FIXED);
         }
 
         [Test]
         public void should_be_able_to_generate_mapping_constructor_with_multiple_parameters()
         {
-            VerifyMapper(_007_ConstructorWithMultipleParameters, _007_ConstructorWithMultipleParameters_FIXED, LocationFromTestFile(25, 17));
+            DiagnosticResultLocation[] locations = LocationFromTestFile(25, 17);
+            TestCodeRefactoring(_007_ConstructorWithMultipleParameters, _007_ConstructorWithMultipleParameters_FIXED);
         }
 
         [Test]
         public void should_be_able_to_generate_mapping_for_recursive_types()
         {
-            VerifyMapper(_008_StopRecursingMapping, _008_StopRecursingMapping_Fixed, LocationFromTestFile(11, 25));
+            DiagnosticResultLocation[] locations = LocationFromTestFile(11, 25);
+            TestCodeRefactoring(_008_StopRecursingMapping, _008_StopRecursingMapping_Fixed);
         }
 
-        private void VerifyMapper(string test, string fixtest, DiagnosticResultLocation[] locations)
-        {
-            var expected = new DiagnosticResult
-            {
-                Id = MappingGeneratorAnalyzer.DiagnosticId,
-                Message = MappingGeneratorAnalyzer.MessageFormat.ToString(),
-                Severity = DiagnosticSeverity.Info,
-                Locations = locations
-            };
-            VerifyCSharpDiagnostic(test, expected);
-            VerifyCSharpFix(test, fixtest, allowNewCompilerDiagnostics: true);
-            
-        }
 
-        protected override CodeFixProvider GetCSharpCodeFixProvider()
-        {
-            return new MappingGeneratorCodeFixProvider();
-        }
+        protected override string LanguageName => LanguageNames.CSharp;
 
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
+        protected override CodeRefactoringProvider CreateProvider()
         {
-            return new MappingGeneratorAnalyzer();
+            return new MappingGeneratorRefactoring();
         }
     }
 }

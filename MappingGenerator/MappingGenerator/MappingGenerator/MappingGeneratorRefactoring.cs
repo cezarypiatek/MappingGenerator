@@ -1,52 +1,62 @@
-using System.Collections.Generic;
-using System.Collections.Immutable;
+using System;
 using System.Composition;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CodeActions;
+using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.CodeRefactorings;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
+using Microsoft.CodeAnalysis.Rename;
+using Microsoft.CodeAnalysis.Text;
 
 namespace MappingGenerator
 {
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(MappingGeneratorCodeFixProvider)), Shared]
-    public class MappingGeneratorCodeFixProvider : CodeFixProvider
+    [ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(MappingGeneratorRefactoring)), Shared]
+    public class MappingGeneratorRefactoring : CodeRefactoringProvider
     {
         private const string title = "Generate mapping code";
 
-        public sealed override ImmutableArray<string> FixableDiagnosticIds
-        {
-            get { return ImmutableArray.Create(MappingGeneratorAnalyzer.DiagnosticId); }
-        }
-
-        public sealed override FixAllProvider GetFixAllProvider()
-        {
-            // See https://github.com/dotnet/roslyn/blob/master/docs/analyzers/FixAllProvider.md for more information on Fix All Providers
-            return WellKnownFixAllProviders.BatchFixer;
-        }
-
-        public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
+        public sealed override async Task ComputeRefactoringsAsync(CodeRefactoringContext context)
         {
             var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
+            var node = root.FindNode(context.Span);
 
-            // TODO: Replace the following code with your own analysis, generating a CodeAction for each fix to suggest
-            var diagnostic = context.Diagnostics.First();
-            var diagnosticSpan = diagnostic.Location.SourceSpan;
+            switch (node)
+            {
+                case MethodDeclarationSyntax methodDeclaration:
+                    if (methodDeclaration.ParameterList.Parameters.Count > 0)
+                    {
+                        var semanticModel = await context.Document.GetSemanticModelAsync();
+                        var methodSymbol = semanticModel.GetDeclaredSymbol(methodDeclaration);
+                        var allParameterHaveNames = methodSymbol.Parameters.All(x => string.IsNullOrWhiteSpace(x.Name) == false);
+                        if (allParameterHaveNames == false)
+                        {
+                            return;
+                        }
 
-            // Find the type declaration identified by the diagnostic.
-            var declaration = root.FindToken(diagnosticSpan.Start).Parent.AncestorsAndSelf().OfType<BaseMethodDeclarationSyntax>().First();
-
-            // Register a code action that will invoke the fix.
-            context.RegisterCodeFix(
-                CodeAction.Create(
-                    title: title,
-                    createChangedDocument: c => GenerateMappingMethodBody(context.Document, declaration, c), 
-                    equivalenceKey: title),
-                diagnostic);
+                        if (SymbolHelper.IsPureMappingFunction(methodSymbol) ||
+                            SymbolHelper.IsUpdateThisObjectFunction(methodSymbol) ||
+                            SymbolHelper.IsUpdateParameterFunction(methodSymbol) ||
+                            SymbolHelper.IsMultiParameterUpdateThisObjectFunction(methodSymbol)
+                        )
+                        {
+                            context.RegisterRefactoring(CodeAction.Create(title: title, createChangedDocument: c => GenerateMappingMethodBody(context.Document, methodDeclaration, c), equivalenceKey: title));
+                           
+                        }
+                    }
+                    break;
+                case ConstructorDeclarationSyntax constructorDeclaration:
+                    if (constructorDeclaration.ParameterList.Parameters.Count >= 1)
+                    {
+                        context.RegisterRefactoring(CodeAction.Create(title: title, createChangedDocument: c => GenerateMappingMethodBody(context.Document, constructorDeclaration, c), equivalenceKey: title));
+                    }
+                    break;
+            }
         }
 
         private async Task<Document> GenerateMappingMethodBody(Document document, BaseMethodDeclarationSyntax methodSyntax, CancellationToken cancellationToken)
@@ -55,7 +65,7 @@ namespace MappingGenerator
             var methodSymbol = semanticModel.GetDeclaredSymbol(methodSyntax);
             var generator = SyntaxGenerator.GetGenerator(document);
             var mappingExpressions = GenerateMappingCode(methodSymbol, generator, semanticModel);
-            return await document.ReplaceNodes(methodSyntax.Body, ((BaseMethodDeclarationSyntax) generator.MethodDeclaration(methodSymbol, mappingExpressions)).Body, cancellationToken);
+            return await document.ReplaceNodes(methodSyntax.Body, ((BaseMethodDeclarationSyntax)generator.MethodDeclaration(methodSymbol, mappingExpressions)).Body, cancellationToken);
         }
 
         private static IEnumerable<SyntaxNode> GenerateMappingCode(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
@@ -66,8 +76,8 @@ namespace MappingGenerator
             {
                 var source = methodSymbol.Parameters[0];
                 var targetType = methodSymbol.ReturnType;
-                var newExpression = mappingEngine.MapExpression((ExpressionSyntax) generator.IdentifierName(source.Name), source.Type, targetType);
-                return new[] { generator.ReturnStatement(newExpression)};
+                var newExpression = mappingEngine.MapExpression((ExpressionSyntax)generator.IdentifierName(source.Name), source.Type, targetType);
+                return new[] { generator.ReturnStatement(newExpression) };
             }
 
             //TODO: Pure mapping with multiple parameters

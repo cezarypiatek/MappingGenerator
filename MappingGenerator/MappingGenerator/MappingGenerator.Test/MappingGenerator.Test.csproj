@@ -1,16 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="EmptyInitializationBlock\TestCasesData\001_CompleteInitializationBlockWithLocals.cs" />
-    <Compile Remove="EmptyInitializationBlock\TestCasesData\001_CompleteInitializationBlockWithLocals_FIXED.cs" />
-    <Compile Remove="EmptyInitializationBlock\TestCasesData\002_CompleteInitializationBlockWithLambdaParameter.cs" />
-    <Compile Remove="EmptyInitializationBlock\TestCasesData\002_CompleteInitializationBlockWithLambdaParameter_FIXED.cs" />
-    <Compile Remove="EmptyInitializationBlock\TestCasesData\003_CompleteInitializationBlockWithSompleLambdaParameter.cs" />
-    <Compile Remove="EmptyInitializationBlock\TestCasesData\003_CompleteInitializationBlockWithSompleLambdaParameter_FIXED.cs" />
     <Compile Remove="ExplicitConversions\TestCaseData\001_ExplicitConversionForInvalidAssigment.cs" />
     <Compile Remove="ExplicitConversions\TestCaseData\001_ExplicitConversionForInvalidAssigment_FIXED.cs" />
     <Compile Remove="ExplicitConversions\TestCaseData\002_ExplicitConversionForInvalidReturn.cs" />
@@ -50,12 +46,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="EmptyInitializationBlock\TestCasesData\001_CompleteInitializationBlockWithLocals_FIXED.cs" />
-    <None Include="EmptyInitializationBlock\TestCasesData\001_CompleteInitializationBlockWithLocals.cs" />
-    <None Include="EmptyInitializationBlock\TestCasesData\003_CompleteInitializationBlockWithSompleLambdaParameter_FIXED.cs" />
-    <None Include="EmptyInitializationBlock\TestCasesData\003_CompleteInitializationBlockWithSompleLambdaParameter.cs" />
-    <None Include="EmptyInitializationBlock\TestCasesData\002_CompleteInitializationBlockWithLambdaParameter.cs" />
-    <None Include="EmptyInitializationBlock\TestCasesData\002_CompleteInitializationBlockWithLambdaParameter_FIXED.cs" />
     <None Include="ExplicitConversions\TestCaseData\001_ExplicitConversionForInvalidAssigment.cs" />
     <None Include="ExplicitConversions\TestCaseData\001_ExplicitConversionForInvalidAssigment_FIXED.cs" />
     <None Include="ExplicitConversions\TestCaseData\002_ExplicitConversionForInvalidReturn.cs" />
@@ -97,9 +87,11 @@
   <ItemGroup>
     <PackageReference Include="Appveyor.TestLogger" Version="2.0.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="2.8.2" />
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" Version="2.8.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="1.1.18" />
-    <PackageReference Include="MSTest.TestFramework" Version="1.1.18" />
+    <PackageReference Include="NUnit" Version="3.10.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
+    <PackageReference Include="RoslynNUnitLight.NetStandard" Version="1.2.3" />
   </ItemGroup>
 
   <ItemGroup>

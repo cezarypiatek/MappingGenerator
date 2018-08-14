@@ -70,7 +70,7 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///{
         ///    public class TestMapper
         ///    {
-        ///        public static UserDTO Map(UserEntity entity)
+        ///        public static UserDTO [|Map|](UserEntity entity)
         ///        {
         ///            throw new NotImplementedException();
         ///        }
@@ -80,7 +80,7 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///    {
         ///        public string FirstName { get;  }
         ///        public string LastName { get; private set; }
-        ///        public int Age { get; set; [rest of string was truncated]&quot;;.
+        ///        public int Age { get;  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _001_PureMappingMethod {
             get {
@@ -124,7 +124,7 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///{
         ///    public class TestMapper
         ///    {
-        ///        public static TDto Map&lt;TDto, TEntity&gt;(TEntity entity) where TDto: UserDTO, new() where TEntity: UserEntity
+        ///        public static TDto [|Map|]&lt;TDto, TEntity&gt;(TEntity entity) where TDto: UserDTO, new() where TEntity: UserEntity
         ///        {
         ///            throw new NotImplementedException();
         ///        }
@@ -133,7 +133,7 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///    public class UserDTO
         ///    {
         ///        public string FirstName { get;  }
-        ///        public string Last [rest of string was truncated]&quot;;.
+        ///        public string  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _002_PureMappingMethodWithGenerics {
             get {
@@ -175,7 +175,7 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///{
         ///    public class TestMapper
         ///    {
-        ///        public static void Map(UserEntity src, UserDTO dst)
+        ///        public static void [|Map|](UserEntity src, UserDTO dst)
         ///        {
         ///            throw new NotImplementedException();
         ///        }
@@ -185,7 +185,7 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///    {
         ///        public string FirstName { get;  }
         ///        public string LastName { get; private set; }
-        ///        public int Age { ge [rest of string was truncated]&quot;;.
+        ///        public int Age  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _003_MappingFromOneToAnotherParameter {
             get {
@@ -404,7 +404,7 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///        public int Id { get; set; }
         ///        public List&lt;Model2Vm&gt; Model2s { get; set; }
         ///
-        ///        public Model1Vm Map(Model1 src)
+        ///        public Model1Vm [|Map|](Model1 src)
         ///        {
         ///            throw new NotImplementedException();
         ///        }
@@ -415,7 +415,7 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///        public int Id { get; set; }
         ///        public Model1Vm Model1 { get; set; }
         ///
-        ///        public string Label [rest of string was truncated]&quot;;.
+        ///        public string L [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _008_StopRecursingMapping {
             get {
@@ -436,16 +436,13 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public Model1Vm Map(Model1 src)
         ///        {
-        ///            throw new NotImplementedException();
-        ///        }
-        ///    }
-        ///
-        ///    public class Model2Vm
-        ///    {
-        ///        public int Id { get; set; }
-        ///        public Model1Vm Model1 { get; set; }
-        ///
-        ///        public string Label [rest of string was truncated]&quot;;.
+        ///            return new Model1Vm()
+        ///            {
+        ///                Id = src.Id,
+        ///                Model2s = src.Model2s.Select(srcModel2 =&gt; new Model2Vm()
+        ///                {
+        ///                    Id = srcModel2.Id,
+        ///    [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _008_StopRecursingMapping_Fixed {
             get {

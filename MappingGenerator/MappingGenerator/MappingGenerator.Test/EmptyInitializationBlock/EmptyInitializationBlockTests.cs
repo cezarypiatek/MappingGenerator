@@ -2,11 +2,10 @@ using MappingGenerator.Test.EmptyInitializationBlock;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeRefactorings;
 using NUnit.Framework;
-using RoslynNUnitLight;
 
 namespace MappingGenerator.Test
 {
-    public class EmptyInitializationBlockTests : CodeRefactoringTestFixture
+    public class EmptyInitializationBlockTests : ExtendedCodeRefactoringTestFixture
     {
         [Test]
         public void should_be_able_to_generate_initialization_block_with_local_variables()
@@ -21,7 +20,7 @@ namespace MappingGenerator.Test
         {
             var test = EmptyInitializationBlockTestCases._002_CompleteInitializationBlockWithLambdaParameter;
             var fixedCode = EmptyInitializationBlockTestCases._002_CompleteInitializationBlockWithLambdaParameter_FIXED;
-            TestCodeRefactoring(test, fixedCode);
+            TestCodeRefactoring(test, fixedCode, 1);
         }
 
         [Test]
@@ -29,7 +28,7 @@ namespace MappingGenerator.Test
         {
             var test = EmptyInitializationBlockTestCases._003_CompleteInitializationBlockWithSompleLambdaParameter;
             var fixedCode = EmptyInitializationBlockTestCases._003_CompleteInitializationBlockWithSompleLambdaParameter_FIXED;
-            TestCodeRefactoring(test, fixedCode);
+            TestCodeRefactoring(test, fixedCode, 1);
         }
       
         protected override string LanguageName => LanguageNames.CSharp;

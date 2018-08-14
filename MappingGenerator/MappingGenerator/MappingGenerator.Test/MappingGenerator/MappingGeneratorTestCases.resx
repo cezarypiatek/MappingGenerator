@@ -119,51 +119,51 @@
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="_001_PureMappingMethod" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\001_PureMappingMethod.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\001_PureMappingMethod.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_001_PureMappingMethod_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\001_PureMappingMethod_FIXED.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\001_PureMappingMethod_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_002_PureMappingMethodWithGenerics" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\002_PureMappingMethodWithGenerics.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\002_PureMappingMethodWithGenerics.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_002_PureMappingMethodWithGenerics_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\002_PureMappingMethodWithGenerics_FIXED.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\002_PureMappingMethodWithGenerics_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_003_MappingFromOneToAnotherParameter" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\003_MappingFromOneToAnotherParameter.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\003_MappingFromOneToAnotherParameter.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_003_MappingFromOneToAnotherParameter_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\003_MappingFromOneToAnotherParameter_FIXED.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\003_MappingFromOneToAnotherParameter_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_004_UpdateThisObjectWithSingleParameter" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\004_UpdateThisObjectWithSingleParameter.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\004_UpdateThisObjectWithSingleParameter.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_004_UpdateThisObjectWithSingleParameter_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\004_UpdateThisObjectWithSingleParameter_FIXED.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\004_UpdateThisObjectWithSingleParameter_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_005_UpdateThisObjectWithMultipleParameters" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\005_UpdateThisObjectWithMultipleParameters.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\005_UpdateThisObjectWithMultipleParameters.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_005_UpdateThisObjectWithMultipleParameters_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\005_UpdateThisObjectWithMultipleParameters_FIXED.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\005_UpdateThisObjectWithMultipleParameters_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_006_ConstructorWithSingleParameter" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\006_ConstructorWithSingleParameter.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\006_ConstructorWithSingleParameter.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_006_ConstructorWithSingleParameter_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\006_ConstructorWithSingleParameter_FIXED.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\006_ConstructorWithSingleParameter_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_007_ConstructorWithMultipleParameters" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\007_ConstructorWithMultipleParameters.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\007_ConstructorWithMultipleParameters.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_007_ConstructorWithMultipleParameters_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\007_ConstructorWithMultipleParameters_FIXED.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\007_ConstructorWithMultipleParameters_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_008_StopRecursingMapping" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\008_StopRecursingMapping.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\008_StopRecursingMapping.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_008_StopRecursingMapping_Fixed" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\008_StopRecursingMapping_Fixed.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\008_StopRecursingMapping_Fixed.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
 </root>

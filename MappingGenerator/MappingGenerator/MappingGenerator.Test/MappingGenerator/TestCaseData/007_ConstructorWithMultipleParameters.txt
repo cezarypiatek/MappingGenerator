@@ -5,17 +5,9 @@ using System.Collections.ObjectModel;
 
 namespace MappingGenerator.Test.MappingGenerator.TestCaseData
 {
-    public class TestMapper
-    {
-        public static UserDTO Map(UserEntity entity)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     public class UserDTO
     {
-        public string FirstName { get;  }
+        public string FirstName { get; }
         public string LastName { get; private set; }
         public int Age { get; set; }
         public int Cash { get;}
@@ -29,6 +21,11 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public AddressDTO MainAddress { get; set; }
         public ReadOnlyCollection<AddressDTO> Addresses { get; set; }
         public int UnitId { get; set; }
+
+        private [|UserDTO|](string firstName, string lastName, int age, IList<AccountEntity> debs, AddressEntity mainAddress, UserSourceEntity source)
+        {
+
+        }
     }
 
     public class UserSourceDTO

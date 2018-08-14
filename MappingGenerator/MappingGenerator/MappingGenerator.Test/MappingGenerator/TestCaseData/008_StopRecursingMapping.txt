@@ -8,7 +8,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public int Id { get; set; }
         public List<Model2Vm> Model2s { get; set; }
 
-        public Model1Vm Map(Model1 src)
+        public Model1Vm [|Map|](Model1 src)
         {
             throw new NotImplementedException();
         }

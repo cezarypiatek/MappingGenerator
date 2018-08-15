@@ -2,10 +2,11 @@ using MappingGenerator.Test.EmptyInitializationBlock;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeRefactorings;
 using NUnit.Framework;
+using RoslynNUnitLight;
 
 namespace MappingGenerator.Test
 {
-    public class EmptyInitializationBlockTests : ExtendedCodeRefactoringTestFixture
+    public class EmptyInitializationBlockTests : CodeRefactoringTestFixture
     {
         [Test]
         public void should_be_able_to_generate_initialization_block_with_local_variables()

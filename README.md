@@ -112,6 +112,10 @@ CS7036 There is no argument given that corresponds to the required formal parame
 ![locals as parameters](doc/localsforconstructor.gif)
 
 
+## Object scaffolding
+
+![sample scaffolding](/doc/object_scaffolding.gif)
+
 ## Mapping rules
 - Mapping Property-To-Property
   ```csharp

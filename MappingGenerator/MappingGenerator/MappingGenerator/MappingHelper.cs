@@ -29,6 +29,16 @@ namespace MappingGenerator
                 case INamedTypeSymbol namedType:
                     if (namedType.IsGenericType == false)
                     {
+                        if (namedType.BaseType == null)
+                        {
+                            var indexer = namedType.GetMembers(WellKnownMemberNames.Indexer).OfType<IPropertySymbol>().FirstOrDefault();
+                            if (indexer != null)
+                            {
+                               return indexer.Type;
+                            }
+
+                            throw new NotSupportedException("Cannot determine collection element type");
+                        }
                         if (ObjectHelper.IsSystemObject(namedType.BaseType))
                         {
                             return namedType.BaseType;

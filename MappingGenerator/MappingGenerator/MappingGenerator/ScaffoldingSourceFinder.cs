@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -27,6 +28,10 @@ namespace MappingGenerator
 
         internal SyntaxNode GetDefaultExpression(ITypeSymbol type)
         {
+            //TODO: Handle types without default constructor
+            //TODO: Handle ReadOnlyCollection
+            //TODO: Handle recursive types
+
             if (type.TypeKind == TypeKind.Enum && type is INamedTypeSymbol namedTypeSymbol)
             {
                 var enumOptions = namedTypeSymbol.MemberNames.ToList();
@@ -47,23 +52,38 @@ namespace MappingGenerator
                     {
                         objectCreationExpression = SyntaxFactory.ObjectCreationExpression((TypeSyntax)syntaxGenerator.TypeExpression(type));
                     }
-                    else
+                    else if (type.TypeKind == TypeKind.Interface)
                     {
-                        //TODO: always create List<>
+                        var namedType = type as INamedTypeSymbol;
+                        if (namedType.IsGenericType)
+                        {
+                            var typeArgumentListSyntax = SyntaxFactory.TypeArgumentList(SyntaxFactory.SeparatedList(namedType.TypeArguments.Select(x=> syntaxGenerator.TypeExpression(x))));
+                            var newType = SyntaxFactory.GenericName(SyntaxFactory.Identifier("List"), typeArgumentListSyntax);
+                            objectCreationExpression = SyntaxFactory.ObjectCreationExpression(newType, SyntaxFactory.ArgumentList(), default(InitializerExpressionSyntax));
+                        }
+                        else
+                        {
+                            var newType = SyntaxFactory.ParseTypeName("ArrayList");
+                            objectCreationExpression = SyntaxFactory.ObjectCreationExpression(newType, SyntaxFactory.ArgumentList(), default(InitializerExpressionSyntax));
+                        }
                     }
 
-
-
                     var subType = MappingHelper.GetElementType(type);
+                    var initializationBlockExpressions = new SeparatedSyntaxList<ExpressionSyntax>();
                     var subTypeDefault = (ExpressionSyntax)GetDefaultExpression(subType);
-                    var initializerExpressionSyntax = SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression, new SeparatedSyntaxList<ExpressionSyntax>().Add(subTypeDefault)).FixInitializerExpressionFormatting(objectCreationExpression);
+                    if (subTypeDefault != null)
+                    {
+                        initializationBlockExpressions = initializationBlockExpressions.Add(subTypeDefault);
+                    }
+
+                    var initializerExpressionSyntax = SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression, initializationBlockExpressions).FixInitializerExpressionFormatting(objectCreationExpression);
                     return objectCreationExpression
                         .WithInitializer(initializerExpressionSyntax);
                 }
 
                 {
 
-                        var fields = ObjectHelper.GetFieldsThaCanBeSetPublicly(type);
+                    var fields = ObjectHelper.GetFieldsThaCanBeSetPublicly(type);
                     var assignments = fields.Select(x =>
                     {
                         var identifier = (ExpressionSyntax)(SyntaxFactory.IdentifierName(x.Name));
@@ -108,19 +128,78 @@ namespace MappingGenerator
                 case SpecialType.System_Decimal:
                     return syntaxGenerator.LiteralExpression(2.0m);
                 case SpecialType.System_Object:
-                    return  null;
-                case SpecialType.System_Collections_IEnumerable: // 0x18
-                case SpecialType.System_Collections_Generic_IEnumerable_T: // 0x19
-                case SpecialType.System_Collections_Generic_IList_T:// 0x1A
-                case SpecialType.System_Collections_Generic_ICollection_T:// 0x1B
-                case SpecialType.System_Collections_IEnumerator: // 0x1C
-                case SpecialType.System_Collections_Generic_IEnumerator_T:// 0x1D
-                case SpecialType.System_Collections_Generic_IReadOnlyList_T:// 0x1E
-                case SpecialType.System_Collections_Generic_IReadOnlyCollection_T: // 0x1F
+                    return SyntaxFactory.ObjectCreationExpression((TypeSyntax)syntaxGenerator.TypeExpression(type), SyntaxFactory.ArgumentList(),default(InitializerExpressionSyntax));
                 default:
                     return syntaxGenerator.LiteralExpression("ccc");
             }
         }
 
+    }
+
+    public static class TypeSyntaxFactory
+    {
+        /// <summary>
+        /// Used to generate a type without generic arguments
+        /// </summary>
+        /// <param name="identifier">The name of the type to be generated</param>
+        /// <returns>An instance of TypeSyntax from the Roslyn Model</returns>
+        public static TypeSyntax GetTypeSyntax(string identifier)
+        {
+            return
+                SyntaxFactory.IdentifierName(
+                    SyntaxFactory.Identifier(identifier)
+                );
+        }
+
+        /// <summary>
+        /// Used to generate a type with generic arguments
+        /// </summary>
+        /// <param name="identifier">Name of the Generic Type</param>
+        /// <param name="arguments">
+        /// Types of the Generic Arguments, which must be basic identifiers
+        /// </param>
+        /// <returns>An instance of TypeSyntax from the Roslyn Model</returns>
+        public static TypeSyntax GetTypeSyntax(string identifier, params string[] arguments)
+        {
+            return GetTypeSyntax(identifier, arguments.Select(GetTypeSyntax).ToArray());
+        }
+
+        /// <summary>
+        /// Used to generate a type with generic arguments
+        /// </summary>
+        /// <param name="identifier">Name of the Generic Type</param>
+        /// <param name="arguments">
+        /// Types of the Generic Arguments, which themselves may be generic types
+        /// </param>
+        /// <returns>An instance of TypeSyntax from the Roslyn Model</returns>
+        public static TypeSyntax GetTypeSyntax(string identifier, params TypeSyntax[] arguments)
+        {
+            return
+                SyntaxFactory.GenericName(
+                    SyntaxFactory.Identifier(identifier),
+                    SyntaxFactory.TypeArgumentList(
+                        SyntaxFactory.SeparatedList(
+                            arguments.Select(
+                                x =>
+                                {
+                                    if (x is GenericNameSyntax)
+                                    {
+                                        var gen_x = x as GenericNameSyntax;
+                                        return
+                                            GetTypeSyntax(
+                                                gen_x.Identifier.ToString(),
+                                                gen_x.TypeArgumentList.Arguments.ToArray()
+                                            );
+                                    }
+                                    else
+                                    {
+                                        return x;
+                                    }
+                                }
+                            )
+                        )
+                    )
+                );
+        }
     }
 }

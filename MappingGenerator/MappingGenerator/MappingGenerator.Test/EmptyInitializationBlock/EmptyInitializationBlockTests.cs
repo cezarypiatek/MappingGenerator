@@ -21,7 +21,7 @@ namespace MappingGenerator.Test
         {
             var test = EmptyInitializationBlockTestCases._002_CompleteInitializationBlockWithLambdaParameter;
             var fixedCode = EmptyInitializationBlockTestCases._002_CompleteInitializationBlockWithLambdaParameter_FIXED;
-            TestCodeRefactoring(test, fixedCode, 1);
+            TestCodeRefactoring(test, fixedCode, 2);
         }
 
         [Test]
@@ -29,7 +29,7 @@ namespace MappingGenerator.Test
         {
             var test = EmptyInitializationBlockTestCases._003_CompleteInitializationBlockWithSompleLambdaParameter;
             var fixedCode = EmptyInitializationBlockTestCases._003_CompleteInitializationBlockWithSompleLambdaParameter_FIXED;
-            TestCodeRefactoring(test, fixedCode, 1);
+            TestCodeRefactoring(test, fixedCode, 2);
         }
       
         protected override string LanguageName => LanguageNames.CSharp;

@@ -129,7 +129,12 @@ namespace MappingGenerator
                     {
                         var identifier = (ExpressionSyntax)(SyntaxFactory.IdentifierName(x.Name));
                         return (ExpressionSyntax)syntaxGenerator.AssignmentStatement(identifier, this.FindMappingSource(x.Type, mappingPath.Clone()).Expression);
-                    });
+                    }).ToList();
+
+                    if (assignments.Count == 0)
+                    {
+                        return objectCreationExpression;
+                    }
                     var initializerExpressionSyntax = SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression, new SeparatedSyntaxList<ExpressionSyntax>().AddRange(assignments)).FixInitializerExpressionFormatting(objectCreationExpression);
                     return objectCreationExpression.WithInitializer(initializerExpressionSyntax);
                 }

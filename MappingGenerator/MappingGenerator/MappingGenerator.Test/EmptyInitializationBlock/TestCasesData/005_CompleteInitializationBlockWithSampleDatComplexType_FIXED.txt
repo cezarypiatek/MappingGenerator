@@ -1,0 +1,165 @@
+﻿using System.Collections.Generic;
+using System.Collections;
+using System.Collections.ObjectModel;
+
+namespace TestAutoMapper
+{
+    class DefaultObject
+    {
+        public string MyProperty { get; set; }
+
+        public int MyProperty1 { get; set; }
+
+        public float MyProperty2 { get; set; }
+
+        public bool MyProperty3 { get; set; }
+
+        public sbyte MyProperty4 { get; set; }
+
+        public byte MyProperty5 { get; set; }
+
+        public char MyProperty6 { get; set; }
+
+        public CustomEnum MyProperty7 { get; set; }
+
+        public decimal DecimalProperty { get; set; }
+
+        public InnerDefaultObject Inner { get; set; }
+
+        public IList<InnerDefaultObject> GenericInners { get; set; }
+
+        public ReadOnlyCollection<InnerDefaultObject> InnersReadonly { get; set; }
+
+        public IList NonGenericInners { get; set; }
+        
+    }
+    
+    class InnerDefaultObject
+    {
+        public string MyProperty { get; set; }
+
+        public int MyProperty1 { get; set; }
+
+        public int[] Numbers { get; set; }
+
+        public IOtherObject FieldWithInterface { get; set; }
+
+        public YetAnotherObject PropertyWithConstructor { get; set; }
+    }
+
+    interface IOtherObject
+    {
+        string Field1 { get; set; }
+    }
+
+    class OtherObject : IOtherObject
+    {
+        public string Field1 { get; set; }
+        public string Field2 { get; set; }
+    }
+
+    class YetAnotherObject
+    {
+        public YetAnotherObject(string name, OtherObject other)
+        {
+            this.Name = name;
+            this.Other = other;
+
+        }
+
+        public string Name { get;  }
+        public OtherObject Other { get; }
+    }
+
+    public enum CustomEnum
+    {
+        Opt1=1,
+        Opt2
+    }
+
+    public static class Factory
+    {
+        public static DefaultObject New()
+        {
+            return new DefaultObject
+            {
+                MyProperty = "lorem ipsum",
+                MyProperty1 = 32,
+                MyProperty2 = 1F,
+                MyProperty3 = true,
+                MyProperty4 = 1,
+                MyProperty5 = 1,
+                MyProperty6 = 'a',
+                MyProperty7 = CustomEnum.Opt1,
+                DecimalProperty = 2.0M,
+                Inner = new InnerDefaultObject()
+                {
+                    MyProperty = "lorem ipsum",
+                    MyProperty1 = 32,
+                    Numbers = new int[]
+                    {
+                        32
+                    },
+                    FieldWithInterface = new OtherObject()
+                    {
+                        Field1 = "lorem ipsum",
+                        Field2 = "lorem ipsum"
+                    },
+                    PropertyWithConstructor = new YetAnotherObject("lorem ipsum", new OtherObject()
+                    {
+                        Field1 = "lorem ipsum",
+                        Field2 = "lorem ipsum"
+                    })
+                },
+                GenericInners = new List<InnerDefaultObject>()
+                {
+                    new InnerDefaultObject()
+                    {
+                        MyProperty = "lorem ipsum",
+                        MyProperty1 = 32,
+                        Numbers = new int[]
+                        {
+                            32
+                        },
+                        FieldWithInterface = new OtherObject()
+                        {
+                            Field1 = "lorem ipsum",
+                            Field2 = "lorem ipsum"
+                        },
+                        PropertyWithConstructor = new YetAnotherObject("lorem ipsum", new OtherObject()
+                        {
+                            Field1 = "lorem ipsum",
+                            Field2 = "lorem ipsum"
+                        })
+                    }
+                },
+                InnersReadonly = new List<InnerDefaultObject>()
+                {
+                    new InnerDefaultObject()
+                    {
+                        MyProperty = "lorem ipsum",
+                        MyProperty1 = 32,
+                        Numbers = new int[]
+                        {
+                            32
+                        },
+                        FieldWithInterface = new OtherObject()
+                        {
+                            Field1 = "lorem ipsum",
+                            Field2 = "lorem ipsum"
+                        },
+                        PropertyWithConstructor = new YetAnotherObject("lorem ipsum", new OtherObject()
+                        {
+                            Field1 = "lorem ipsum",
+                            Field2 = "lorem ipsum"
+                        })
+                    }
+                }.AsReadOnly(),
+                NonGenericInners = new ArrayList()
+                {
+                    new object()
+                }
+            };
+        }
+    }
+}

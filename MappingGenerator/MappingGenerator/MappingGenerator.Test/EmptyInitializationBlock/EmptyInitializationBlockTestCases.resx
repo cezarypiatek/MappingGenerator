@@ -136,4 +136,16 @@
   <data name="_003_CompleteInitializationBlockWithSompleLambdaParameter_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>TestCasesData\003_CompleteInitializationBlockWithSompleLambdaParameter_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="_004_CompleteInitializationBlockWithSampleDataRecursiveType" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCasesData\004_CompleteInitializationBlockWithSampleDataRecursiveType.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_004_CompleteInitializationBlockWithSampleDataRecursiveType_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCasesData\004_CompleteInitializationBlockWithSampleDataRecursiveType_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_005_CompleteInitializationBlockWithSampleDatComplexType" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCasesData\005_CompleteInitializationBlockWithSampleDatComplexType.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_005_CompleteInitializationBlockWithSampleDatComplexType_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCasesData\005_CompleteInitializationBlockWithSampleDatComplexType_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

@@ -195,20 +195,20 @@ namespace MappingGenerator
 
         private SyntaxNode MapCollections(SyntaxNode sourceAccess, ITypeSymbol sourceListType, ITypeSymbol targetListType, MappingPath mappingPath)
         {
-            var isReadolyCollection = targetListType.Name == "ReadOnlyCollection";
+            var isReadonlyCollection = ObjectHelper.IsReadonlyCollection(targetListType);
             var sourceListElementType = MappingHelper.GetElementType(sourceListType);
             var targetListElementType = MappingHelper.GetElementType(targetListType);
             if (ObjectHelper.IsSimpleType(sourceListElementType) || sourceListElementType.Equals(targetListElementType))
             {
                 var toListInvocation = AddMaterializeCollectionInvocation(syntaxGenerator, sourceAccess, targetListType);
-                return WrapInReadonlyCollectionIfNecessary(isReadolyCollection, toListInvocation, syntaxGenerator);
+                return MappingHelper.WrapInReadonlyCollectionIfNecessary(toListInvocation, isReadonlyCollection, syntaxGenerator);
             }
             var selectAccess = syntaxGenerator.MemberAccessExpression(sourceAccess, "Select");
             var lambdaParameterName = CreateLambdaParameterName(sourceAccess);
             var mappingLambda = CreateMappingLambda(lambdaParameterName, sourceListElementType, targetListElementType, mappingPath);
 	        var selectInvocation = syntaxGenerator.InvocationExpression(selectAccess, mappingLambda);
             var toList = AddMaterializeCollectionInvocation(syntaxGenerator, selectInvocation, targetListType);
-            return WrapInReadonlyCollectionIfNecessary(isReadolyCollection, toList, syntaxGenerator);
+            return MappingHelper.WrapInReadonlyCollectionIfNecessary(toList, isReadonlyCollection, syntaxGenerator);
         }
 
 	    public SyntaxNode CreateMappingLambda(string lambdaParameterName, ITypeSymbol sourceListElementType, ITypeSymbol targetListElementType, MappingPath mappingPath)
@@ -264,16 +264,7 @@ namespace MappingGenerator
             return generator.InvocationExpression(toListAccess);
         }
 
-        private static SyntaxNode WrapInReadonlyCollectionIfNecessary(bool isReadonly, SyntaxNode node, SyntaxGenerator generator)
-        {
-            if (isReadonly == false)
-            {
-                return node;
-            }
 
-            var accessAsReadonly = generator.MemberAccessExpression(node, "AsReadOnly");
-            return generator.InvocationExpression(accessAsReadonly);
-        }
 
         public ExpressionSyntax CreateDefaultExpression(ITypeSymbol typeSymbol)
         {

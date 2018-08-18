@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Editing;
 
 namespace MappingGenerator
 {
@@ -73,6 +74,11 @@ namespace MappingGenerator
         public static bool IsSystemObject(ITypeSymbol current)
         {
             return current.Name == "Object" && current.ContainingNamespace.Name =="System";
+        }
+
+        public static bool IsReadonlyCollection(ITypeSymbol current)
+        {
+            return current.Name == "ReadOnlyCollection";
         }
 
         private static string[] SimpleTypes = new[] {"String", "Decimal"};

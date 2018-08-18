@@ -111,5 +111,17 @@ namespace MappingGenerator
             }
             return generator.MemberAccessExpression(globalTargetAccessor, property.Name);
         }
+
+        public static SyntaxNode WrapInReadonlyCollectionIfNecessary(this SyntaxNode node, bool isReadonly,
+            SyntaxGenerator generator)
+        {
+            if (isReadonly == false)
+            {
+                return node;
+            }
+
+            var accessAsReadonly = generator.MemberAccessExpression(node, "AsReadOnly");
+            return generator.InvocationExpression(accessAsReadonly);
+        }
     }
 }

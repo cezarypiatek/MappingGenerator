@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -19,10 +20,10 @@ namespace MappingGenerator
 
         public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType)
         {
-            return FindMappingSource(targetName, targetType, new MappingPath());
+            return FindMappingSource(targetType, new MappingPath());
         }
 
-        private MappingElement FindMappingSource(string targetName, ITypeSymbol targetType, MappingPath mappingPath)
+        private MappingElement FindMappingSource(ITypeSymbol targetType, MappingPath mappingPath)
         {
             return new MappingElement
             {
@@ -40,7 +41,6 @@ namespace MappingGenerator
             }
 
             //TODO: Handle types without default constructor
-            //TODO: Handle ReadOnlyCollection
 
             if (type.TypeKind == TypeKind.Enum && type is INamedTypeSymbol namedTypeSymbol)
             {
@@ -58,11 +58,13 @@ namespace MappingGenerator
 
                 if (MappingHelper.IsCollection(type))
                 {
+                    var isReadonlyCollection = ObjectHelper.IsReadonlyCollection(type);
+
                     if (type is IArrayTypeSymbol)
                     {
                         objectCreationExpression = SyntaxFactory.ObjectCreationExpression((TypeSyntax)syntaxGenerator.TypeExpression(type));
                     }
-                    else if (type.TypeKind == TypeKind.Interface)
+                    else if (type.TypeKind == TypeKind.Interface || isReadonlyCollection)
                     {
                         var namedType = type as INamedTypeSymbol;
                         if (namedType.IsGenericType)
@@ -77,7 +79,6 @@ namespace MappingGenerator
                             objectCreationExpression = SyntaxFactory.ObjectCreationExpression(newType, SyntaxFactory.ArgumentList(), default(InitializerExpressionSyntax));
                         }
                     }
-
                     var subType = MappingHelper.GetElementType(type);
                     var initializationBlockExpressions = new SeparatedSyntaxList<ExpressionSyntax>();
                     var subTypeDefault = (ExpressionSyntax)GetDefaultExpression(subType, mappingPath.Clone());
@@ -88,7 +89,8 @@ namespace MappingGenerator
 
                     var initializerExpressionSyntax = SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression, initializationBlockExpressions).FixInitializerExpressionFormatting(objectCreationExpression);
                     return objectCreationExpression
-                        .WithInitializer(initializerExpressionSyntax);
+                        .WithInitializer(initializerExpressionSyntax)
+                        .WrapInReadonlyCollectionIfNecessary(isReadonlyCollection, syntaxGenerator);
                 }
 
                 {
@@ -97,7 +99,7 @@ namespace MappingGenerator
                     var assignments = fields.Select(x =>
                     {
                         var identifier = (ExpressionSyntax)(SyntaxFactory.IdentifierName(x.Name));
-                        return (ExpressionSyntax)syntaxGenerator.AssignmentStatement(identifier, this.FindMappingSource(x.Name, x.Type, mappingPath).Expression);
+                        return (ExpressionSyntax)syntaxGenerator.AssignmentStatement(identifier, this.FindMappingSource(x.Type, mappingPath.Clone()).Expression);
                     });
                     var initializerExpressionSyntax = SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression, new SeparatedSyntaxList<ExpressionSyntax>().AddRange(assignments)).FixInitializerExpressionFormatting(objectCreationExpression);
                     return objectCreationExpression.WithInitializer(initializerExpressionSyntax);

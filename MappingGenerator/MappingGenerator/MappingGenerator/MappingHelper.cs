@@ -12,8 +12,14 @@ namespace MappingGenerator
     {
         public static bool IsMappingBetweenCollections(ITypeSymbol targetClassSymbol, ITypeSymbol sourceClassSymbol)
         {
-            return (ObjectHelper.HasInterface(targetClassSymbol, "System.Collections.ICollection") || targetClassSymbol.Kind == SymbolKind.ArrayType)
-                   && (ObjectHelper.HasInterface(sourceClassSymbol, "System.Collections.IEnumerable") || sourceClassSymbol.Kind == SymbolKind.ArrayType);
+            return IsCollection(targetClassSymbol) && IsCollection(sourceClassSymbol);
+        }
+
+        public static bool IsCollection(ITypeSymbol typeSymbol)
+        {
+            return ObjectHelper.HasInterface(typeSymbol, "System.Collections.ICollection") || 
+                   ObjectHelper.HasInterface(typeSymbol, "System.Collections.IEnumerable") || 
+                   typeSymbol.Kind == SymbolKind.ArrayType;
         }
 
         public static ITypeSymbol GetElementType(ITypeSymbol collectionType)
@@ -23,6 +29,16 @@ namespace MappingGenerator
                 case INamedTypeSymbol namedType:
                     if (namedType.IsGenericType == false)
                     {
+                        if (namedType.BaseType == null)
+                        {
+                            var indexer = namedType.GetMembers(WellKnownMemberNames.Indexer).OfType<IPropertySymbol>().FirstOrDefault();
+                            if (indexer != null)
+                            {
+                               return indexer.Type;
+                            }
+
+                            throw new NotSupportedException("Cannot determine collection element type");
+                        }
                         if (ObjectHelper.IsSystemObject(namedType.BaseType))
                         {
                             return namedType.BaseType;
@@ -54,46 +70,58 @@ namespace MappingGenerator
             MappingPath mappingPath=null)
         {
             var propertiesToSet = ObjectHelper.GetFieldsThaCanBeSetPublicly(createdObjectTyp);
-            var assigments = MapUsingSimpleAssigment(syntaxGenerator, semanticModel, propertiesToSet, mappingSourceFinder, mappingPath);
+            var assignments = MapUsingSimpleAssignment(syntaxGenerator, semanticModel, propertiesToSet, mappingSourceFinder, mappingPath);
 
-            var initializerExpressionSyntax = SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression,new SeparatedSyntaxList<ExpressionSyntax>().AddRange(assigments)).FixInitializerExpressionFormatting(objectCreationExpression);
+            var initializerExpressionSyntax = SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression,new SeparatedSyntaxList<ExpressionSyntax>().AddRange(assignments )).FixInitializerExpressionFormatting(objectCreationExpression);
             return objectCreationExpression.WithInitializer(initializerExpressionSyntax);
         }
 
 
-        public static IEnumerable<ExpressionSyntax> MapUsingSimpleAssigment(SyntaxGenerator generator,
+        public static IEnumerable<ExpressionSyntax> MapUsingSimpleAssignment(SyntaxGenerator generator,
             SemanticModel semanticModel, IEnumerable<IPropertySymbol> targets, IMappingSourceFinder sourceFinder,
-            MappingPath mappingPath =null, SyntaxNode gloablTargetAccessor = null)
+            MappingPath mappingPath =null, SyntaxNode globalTargetAccessor = null)
         {
             if (mappingPath == null)
             {
                 mappingPath = new MappingPath();
             }
-            var mappingEngie = new MappingEngine(semanticModel, generator);
+            var mappingEngine = new MappingEngine(semanticModel, generator);
             return targets.Select(property => new
                 {
                     source = sourceFinder.FindMappingSource(property.Name, property.Type),
                     target = new MappingElement()
                     {
-                        Expression = (ExpressionSyntax) CreateAccessPropertyExpression(gloablTargetAccessor, property, generator),
+                        Expression = (ExpressionSyntax) CreateAccessPropertyExpression(globalTargetAccessor, property, generator),
                         ExpressionType = property.Type
                     }
                 })
                 .Where(x=>x.source!=null)
                 .Select(pair =>
                 {
-                    var sourceExpression = mappingEngie.MapExpression(pair.source, pair.target.ExpressionType, mappingPath.Clone()).Expression;
+                    var sourceExpression = mappingEngine.MapExpression(pair.source, pair.target.ExpressionType, mappingPath.Clone()).Expression;
                     return (ExpressionSyntax) generator.AssignmentStatement(pair.target.Expression, sourceExpression);
                 }).ToList();
         }
 
-        private static SyntaxNode CreateAccessPropertyExpression(SyntaxNode gloablTargetAccessor, IPropertySymbol property, SyntaxGenerator generator)
+        private static SyntaxNode CreateAccessPropertyExpression(SyntaxNode globalTargetAccessor, IPropertySymbol property, SyntaxGenerator generator)
         {
-            if (gloablTargetAccessor == null)
+            if (globalTargetAccessor == null)
             {
                 return SyntaxFactory.IdentifierName(property.Name);
             }
-            return generator.MemberAccessExpression(gloablTargetAccessor, property.Name);
+            return generator.MemberAccessExpression(globalTargetAccessor, property.Name);
+        }
+
+        public static SyntaxNode WrapInReadonlyCollectionIfNecessary(this SyntaxNode node, bool isReadonly,
+            SyntaxGenerator generator)
+        {
+            if (isReadonly == false)
+            {
+                return node;
+            }
+
+            var accessAsReadonly = generator.MemberAccessExpression(node, "AsReadOnly");
+            return generator.InvocationExpression(accessAsReadonly);
         }
     }
 }

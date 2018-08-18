@@ -1,0 +1,19 @@
+﻿namespace TestAutoMapper
+{
+    public class Tree
+    {
+        public string Name { get; set; }
+        public Tree Left { get; set; }
+        public Tree Right { get; set; }
+    }
+
+    public static class Factory
+    {
+        public static Tree New()
+        {
+            return new Tree
+            [|{
+            }|];
+        }
+    }
+}

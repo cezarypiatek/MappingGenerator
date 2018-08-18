@@ -195,14 +195,14 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
         ///    {
         ///        public IList&lt;UserDTO&gt; Map(IList&lt;UserEntity&gt; entities)
         ///        {
-        ///            return entities.Select((UserEntity x) =&gt; new UserDTO() { }).ToList();
+        ///            return entities.Select((UserEntity x) =&gt; new UserDTO() [|{ }|]).ToList();
         ///        }
         ///    }
         ///
         ///    public class UserDTO
         ///    {
         ///        public string FirstName { get; set; }
-        ///        public string LastName { get; set; } [rest of string was truncated]&quot;;.
+        ///        public string LastName { get; se [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _003_CompleteInitializationBlockWithSompleLambdaParameter {
             get {
@@ -233,6 +233,119 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
         internal static string _003_CompleteInitializationBlockWithSompleLambdaParameter_FIXED {
             get {
                 return ResourceManager.GetString("_003_CompleteInitializationBlockWithSompleLambdaParameter_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to namespace TestAutoMapper
+        ///{
+        ///    public class Tree
+        ///    {
+        ///        public string Name { get; set; }
+        ///        public Tree Left { get; set; }
+        ///        public Tree Right { get; set; }
+        ///    }
+        ///
+        ///    public static class Factory
+        ///    {
+        ///        public static Tree New()
+        ///        {
+        ///            return new Tree
+        ///            [|{
+        ///            }|];
+        ///        }
+        ///    }
+        ///}.
+        /// </summary>
+        internal static string _004_CompleteInitializationBlockWithSampleDataRecursiveType {
+            get {
+                return ResourceManager.GetString("_004_CompleteInitializationBlockWithSampleDataRecursiveType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to namespace TestAutoMapper
+        ///{
+        ///    public class Tree
+        ///    {
+        ///        public string Name { get; set; }
+        ///        public Tree Left { get; set; }
+        ///        public Tree Right { get; set; }
+        ///    }
+        ///
+        ///    public static class Factory
+        ///    {
+        ///        public static Tree New()
+        ///        {
+        ///            return new Tree
+        ///            {
+        ///                Name = &quot;lorem ipsum&quot;,
+        ///                Left = new Tree()
+        ///                {
+        ///                    Name = &quot;lorem ipsum&quot;,
+        ///                    Left = null /* Stop recursive mappin [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _004_CompleteInitializationBlockWithSampleDataRecursiveType_FIXED {
+            get {
+                return ResourceManager.GetString("_004_CompleteInitializationBlockWithSampleDataRecursiveType_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to namespace TestAutoMapper
+        ///{
+        ///    class DefaultObject
+        ///    {
+        ///        public string MyProperty { get; set; }
+        ///
+        ///        public int MyProperty1 { get; set; }
+        ///
+        ///        public float MyProperty2 { get; set; }
+        ///
+        ///        public bool MyProperty3 { get; set; }
+        ///
+        ///        public sbyte MyProperty4 { get; set; }
+        ///
+        ///        public byte MyProperty5 { get; set; }
+        ///
+        ///        public char MyProperty6 { get; set; }
+        ///
+        ///        public CustomEnum MyProperty7 { get; set; }
+        ///
+        ///        public decimal DecimalProperty { get; set;  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _005_CompleteInitializationBlockWithSampleDatComplexType {
+            get {
+                return ResourceManager.GetString("_005_CompleteInitializationBlockWithSampleDatComplexType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to namespace TestAutoMapper
+        ///{
+        ///    class DefaultObject
+        ///    {
+        ///        public string MyProperty { get; set; }
+        ///
+        ///        public int MyProperty1 { get; set; }
+        ///
+        ///        public float MyProperty2 { get; set; }
+        ///
+        ///        public bool MyProperty3 { get; set; }
+        ///
+        ///        public sbyte MyProperty4 { get; set; }
+        ///
+        ///        public byte MyProperty5 { get; set; }
+        ///
+        ///        public char MyProperty6 { get; set; }
+        ///
+        ///        public CustomEnum MyProperty7 { get; set; }
+        ///
+        ///        public decimal DecimalProperty { get; set;  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _005_CompleteInitializationBlockWithSampleDatComplexType_FIXED {
+            get {
+                return ResourceManager.GetString("_005_CompleteInitializationBlockWithSampleDatComplexType_FIXED", resourceCulture);
             }
         }
     }

@@ -74,7 +74,7 @@ namespace MappingGenerator
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
-            var mappingSourceFinder = new ScaffoldingSourceFinder(syntaxGenerator);
+            var mappingSourceFinder = new ScaffoldingSourceFinder(syntaxGenerator, document);
             return await ReplaceEmptyInitializationBlock(document, objectInitializer, cancellationToken, semanticModel, mappingSourceFinder, syntaxGenerator);
         }
     }

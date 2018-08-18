@@ -6,16 +6,19 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
+using Microsoft.CodeAnalysis.FindSymbols;
 
 namespace MappingGenerator
 {
     public class ScaffoldingSourceFinder:IMappingSourceFinder
     {
         private readonly SyntaxGenerator syntaxGenerator;
+        private readonly Document _document;
 
-        public ScaffoldingSourceFinder(SyntaxGenerator syntaxGenerator)
+        public ScaffoldingSourceFinder(SyntaxGenerator syntaxGenerator, Document document)
         {
             this.syntaxGenerator = syntaxGenerator;
+            _document = document;
         }
 
         public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType)
@@ -40,8 +43,6 @@ namespace MappingGenerator
                     .WithTrailingTrivia(SyntaxFactory.Comment(" /* Stop recursive mapping */"));
             }
             
-            //TODO: Handle interfaces
-
             if (type.TypeKind == TypeKind.Enum && type is INamedTypeSymbol namedTypeSymbol)
             {
                 var enumOptions = namedTypeSymbol.MemberNames.ToList();
@@ -98,15 +99,32 @@ namespace MappingGenerator
 
                 {
                     var nt = type as INamedTypeSymbol;
+
+                    if (nt.TypeKind == TypeKind.Interface)
+                    {
+                        var implementations =  SymbolFinder.FindImplementationsAsync(nt, this._document.Project.Solution).Result;
+                        var firstImplementation = implementations.FirstOrDefault();
+                        if (firstImplementation is INamedTypeSymbol == false)
+                        {
+                            return syntaxGenerator.DefaultExpression(nt)
+                                .WithTrailingTrivia(SyntaxFactory.Comment($" /* Cannot find any type implementing {nt.Name} */"));
+                        }
+
+                        nt = firstImplementation as INamedTypeSymbol;
+                        objectCreationExpression =
+                            (ObjectCreationExpressionSyntax) syntaxGenerator.ObjectCreationExpression(nt);
+
+                    }
+
                     var hasDefaultConstructor = nt.Constructors.Any(x => x.Parameters.Length == 0);
                     if (hasDefaultConstructor == false && nt.Constructors.Length >0)
                     {
                         var randomConstructor = nt.Constructors.First();
                         var constructorArguments = randomConstructor.Parameters.Select(p => GetDefaultExpression(p.Type, mappingPath.Clone())).ToList();
-                        objectCreationExpression = (ObjectCreationExpressionSyntax)syntaxGenerator.ObjectCreationExpression(type, constructorArguments);
+                        objectCreationExpression = (ObjectCreationExpressionSyntax)syntaxGenerator.ObjectCreationExpression(nt, constructorArguments);
                     }
 
-                    var fields = ObjectHelper.GetFieldsThaCanBeSetPublicly(type);
+                    var fields = ObjectHelper.GetFieldsThaCanBeSetPublicly(nt);
                     var assignments = fields.Select(x =>
                     {
                         var identifier = (ExpressionSyntax)(SyntaxFactory.IdentifierName(x.Name));

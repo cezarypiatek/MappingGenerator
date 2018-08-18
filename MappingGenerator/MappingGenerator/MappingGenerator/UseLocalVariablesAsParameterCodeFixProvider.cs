@@ -94,6 +94,10 @@ namespace MappingGenerator
 
             var sourceElementType = ((INamedTypeSymbol)mappingOverload.Parameters[0].Type).TypeArguments[0];
             var targetElementType = GetExpressionType(semanticModel, invocation.SourceNode);
+            if (targetElementType == null)
+            {
+                return document;
+            }
             var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator);
             var mappingLambda = mappingEngine.CreateMappingLambda("x", sourceElementType, targetElementType, new MappingPath());
             return await document.ReplaceNodes(invocation.SourceNode, invocation.WithArgumentList(SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument((ExpressionSyntax)mappingLambda))), cancellationToken);
@@ -101,6 +105,27 @@ namespace MappingGenerator
 
         private static ITypeSymbol GetExpressionType(SemanticModel semanticModel, SyntaxNode sourceNodeParent)
         {
+            if (sourceNodeParent == null)
+            {
+                return null;
+            }
+
+            if (sourceNodeParent is MethodDeclarationSyntax methodDeclaration)
+            {
+                var returnTypeInfo = semanticModel.GetTypeInfo(methodDeclaration.ReturnType);
+                if (returnTypeInfo.Type != null && MappingHelper.IsCollection(returnTypeInfo.Type))
+                {
+                    return MappingHelper.GetElementType(returnTypeInfo.Type);
+                }
+
+                return null;
+            }
+
+            if (sourceNodeParent is LocalDeclarationStatementSyntax localDeclaration && localDeclaration.Declaration.Type.IsVar)
+            {
+                return null;
+            }
+
             var typeInfo = semanticModel.GetTypeInfo(sourceNodeParent);
             if (typeInfo.ConvertedType != null && typeInfo.ConvertedType.Kind != SymbolKind.ErrorType && typeInfo.ConvertedType is INamedTypeSymbol nt)
                 return nt.TypeArguments[0];

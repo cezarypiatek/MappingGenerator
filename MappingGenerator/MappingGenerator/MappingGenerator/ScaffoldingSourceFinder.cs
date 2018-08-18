@@ -39,8 +39,8 @@ namespace MappingGenerator
                 return syntaxGenerator.DefaultExpression(type)
                     .WithTrailingTrivia(SyntaxFactory.Comment(" /* Stop recursive mapping */"));
             }
-
-            //TODO: Handle types without default constructor
+            
+            //TODO: Handle interfaces
 
             if (type.TypeKind == TypeKind.Enum && type is INamedTypeSymbol namedTypeSymbol)
             {
@@ -54,7 +54,10 @@ namespace MappingGenerator
 
             if (type.SpecialType == SpecialType.None)
             {
+                
+
                 var objectCreationExpression = (ObjectCreationExpressionSyntax)syntaxGenerator.ObjectCreationExpression(type);
+                
 
                 if (MappingHelper.IsCollection(type))
                 {
@@ -94,6 +97,14 @@ namespace MappingGenerator
                 }
 
                 {
+                    var nt = type as INamedTypeSymbol;
+                    var hasDefaultConstructor = nt.Constructors.Any(x => x.Parameters.Length == 0);
+                    if (hasDefaultConstructor == false && nt.Constructors.Length >0)
+                    {
+                        var randomConstructor = nt.Constructors.First();
+                        var constructorArguments = randomConstructor.Parameters.Select(p => GetDefaultExpression(p.Type, mappingPath.Clone())).ToList();
+                        objectCreationExpression = (ObjectCreationExpressionSyntax)syntaxGenerator.ObjectCreationExpression(type, constructorArguments);
+                    }
 
                     var fields = ObjectHelper.GetFieldsThaCanBeSetPublicly(type);
                     var assignments = fields.Select(x =>

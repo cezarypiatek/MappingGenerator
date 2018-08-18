@@ -19,18 +19,28 @@ namespace MappingGenerator
 
         public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType)
         {
+            return FindMappingSource(targetName, targetType, new MappingPath());
+        }
+
+        private MappingElement FindMappingSource(string targetName, ITypeSymbol targetType, MappingPath mappingPath)
+        {
             return new MappingElement
             {
                 ExpressionType = targetType,
-                Expression = (ExpressionSyntax) GetDefaultExpression(targetType)
+                Expression = (ExpressionSyntax) GetDefaultExpression(targetType, mappingPath)
             };  
         }
 
-        internal SyntaxNode GetDefaultExpression(ITypeSymbol type)
+        internal SyntaxNode GetDefaultExpression(ITypeSymbol type, MappingPath mappingPath)
         {
+            if (mappingPath.AddToMapped(type) == false)
+            {
+                return syntaxGenerator.DefaultExpression(type)
+                    .WithTrailingTrivia(SyntaxFactory.Comment(" /* Stop recursive mapping */"));
+            }
+
             //TODO: Handle types without default constructor
             //TODO: Handle ReadOnlyCollection
-            //TODO: Handle recursive types
 
             if (type.TypeKind == TypeKind.Enum && type is INamedTypeSymbol namedTypeSymbol)
             {
@@ -70,7 +80,7 @@ namespace MappingGenerator
 
                     var subType = MappingHelper.GetElementType(type);
                     var initializationBlockExpressions = new SeparatedSyntaxList<ExpressionSyntax>();
-                    var subTypeDefault = (ExpressionSyntax)GetDefaultExpression(subType);
+                    var subTypeDefault = (ExpressionSyntax)GetDefaultExpression(subType, mappingPath.Clone());
                     if (subTypeDefault != null)
                     {
                         initializationBlockExpressions = initializationBlockExpressions.Add(subTypeDefault);
@@ -87,7 +97,7 @@ namespace MappingGenerator
                     var assignments = fields.Select(x =>
                     {
                         var identifier = (ExpressionSyntax)(SyntaxFactory.IdentifierName(x.Name));
-                        return (ExpressionSyntax)syntaxGenerator.AssignmentStatement(identifier, this.FindMappingSource(x.Name, x.Type).Expression);
+                        return (ExpressionSyntax)syntaxGenerator.AssignmentStatement(identifier, this.FindMappingSource(x.Name, x.Type, mappingPath).Expression);
                     });
                     var initializerExpressionSyntax = SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression, new SeparatedSyntaxList<ExpressionSyntax>().AddRange(assignments)).FixInitializerExpressionFormatting(objectCreationExpression);
                     return objectCreationExpression.WithInitializer(initializerExpressionSyntax);

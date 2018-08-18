@@ -88,7 +88,7 @@ namespace MappingGenerator
                 var target = methodSymbol.Parameters[1];
                 var targets = ObjectHelper.GetFieldsThaCanBeSetPublicly(target.Type);
                 var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator);
-                return MappingHelper.MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder, gloablTargetAccessor: generator.IdentifierName(target.Name));
+                return MappingHelper.MapUsingSimpleAssignment(generator, semanticModel, targets, sourceFinder, globalTargetAccessor: generator.IdentifierName(target.Name));
             }
 
             if (SymbolHelper.IsUpdateThisObjectFunction(methodSymbol))
@@ -96,14 +96,14 @@ namespace MappingGenerator
                 var source = methodSymbol.Parameters[0];
                 var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator);
                 var targets = ObjectHelper.GetFieldsThaCanBeSetPrivately(methodSymbol.ContainingType);
-                return MappingHelper.MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder);
+                return MappingHelper.MapUsingSimpleAssignment(generator, semanticModel, targets, sourceFinder);
             }
 
             if (SymbolHelper.IsMultiParameterUpdateThisObjectFunction(methodSymbol))
             {
                 var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters);
                 var targets = ObjectHelper.GetFieldsThaCanBeSetPrivately(methodSymbol.ContainingType);
-                return MappingHelper.MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder);
+                return MappingHelper.MapUsingSimpleAssignment(generator, semanticModel, targets, sourceFinder);
             }
 
             if (SymbolHelper.IsMappingConstructor(methodSymbol))
@@ -111,14 +111,14 @@ namespace MappingGenerator
                 var source = methodSymbol.Parameters[0];
                 var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator);
                 var targets = ObjectHelper.GetFieldsThaCanBeSetFromConstructor(methodSymbol.ContainingType);
-                return MappingHelper.MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder);
+                return MappingHelper.MapUsingSimpleAssignment(generator, semanticModel, targets, sourceFinder);
             }
 
             if (SymbolHelper.IsMultiParameterMappingConstructor(methodSymbol))
             {
                 var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters);
                 var targets = ObjectHelper.GetFieldsThaCanBeSetFromConstructor(methodSymbol.ContainingType);
-                return MappingHelper.MapUsingSimpleAssigment(generator, semanticModel, targets, sourceFinder);
+                return MappingHelper.MapUsingSimpleAssignment(generator, semanticModel, targets, sourceFinder);
             }
             return Enumerable.Empty<SyntaxNode>();
         }

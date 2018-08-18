@@ -21,7 +21,7 @@ namespace MappingGenerator.Test
         {
             var test = EmptyInitializationBlockTestCases._002_CompleteInitializationBlockWithLambdaParameter;
             var fixedCode = EmptyInitializationBlockTestCases._002_CompleteInitializationBlockWithLambdaParameter_FIXED;
-            TestCodeRefactoring(test, fixedCode, 1);
+            TestCodeRefactoring(test, fixedCode, 2);
         }
 
         [Test]
@@ -29,6 +29,22 @@ namespace MappingGenerator.Test
         {
             var test = EmptyInitializationBlockTestCases._003_CompleteInitializationBlockWithSompleLambdaParameter;
             var fixedCode = EmptyInitializationBlockTestCases._003_CompleteInitializationBlockWithSompleLambdaParameter_FIXED;
+            TestCodeRefactoring(test, fixedCode, 2);
+        }
+
+        [Test]
+        public void should_be_able_to_generate_initialization_block_with_sample_data_for_recursive_type()
+        {
+            var test = EmptyInitializationBlockTestCases._004_CompleteInitializationBlockWithSampleDataRecursiveType;
+            var fixedCode = EmptyInitializationBlockTestCases._004_CompleteInitializationBlockWithSampleDataRecursiveType_FIXED;
+            TestCodeRefactoring(test, fixedCode, 1);
+        }
+
+        [Test]
+        public void should_be_able_to_generate_initialization_block_with_sample_data_for_complex_type()
+        {
+            var test = EmptyInitializationBlockTestCases._005_CompleteInitializationBlockWithSampleDatComplexType;
+            var fixedCode = EmptyInitializationBlockTestCases._005_CompleteInitializationBlockWithSampleDatComplexType_FIXED;
             TestCodeRefactoring(test, fixedCode, 1);
         }
       

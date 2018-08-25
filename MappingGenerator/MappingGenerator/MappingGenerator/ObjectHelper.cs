@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 
 namespace MappingGenerator
 {
-    public class ObjectHelper
+    public static class ObjectHelper
     {
         private static bool IsPublicGetMethod(ISymbol x)
         {
@@ -99,16 +100,32 @@ namespace MappingGenerator
                 .Where(property => property.SetMethod != null || property.CanBeSetOnlyFromConstructor());
         }
         
-        public static IEnumerable<IPropertySymbol> GetFieldsThaCanBeSetPublicly(ITypeSymbol type)
+        public static IEnumerable<IPropertySymbol> GetFieldsThaCanBeSetPublicly(ITypeSymbol type,
+            IAssemblySymbol contextAssembly)
         {
-            return ObjectHelper.GetPublicPropertySymbols(type)
-                .Where(property => property.SetMethod != null && property.CanBeSetPublicly());
+            var canSetInternalFields =contextAssembly.IsSameAssemblyOrHasFriendAccessTo(type.ContainingAssembly);
+            return GetPublicPropertySymbols(type).Where(property => property.SetMethod != null && property.CanBeSetPublicly(canSetInternalFields));
         }
-        
+
+        public static bool IsSameAssemblyOrHasFriendAccessTo(this IAssemblySymbol assembly, IAssemblySymbol toAssembly)
+        {
+            return
+                Equals(assembly, toAssembly) ||
+                (assembly.IsInteractive && toAssembly.IsInteractive) ||
+                toAssembly.GivesAccessTo(assembly);
+        }
+
         public static IEnumerable<IPropertySymbol> GetFieldsThaCanBeSetPrivately(ITypeSymbol type)
         {
             return ObjectHelper.GetPublicPropertySymbols(type)
                 .Where(property => property.SetMethod != null && property.CanBeSetPrivately());
+        }
+
+        public static IAssemblySymbol FindContextAssembly(this SemanticModel semanticModel, SyntaxNode node )
+        {
+            var type = node.FindNearestContainer<ClassDeclarationSyntax, StructDeclarationSyntax>();
+            var symbol = semanticModel.GetDeclaredSymbol(type);
+            return symbol.ContainingAssembly;
         }
     }
 

@@ -14,11 +14,13 @@ namespace MappingGenerator
     {
         private readonly SemanticModel semanticModel;
         private readonly SyntaxGenerator syntaxGenerator;
+        private readonly IAssemblySymbol contextAssembly;
 
-        public MappingEngine(SemanticModel semanticModel, SyntaxGenerator syntaxGenerator)
+        public MappingEngine(SemanticModel semanticModel, SyntaxGenerator syntaxGenerator, IAssemblySymbol contextAssembly)
         {
             this.semanticModel = semanticModel;
             this.syntaxGenerator = syntaxGenerator;
+            this.contextAssembly = contextAssembly;
         }
 
         public TypeInfo GetExpressionTypeInfo(SyntaxNode expression)
@@ -26,11 +28,11 @@ namespace MappingGenerator
             return semanticModel.GetTypeInfo(expression);
         }
 
-        public static async Task<MappingEngine> Create(Document document, CancellationToken cancellationToken)
+        public static async Task<MappingEngine> Create(Document document, CancellationToken cancellationToken, IAssemblySymbol contextAssembly)
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
-            return new MappingEngine(semanticModel, syntaxGenerator);
+            return new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
         }
 
         public ExpressionSyntax MapExpression(ExpressionSyntax sourceExpression, ITypeSymbol sourceType, ITypeSymbol destinationType)
@@ -130,7 +132,7 @@ namespace MappingGenerator
             return new MappingElement()
             {
                 ExpressionType = targetType,
-                Expression = ((ObjectCreationExpressionSyntax) syntaxGenerator.ObjectCreationExpression(targetType)).AddInitializerWithMapping(subMappingSourceFinder, targetType, semanticModel, syntaxGenerator, mappingPath)
+                Expression = ((ObjectCreationExpressionSyntax) syntaxGenerator.ObjectCreationExpression(targetType)).AddInitializerWithMapping(subMappingSourceFinder, targetType, semanticModel, syntaxGenerator, this.contextAssembly, mappingPath)
             };
         }
 

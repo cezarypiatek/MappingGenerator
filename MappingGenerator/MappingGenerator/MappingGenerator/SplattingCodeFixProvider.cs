@@ -67,7 +67,8 @@ namespace MappingGenerator
             if (overloadParameterSets != null)
             {
                 var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
-                var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator);
+                var contextAssembly = semanticModel.FindContextAssembly(invocation.SourceNode);
+                var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
                 var invalidArgumentList = invocation.Arguments;
                 var parametersMatch = FindParametersMatch(invalidArgumentList, overloadParameterSets, semanticModel, syntaxGenerator);
                 if (parametersMatch != null)

@@ -98,7 +98,9 @@ namespace MappingGenerator
             {
                 return document;
             }
-            var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator);
+
+            var contextAssembly = semanticModel.FindContextAssembly(invocation.SourceNode);
+            var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
             var mappingLambda = mappingEngine.CreateMappingLambda("x", sourceElementType, targetElementType, new MappingPath());
             return await document.ReplaceNodes(invocation.SourceNode, invocation.WithArgumentList(SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument((ExpressionSyntax)mappingLambda))), cancellationToken);
         }
@@ -140,7 +142,8 @@ namespace MappingGenerator
             var overloadParameterSets = invocation.GetOverloadParameterSets(semanticModel);
             if (overloadParameterSets != null)
             {
-                var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator);
+                var contextAssembly = semanticModel.FindContextAssembly(invocation.SourceNode);
+                var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
                 var parametersMatch = MethodHelper.FindBestParametersMatch(mappingSourceFinder, overloadParameterSets);
                 if (parametersMatch != null)
                 {

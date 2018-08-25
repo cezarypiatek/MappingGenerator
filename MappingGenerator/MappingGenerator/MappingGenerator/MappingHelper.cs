@@ -67,10 +67,11 @@ namespace MappingGenerator
         public static ObjectCreationExpressionSyntax AddInitializerWithMapping(
             this ObjectCreationExpressionSyntax objectCreationExpression, IMappingSourceFinder mappingSourceFinder,
             ITypeSymbol createdObjectTyp, SemanticModel semanticModel, SyntaxGenerator syntaxGenerator,
-            MappingPath mappingPath=null)
+            IAssemblySymbol contextAssembly,
+            MappingPath mappingPath = null)
         {
-            var propertiesToSet = ObjectHelper.GetFieldsThaCanBeSetPublicly(createdObjectTyp);
-            var assignments = MapUsingSimpleAssignment(syntaxGenerator, semanticModel, propertiesToSet, mappingSourceFinder, mappingPath);
+            var propertiesToSet = ObjectHelper.GetFieldsThaCanBeSetPublicly(createdObjectTyp, contextAssembly);
+            var assignments = MapUsingSimpleAssignment(syntaxGenerator, semanticModel, propertiesToSet, mappingSourceFinder, contextAssembly, mappingPath);
 
             var initializerExpressionSyntax = SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression,new SeparatedSyntaxList<ExpressionSyntax>().AddRange(assignments )).FixInitializerExpressionFormatting(objectCreationExpression);
             return objectCreationExpression.WithInitializer(initializerExpressionSyntax);
@@ -78,14 +79,14 @@ namespace MappingGenerator
 
 
         public static IEnumerable<ExpressionSyntax> MapUsingSimpleAssignment(SyntaxGenerator generator,
-            SemanticModel semanticModel, IEnumerable<IPropertySymbol> targets, IMappingSourceFinder sourceFinder,
+            SemanticModel semanticModel, IEnumerable<IPropertySymbol> targets, IMappingSourceFinder sourceFinder, IAssemblySymbol contextAssembly,
             MappingPath mappingPath =null, SyntaxNode globalTargetAccessor = null)
         {
             if (mappingPath == null)
             {
                 mappingPath = new MappingPath();
             }
-            var mappingEngine = new MappingEngine(semanticModel, generator);
+            var mappingEngine = new MappingEngine(semanticModel, generator, contextAssembly);
             return targets.Select(property => new
                 {
                     source = sourceFinder.FindMappingSource(property.Name, property.Type),

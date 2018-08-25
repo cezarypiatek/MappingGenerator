@@ -60,22 +60,23 @@ namespace MappingGenerator
             return await ReplaceEmptyInitializationBlock(document, objectInitializer, cancellationToken, semanticModel, mappingSourceFinder, generator);
         }
 
-        private static async Task<Document> ReplaceEmptyInitializationBlock(Document document,
-            InitializerExpressionSyntax objectInitializer, CancellationToken cancellationToken,
-            SemanticModel semanticModel, IMappingSourceFinder mappingSourceFinder, SyntaxGenerator syntaxGenerator)
-        {
-            var oldObjCreation = objectInitializer.FindContainer<ObjectCreationExpressionSyntax>();
-            var createdObjectType = ModelExtensions.GetTypeInfo(semanticModel, oldObjCreation).Type;
-            var newObjectCreation = oldObjCreation.AddInitializerWithMapping(mappingSourceFinder, createdObjectType, semanticModel, syntaxGenerator);
-            return await document.ReplaceNodes(oldObjCreation, newObjectCreation, cancellationToken);
-        }
-
         private async Task<Document> InitializeWithDefaults(Document document, InitializerExpressionSyntax objectInitializer, CancellationToken cancellationToken)
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
-            var mappingSourceFinder = new ScaffoldingSourceFinder(syntaxGenerator, document);
+            var mappingSourceFinder = new ScaffoldingSourceFinder(syntaxGenerator, document, semanticModel.FindContextAssembly(objectInitializer));
             return await ReplaceEmptyInitializationBlock(document, objectInitializer, cancellationToken, semanticModel, mappingSourceFinder, syntaxGenerator);
+        }
+
+        private static async Task<Document> ReplaceEmptyInitializationBlock(Document document,
+            InitializerExpressionSyntax objectInitializer, CancellationToken cancellationToken,
+            SemanticModel semanticModel, IMappingSourceFinder mappingSourceFinder, SyntaxGenerator syntaxGenerator)
+        {
+            var contextAssembly = semanticModel.FindContextAssembly(objectInitializer);
+            var oldObjCreation = objectInitializer.FindContainer<ObjectCreationExpressionSyntax>();
+            var createdObjectType = ModelExtensions.GetTypeInfo(semanticModel, oldObjCreation).Type;
+            var newObjectCreation = oldObjCreation.AddInitializerWithMapping(mappingSourceFinder, createdObjectType, semanticModel, syntaxGenerator, contextAssembly);
+            return await document.ReplaceNodes(oldObjCreation, newObjectCreation, cancellationToken);
         }
     }
 }

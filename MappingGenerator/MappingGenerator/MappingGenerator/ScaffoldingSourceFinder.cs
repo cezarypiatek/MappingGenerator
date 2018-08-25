@@ -14,11 +14,13 @@ namespace MappingGenerator
     {
         private readonly SyntaxGenerator syntaxGenerator;
         private readonly Document _document;
+        private readonly IAssemblySymbol _contextAssembly;
 
-        public ScaffoldingSourceFinder(SyntaxGenerator syntaxGenerator, Document document)
+        public ScaffoldingSourceFinder(SyntaxGenerator syntaxGenerator, Document document, IAssemblySymbol contextAssembly)
         {
             this.syntaxGenerator = syntaxGenerator;
             _document = document;
+            _contextAssembly = contextAssembly;
         }
 
         public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType)
@@ -124,7 +126,7 @@ namespace MappingGenerator
                         objectCreationExpression = (ObjectCreationExpressionSyntax)syntaxGenerator.ObjectCreationExpression(nt, constructorArguments);
                     }
 
-                    var fields = ObjectHelper.GetFieldsThaCanBeSetPublicly(nt);
+                    var fields = ObjectHelper.GetFieldsThaCanBeSetPublicly(nt, _contextAssembly);
                     var assignments = fields.Select(x =>
                     {
                         var identifier = (ExpressionSyntax)(SyntaxFactory.IdentifierName(x.Name));

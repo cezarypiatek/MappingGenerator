@@ -70,7 +70,7 @@ namespace MappingGenerator
 
         private static IEnumerable<SyntaxNode> GenerateMappingCode(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
         {
-            var mappingEngine = new MappingEngine(semanticModel, generator);
+            var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
 
             if (SymbolHelper.IsPureMappingFunction(methodSymbol))
             {
@@ -86,9 +86,9 @@ namespace MappingGenerator
             {
                 var source = methodSymbol.Parameters[0];
                 var target = methodSymbol.Parameters[1];
-                var targets = ObjectHelper.GetFieldsThaCanBeSetPublicly(target.Type);
+                var targets = ObjectHelper.GetFieldsThaCanBeSetPublicly(target.Type, methodSymbol.ContainingAssembly);
                 var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator);
-                return MappingHelper.MapUsingSimpleAssignment(generator, semanticModel, targets, sourceFinder, globalTargetAccessor: generator.IdentifierName(target.Name));
+                return MappingHelper.MapUsingSimpleAssignment(generator, semanticModel, targets, sourceFinder, globalTargetAccessor: generator.IdentifierName(target.Name), contextAssembly: methodSymbol.ContainingAssembly);
             }
 
             if (SymbolHelper.IsUpdateThisObjectFunction(methodSymbol))
@@ -96,14 +96,14 @@ namespace MappingGenerator
                 var source = methodSymbol.Parameters[0];
                 var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator);
                 var targets = ObjectHelper.GetFieldsThaCanBeSetPrivately(methodSymbol.ContainingType);
-                return MappingHelper.MapUsingSimpleAssignment(generator, semanticModel, targets, sourceFinder);
+                return MappingHelper.MapUsingSimpleAssignment(generator, semanticModel, targets, sourceFinder, contextAssembly: methodSymbol.ContainingAssembly);
             }
 
             if (SymbolHelper.IsMultiParameterUpdateThisObjectFunction(methodSymbol))
             {
                 var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters);
                 var targets = ObjectHelper.GetFieldsThaCanBeSetPrivately(methodSymbol.ContainingType);
-                return MappingHelper.MapUsingSimpleAssignment(generator, semanticModel, targets, sourceFinder);
+                return MappingHelper.MapUsingSimpleAssignment(generator, semanticModel, targets, sourceFinder, contextAssembly: methodSymbol.ContainingAssembly);
             }
 
             if (SymbolHelper.IsMappingConstructor(methodSymbol))
@@ -111,14 +111,14 @@ namespace MappingGenerator
                 var source = methodSymbol.Parameters[0];
                 var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator);
                 var targets = ObjectHelper.GetFieldsThaCanBeSetFromConstructor(methodSymbol.ContainingType);
-                return MappingHelper.MapUsingSimpleAssignment(generator, semanticModel, targets, sourceFinder);
+                return MappingHelper.MapUsingSimpleAssignment(generator, semanticModel, targets, sourceFinder, contextAssembly: methodSymbol.ContainingAssembly);
             }
 
             if (SymbolHelper.IsMultiParameterMappingConstructor(methodSymbol))
             {
                 var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters);
                 var targets = ObjectHelper.GetFieldsThaCanBeSetFromConstructor(methodSymbol.ContainingType);
-                return MappingHelper.MapUsingSimpleAssignment(generator, semanticModel, targets, sourceFinder);
+                return MappingHelper.MapUsingSimpleAssignment(generator, semanticModel, targets, sourceFinder, contextAssembly: methodSymbol.ContainingAssembly);
             }
             return Enumerable.Empty<SyntaxNode>();
         }

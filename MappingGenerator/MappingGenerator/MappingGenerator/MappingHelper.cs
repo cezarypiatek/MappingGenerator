@@ -64,58 +64,7 @@ namespace MappingGenerator
                 .WithLeadingTrivia(SyntaxTriviaList.Create(SyntaxFactory.EndOfLine(Environment.NewLine)));
         }
 
-        public static ObjectCreationExpressionSyntax AddInitializerWithMapping(
-            this ObjectCreationExpressionSyntax objectCreationExpression, IMappingSourceFinder mappingSourceFinder,
-            ITypeSymbol createdObjectTyp, SemanticModel semanticModel, SyntaxGenerator syntaxGenerator,
-            IAssemblySymbol contextAssembly,
-            MappingPath mappingPath = null,
-            bool mapComplexTypesEvenHasTheSameType = false)
-        {
-            var propertiesToSet = ObjectHelper.GetFieldsThaCanBeSetPublicly(createdObjectTyp, contextAssembly);
-            var assignments = MapUsingSimpleAssignment(syntaxGenerator, semanticModel, propertiesToSet, mappingSourceFinder, contextAssembly, mappingPath, mapComplexTypesEvenHasTheSameType:mapComplexTypesEvenHasTheSameType);
-
-            var initializerExpressionSyntax = SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression,new SeparatedSyntaxList<ExpressionSyntax>().AddRange(assignments )).FixInitializerExpressionFormatting(objectCreationExpression);
-            return objectCreationExpression.WithInitializer(initializerExpressionSyntax);
-        }
-
-
-        public static IEnumerable<ExpressionSyntax> MapUsingSimpleAssignment(SyntaxGenerator generator,
-            SemanticModel semanticModel, IEnumerable<IPropertySymbol> targets, IMappingSourceFinder sourceFinder, IAssemblySymbol contextAssembly,
-            MappingPath mappingPath =null, SyntaxNode globalTargetAccessor = null, bool mapComplexTypesEvenHasTheSameType=false)
-        {
-            if (mappingPath == null)
-            {
-                mappingPath = new MappingPath();
-            }
-            var mappingEngine = new MappingEngine(semanticModel, generator, contextAssembly)
-            {
-                MapComplexTypesEvenHasTheSameType = mapComplexTypesEvenHasTheSameType
-            };
-            return targets.Select(property => new
-                {
-                    source = sourceFinder.FindMappingSource(property.Name, property.Type),
-                    target = new MappingElement()
-                    {
-                        Expression = (ExpressionSyntax) CreateAccessPropertyExpression(globalTargetAccessor, property, generator),
-                        ExpressionType = property.Type
-                    }
-                })
-                .Where(x=>x.source!=null)
-                .Select(pair =>
-                {
-                    var sourceExpression = mappingEngine.MapExpression(pair.source, pair.target.ExpressionType, mappingPath.Clone()).Expression;
-                    return (ExpressionSyntax) generator.AssignmentStatement(pair.target.Expression, sourceExpression);
-                }).ToList();
-        }
-
-        private static SyntaxNode CreateAccessPropertyExpression(SyntaxNode globalTargetAccessor, IPropertySymbol property, SyntaxGenerator generator)
-        {
-            if (globalTargetAccessor == null)
-            {
-                return SyntaxFactory.IdentifierName(property.Name);
-            }
-            return generator.MemberAccessExpression(globalTargetAccessor, property.Name);
-        }
+       
 
         public static SyntaxNode WrapInReadonlyCollectionIfNecessary(this SyntaxNode node, bool isReadonly,
             SyntaxGenerator generator)

@@ -38,6 +38,9 @@
     <Compile Update="ExplicitConversionCodeFixProvider.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="ImplementCloneMethodRefactoring.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="MappingGeneratorRefactoring.cs">
       <SubType>Code</SubType>
     </Compile>

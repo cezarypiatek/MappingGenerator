@@ -1,0 +1,92 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Collections.ObjectModel;
+
+namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+{
+    public class UserDTO : System.ICloneable
+    {
+        public string FirstName { get; }
+        public string LastName { get; private set; }
+        public int Age { get; set; }
+        public int Cash { get;}
+        public AccountDTO Account { get; private set; }
+        public List<AccountDTO> Debs { get; set; }
+        public UserSourceDTO Source { get; set; }
+        public string Login { get; set; }
+        public byte[] ImageData { get; set; }
+        public List<int> LuckyNumbers { get; set; }
+        public int Total { get; set; }
+        public AddressDTO MainAddress { get; set; }
+        public ReadOnlyCollection<AddressDTO> Addresses { get; set; }
+        public int UnitId { get; set; }
+
+        public UserDTO Clone()
+        {
+            return new UserDTO()
+            {
+                Age = Age,
+                Debs = Debs.Select(thisDeb => new AccountDTO()
+                {
+                    BankName = thisDeb.BankName,
+                    Number = thisDeb.Number
+                }).ToList(),
+                Source = new UserSourceDTO(providerName: Source.ProviderName, providerAddress: Source.ProviderAddress),
+                Login = Login,
+                ImageData = ImageData.ToArray(),
+                LuckyNumbers = LuckyNumbers.ToList(),
+                Total = Total,
+                MainAddress = new AddressDTO()
+                {
+                    City = MainAddress.City,
+                    ZipCode = MainAddress.ZipCode,
+                    Street = MainAddress.Street,
+                    FlatNo = MainAddress.FlatNo,
+                    BuildingNo = MainAddress.BuildingNo
+                },
+                Addresses = Addresses.Select(thisAddresse => new AddressDTO()
+                {
+                    City = thisAddresse.City,
+                    ZipCode = thisAddresse.ZipCode,
+                    Street = thisAddresse.Street,
+                    FlatNo = thisAddresse.FlatNo,
+                    BuildingNo = thisAddresse.BuildingNo
+                }).ToList().AsReadOnly(),
+                UnitId = UnitId
+            };
+        }
+
+        object ICloneable.Clone()
+        {
+            return Clone();
+        }
+    }
+
+    public class UserSourceDTO
+    {
+        public string ProviderName { get; set; }
+        public string ProviderAddress { get; set; }
+
+        public UserSourceDTO(string providerName, string providerAddress)
+        {
+            ProviderName = providerName;
+            ProviderAddress = providerAddress;
+        }
+    }
+    
+    public class AccountDTO
+    {
+        public string BankName { get; set; }
+        public string Number { get; set; }
+    }
+
+    public class AddressDTO
+    {
+        public string City { get; set; }
+        public string ZipCode { get; set; }
+        public string Street { get; set; }
+        public string FlatNo { get; set; }
+        public string BuildingNo { get; set; }
+    }
+}

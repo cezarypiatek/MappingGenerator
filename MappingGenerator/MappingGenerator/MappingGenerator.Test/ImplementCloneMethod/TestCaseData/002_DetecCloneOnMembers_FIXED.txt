@@ -1,0 +1,80 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Collections.ObjectModel;
+
+namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+{
+    public class Classx : ICloneable
+    {
+        public string A { get; set; }
+        public string B { get; set; }
+
+        public Classx Clone()
+        {
+            return new Classx()
+            {
+                A = A,
+                B = B
+            };
+        }
+
+        object ICloneable.Clone()
+        {
+            return Clone();
+        }
+    }
+
+
+    public class Classy : ICloneable
+    {
+        public string A { get; set; }
+        public string B { get; set; }
+
+       
+        object ICloneable.Clone()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class Classz : ICloneable
+    {
+        public string A { get; set; }
+        public string B { get; set; }
+
+
+        public object Clone()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class User : System.ICloneable
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public int Age { get; set; }
+        public Classx MyProperty1 { get; set; }
+        public Classy MyProperty2 { get; set; }
+        public Classz MyProperty3 { get; set; }
+
+        public User Clone()
+        {
+            return new User()
+            {
+                FirstName = FirstName,
+                LastName = LastName,
+                Age = Age,
+                MyProperty1 = MyProperty1.Clone(),
+                MyProperty2 = ((ICloneable)MyProperty2).Clone() as Classy,
+                MyProperty3 = MyProperty3.Clone() as Classz
+            };
+        }
+
+        object ICloneable.Clone()
+        {
+            return Clone();
+        }
+    }
+}

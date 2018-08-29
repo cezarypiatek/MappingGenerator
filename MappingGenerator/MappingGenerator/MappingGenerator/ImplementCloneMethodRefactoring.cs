@@ -86,10 +86,7 @@ namespace MappingGenerator
         private SyntaxNode[] CreateCloneExpression(SyntaxGenerator generator, SemanticModel semanticModel, INamedTypeSymbol type)
         {
             //TODO: If subtypes contains clone method use it, remember about casting
-            var mappingEngine = new MappingEngine(semanticModel, generator, type.ContainingAssembly)
-            {
-                MapComplexTypesEvenHasTheSameType = true
-            };
+            var mappingEngine = new CloneMappingEngine(semanticModel, generator, type.ContainingAssembly);
             var newExpression = mappingEngine.MapExpression((ExpressionSyntax)generator.ThisExpression(), type, type);
             return new[] { generator.ReturnStatement(newExpression) };
         }

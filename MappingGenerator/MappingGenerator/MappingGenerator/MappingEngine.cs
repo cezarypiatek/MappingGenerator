@@ -59,27 +59,33 @@ namespace MappingGenerator
                 mappingPath = new MappingPath();
             }
 
-            if (mappingPath.AddToMapped(element.ExpressionType) == false)
+            var sourceType = element.ExpressionType;
+            if (mappingPath.AddToMapped(sourceType) == false)
             {
                 return new MappingElement()
                 {
-                    ExpressionType = element.ExpressionType,
+                    ExpressionType = sourceType,
                     Expression = element.Expression.WithTrailingTrivia(SyntaxFactory.Comment(" /* Stop recursive mapping */"))
                 };
             }
 
-            if (IsUnrappingNeeded(targetType, element))
+            if (IsUnwrappingNeeded(targetType, element))
             {
-                return TryToUnwrapp(targetType, element);
+                return TryToUnwrap(targetType, element);
             }
 
             
-            if ((element.ExpressionType.Equals(targetType) == false  || MapComplexTypesEvenHasTheSameType) && ObjectHelper.IsSimpleType(targetType)==false && ObjectHelper.IsSimpleType(element.ExpressionType)==false)
+            if (ShouldCreateConversionBetweenTypes(targetType, sourceType))
             {
                 return TryToCreateMappingExpression(element, targetType, mappingPath);
             }
 
             return element;
+        }
+
+        private bool ShouldCreateConversionBetweenTypes(ITypeSymbol targetType, ITypeSymbol sourceType)
+        {
+            return (sourceType.Equals(targetType) == false  || MapComplexTypesEvenHasTheSameType) && ObjectHelper.IsSimpleType(targetType)==false && ObjectHelper.IsSimpleType(sourceType)==false;
         }
 
         private MappingElement TryToCreateMappingExpression(MappingElement source, ITypeSymbol targetType, MappingPath mappingPath)
@@ -139,12 +145,12 @@ namespace MappingGenerator
             };
         }
 
-        private bool IsUnrappingNeeded(ITypeSymbol targetType, MappingElement element)
+        private bool IsUnwrappingNeeded(ITypeSymbol targetType, MappingElement element)
         {
             return targetType != element.ExpressionType && ObjectHelper.IsSimpleType(targetType);
         }
 
-        private MappingElement TryToUnwrapp(ITypeSymbol targetType, MappingElement element)
+        private MappingElement TryToUnwrap(ITypeSymbol targetType, MappingElement element)
         {
             var sourceAccess = element.Expression as SyntaxNode;
             var conversion =  semanticModel.Compilation.ClassifyConversion(element.ExpressionType, targetType);
@@ -203,17 +209,18 @@ namespace MappingGenerator
             var isReadonlyCollection = ObjectHelper.IsReadonlyCollection(targetListType);
             var sourceListElementType = MappingHelper.GetElementType(sourceListType);
             var targetListElementType = MappingHelper.GetElementType(targetListType);
-            if (ObjectHelper.IsSimpleType(sourceListElementType) || (sourceListElementType.Equals(targetListElementType) && MapComplexTypesEvenHasTheSameType ==false))
+            if (ShouldCreateConversionBetweenTypes(targetListElementType, sourceListElementType))
             {
-                var toListInvocation = AddMaterializeCollectionInvocation(syntaxGenerator, sourceAccess, targetListType);
-                return MappingHelper.WrapInReadonlyCollectionIfNecessary(toListInvocation, isReadonlyCollection, syntaxGenerator);
+                var selectAccess = syntaxGenerator.MemberAccessExpression(sourceAccess, "Select");
+                var lambdaParameterName = CreateLambdaParameterName(sourceAccess);
+                var mappingLambda = CreateMappingLambda(lambdaParameterName, sourceListElementType, targetListElementType, mappingPath);
+                var selectInvocation = syntaxGenerator.InvocationExpression(selectAccess, mappingLambda);
+                var toList = AddMaterializeCollectionInvocation(syntaxGenerator, selectInvocation, targetListType);
+                return MappingHelper.WrapInReadonlyCollectionIfNecessary(toList, isReadonlyCollection, syntaxGenerator);
             }
-            var selectAccess = syntaxGenerator.MemberAccessExpression(sourceAccess, "Select");
-            var lambdaParameterName = CreateLambdaParameterName(sourceAccess);
-            var mappingLambda = CreateMappingLambda(lambdaParameterName, sourceListElementType, targetListElementType, mappingPath);
-	        var selectInvocation = syntaxGenerator.InvocationExpression(selectAccess, mappingLambda);
-            var toList = AddMaterializeCollectionInvocation(syntaxGenerator, selectInvocation, targetListType);
-            return MappingHelper.WrapInReadonlyCollectionIfNecessary(toList, isReadonlyCollection, syntaxGenerator);
+
+            var toListInvocation = AddMaterializeCollectionInvocation(syntaxGenerator, sourceAccess, targetListType);
+            return MappingHelper.WrapInReadonlyCollectionIfNecessary(toListInvocation, isReadonlyCollection, syntaxGenerator);
         }
 
 	    public SyntaxNode CreateMappingLambda(string lambdaParameterName, ITypeSymbol sourceListElementType, ITypeSymbol targetListElementType, MappingPath mappingPath)

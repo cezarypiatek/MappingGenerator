@@ -137,13 +137,62 @@ namespace MappingGenerator
             }
 
 
+            var objectCreationExpressionSyntax = ((ObjectCreationExpressionSyntax) syntaxGenerator.ObjectCreationExpression(targetType));
             return new MappingElement()
             {
                 ExpressionType = targetType,
-                Expression = ((ObjectCreationExpressionSyntax) syntaxGenerator.ObjectCreationExpression(targetType))
-                    .AddInitializerWithMapping(subMappingSourceFinder, targetType, semanticModel, syntaxGenerator, this.contextAssembly, mappingPath, mapComplexTypesEvenHasTheSameType: this.MapComplexTypesEvenHasTheSameType)
+                Expression = AddInitializerWithMapping(objectCreationExpressionSyntax, subMappingSourceFinder, targetType, mappingPath)
             };
         }
+
+
+        public ObjectCreationExpressionSyntax AddInitializerWithMapping(
+            ObjectCreationExpressionSyntax objectCreationExpression, IMappingSourceFinder mappingSourceFinder,
+            ITypeSymbol createdObjectTyp,
+            MappingPath mappingPath = null)
+        {
+            var propertiesToSet = ObjectHelper.GetFieldsThaCanBeSetPublicly(createdObjectTyp, contextAssembly);
+            var assignments = MapUsingSimpleAssignment(syntaxGenerator, propertiesToSet, mappingSourceFinder, mappingPath);
+
+            var initializerExpressionSyntax = SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression, new SeparatedSyntaxList<ExpressionSyntax>().AddRange(assignments)).FixInitializerExpressionFormatting(objectCreationExpression);
+            return objectCreationExpression.WithInitializer(initializerExpressionSyntax);
+        }
+
+        public IEnumerable<ExpressionSyntax> MapUsingSimpleAssignment(SyntaxGenerator generator,
+            IEnumerable<IPropertySymbol> targets, IMappingSourceFinder sourceFinder,
+            MappingPath mappingPath = null, SyntaxNode globalTargetAccessor = null)
+        {
+            if (mappingPath == null)
+            {
+                mappingPath = new MappingPath();
+            }
+          
+            return targets.Select(property => new
+                {
+                    source = sourceFinder.FindMappingSource(property.Name, property.Type),
+                    target = new MappingElement()
+                    {
+                        Expression = (ExpressionSyntax)CreateAccessPropertyExpression(globalTargetAccessor, property, generator),
+                        ExpressionType = property.Type
+                    }
+                })
+                .Where(x => x.source != null)
+                .Select(pair =>
+                {
+                    var sourceExpression = this.MapExpression(pair.source, pair.target.ExpressionType, mappingPath.Clone()).Expression;
+                    return (ExpressionSyntax)generator.AssignmentStatement(pair.target.Expression, sourceExpression);
+                }).ToList();
+        }
+
+        private static SyntaxNode CreateAccessPropertyExpression(SyntaxNode globalTargetAccessor, IPropertySymbol property, SyntaxGenerator generator)
+        {
+            if (globalTargetAccessor == null)
+            {
+                return SyntaxFactory.IdentifierName(property.Name);
+            }
+            return generator.MemberAccessExpression(globalTargetAccessor, property.Name);
+        }
+
 
         private bool IsUnwrappingNeeded(ITypeSymbol targetType, MappingElement element)
         {
@@ -247,11 +296,11 @@ namespace MappingGenerator
             return finalName;
         }
 
-        private static char[] FobiddenSigns = new[] {'.', '[', ']', '(', ')'};
+        private static readonly char[] ForbiddenSigns = new[] {'.', '[', ']', '(', ')'};
 
         private static string ToLocalVariableName(string proposalLocalName)
         {
-            var withoutForbiddenSigns = string.Join("",proposalLocalName.Trim().Split(FobiddenSigns).Where(x=> string.IsNullOrWhiteSpace(x) == false).Select(x=>
+            var withoutForbiddenSigns = string.Join("",proposalLocalName.Trim().Split(ForbiddenSigns).Where(x=> string.IsNullOrWhiteSpace(x) == false).Select(x=>
             {
                 var cleanElement = x.Trim();
                 return $"{cleanElement.Substring(0, 1).ToUpper()}{cleanElement.Substring(1)}";

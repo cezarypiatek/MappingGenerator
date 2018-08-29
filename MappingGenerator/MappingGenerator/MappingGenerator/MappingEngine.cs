@@ -12,11 +12,10 @@ namespace MappingGenerator
 {
     public class MappingEngine
     {
-        private readonly SemanticModel semanticModel;
-        private readonly SyntaxGenerator syntaxGenerator;
-        private readonly IAssemblySymbol contextAssembly;
+        protected readonly SemanticModel semanticModel;
+        protected readonly SyntaxGenerator syntaxGenerator;
+        protected readonly IAssemblySymbol contextAssembly;
 
-        public bool MapComplexTypesEvenHasTheSameType { get; set; } = false;
 
         public MappingEngine(SemanticModel semanticModel, SyntaxGenerator syntaxGenerator, IAssemblySymbol contextAssembly)
         {
@@ -83,12 +82,12 @@ namespace MappingGenerator
             return element;
         }
 
-        private bool ShouldCreateConversionBetweenTypes(ITypeSymbol targetType, ITypeSymbol sourceType)
+        protected virtual bool ShouldCreateConversionBetweenTypes(ITypeSymbol targetType, ITypeSymbol sourceType)
         {
-            return (sourceType.Equals(targetType) == false  || MapComplexTypesEvenHasTheSameType) && ObjectHelper.IsSimpleType(targetType)==false && ObjectHelper.IsSimpleType(sourceType)==false;
+            return (sourceType.Equals(targetType) == false) && ObjectHelper.IsSimpleType(targetType)==false && ObjectHelper.IsSimpleType(sourceType)==false;
         }
 
-        private MappingElement TryToCreateMappingExpression(MappingElement source, ITypeSymbol targetType, MappingPath mappingPath)
+        protected virtual MappingElement TryToCreateMappingExpression(MappingElement source, ITypeSymbol targetType, MappingPath mappingPath)
         {
             //TODO: If source expression is method or constructor invocation then we should extract local variable and use it im mappings as a reference
             var namedTargetType = targetType as INamedTypeSymbol;
@@ -336,6 +335,8 @@ namespace MappingGenerator
     public class MappingPath
     {
         private List<ITypeSymbol> mapped;
+
+        public int Length => mapped.Count;
 
         private MappingPath(List<ITypeSymbol> mapped)
         {

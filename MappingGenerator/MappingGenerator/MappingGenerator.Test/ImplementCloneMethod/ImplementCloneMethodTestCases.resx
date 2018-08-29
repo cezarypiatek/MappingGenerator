@@ -124,4 +124,10 @@
   <data name="_001_DeepClone_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>TestCaseData\001_DeepClone_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="_002_DetecCloneOnMembers" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\002_DetecCloneOnMembers.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_002_DetecCloneOnMembers_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\002_DetecCloneOnMembers_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

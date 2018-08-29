@@ -10,13 +10,43 @@ using Microsoft.CodeAnalysis.Editing;
 
 namespace MappingGenerator
 {
+    public class CloneMappingEngine: MappingEngine
+    {
+        public CloneMappingEngine(SemanticModel semanticModel, SyntaxGenerator syntaxGenerator, IAssemblySymbol contextAssembly) 
+            : base(semanticModel, syntaxGenerator, contextAssembly)
+        {
+        }
+
+        protected override bool ShouldCreateConversionBetweenTypes(ITypeSymbol targetType, ITypeSymbol sourceType)
+        {
+            return  ObjectHelper.IsSimpleType(targetType) == false && ObjectHelper.IsSimpleType(sourceType) == false;
+        }
+
+        protected override MappingElement TryToCreateMappingExpression(MappingElement source, ITypeSymbol targetType, MappingPath mappingPath)
+        {
+            if (mappingPath.Length > 1 && source.ExpressionType.AllInterfaces.Any(x => x.Name == "ICloneable") && source.ExpressionType.SpecialType!=SpecialType.System_Array)
+            {
+                //TODO: cast to ICloneable if explicitly implemented
+                //TODO: check if strongly typed version exists
+                //TODO: check if source is not null (conditional member access)
+                var invokeClone = syntaxGenerator.InvocationExpression(syntaxGenerator.MemberAccessExpression(source.Expression,"Clone"));
+                return new MappingElement()
+                {
+                    ExpressionType = targetType,
+                    Expression = syntaxGenerator.TryCastExpression(invokeClone, targetType) as ExpressionSyntax
+                };
+            }
+
+            return base.TryToCreateMappingExpression(source, targetType, mappingPath);
+        }
+    }
+
     public class MappingEngine
     {
-        private readonly SemanticModel semanticModel;
-        private readonly SyntaxGenerator syntaxGenerator;
+        protected readonly SemanticModel semanticModel;
+        protected readonly SyntaxGenerator syntaxGenerator;
         private readonly IAssemblySymbol contextAssembly;
 
-        public bool MapComplexTypesEvenHasTheSameType { get; set; } = false;
 
         public MappingEngine(SemanticModel semanticModel, SyntaxGenerator syntaxGenerator, IAssemblySymbol contextAssembly)
         {
@@ -83,12 +113,12 @@ namespace MappingGenerator
             return element;
         }
 
-        private bool ShouldCreateConversionBetweenTypes(ITypeSymbol targetType, ITypeSymbol sourceType)
+        protected virtual bool ShouldCreateConversionBetweenTypes(ITypeSymbol targetType, ITypeSymbol sourceType)
         {
-            return (sourceType.Equals(targetType) == false  || MapComplexTypesEvenHasTheSameType) && ObjectHelper.IsSimpleType(targetType)==false && ObjectHelper.IsSimpleType(sourceType)==false;
+            return (sourceType.Equals(targetType) == false) && ObjectHelper.IsSimpleType(targetType)==false && ObjectHelper.IsSimpleType(sourceType)==false;
         }
 
-        private MappingElement TryToCreateMappingExpression(MappingElement source, ITypeSymbol targetType, MappingPath mappingPath)
+        protected virtual MappingElement TryToCreateMappingExpression(MappingElement source, ITypeSymbol targetType, MappingPath mappingPath)
         {
             //TODO: If source expression is method or constructor invocation then we should extract local variable and use it im mappings as a reference
             var namedTargetType = targetType as INamedTypeSymbol;
@@ -336,6 +366,8 @@ namespace MappingGenerator
     public class MappingPath
     {
         private List<ITypeSymbol> mapped;
+
+        public int Length => mapped.Count;
 
         private MappingPath(List<ITypeSymbol> mapped)
         {

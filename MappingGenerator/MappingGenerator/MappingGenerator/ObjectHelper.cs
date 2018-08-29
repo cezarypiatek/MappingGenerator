@@ -86,6 +86,7 @@ namespace MappingGenerator
 
         public static bool IsSimpleType(ITypeSymbol type)
         {
+            //TODO: handle struct
             return type.IsValueType || SimpleTypes.Contains(type.Name);
         }
 

@@ -61,7 +61,22 @@ namespace MappingGenerator.Test.ImplementCloneMethod {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class [|UserDTO|]
+        ///    {
+        ///        public string FirstName { get; }
+        ///        public string LastName { get; private set; }
+        ///        public int Age { get; set; }
+        ///        public int Cash { get;}
+        ///        public AccountDTO Account { get; private set; }
+        ///        public List&lt;AccountDTO&gt; Debs { get; set; }
+        ///        public UserSou [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _001_DeepClone {
             get {
@@ -70,11 +85,88 @@ namespace MappingGenerator.Test.ImplementCloneMethod {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class UserDTO : System.ICloneable
+        ///    {
+        ///        public string FirstName { get; }
+        ///        public string LastName { get; private set; }
+        ///        public int Age { get; set; }
+        ///        public int Cash { get;}
+        ///        public AccountDTO Account { get; private set; }
+        ///        public List&lt;AccountDTO&gt; Debs { get; set; }
+        ///       [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _001_DeepClone_FIXED {
             get {
                 return ResourceManager.GetString("_001_DeepClone_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class Classx : ICloneable
+        ///    {
+        ///        public string A { get; set; }
+        ///        public string B { get; set; }
+        ///
+        ///        public Classx Clone()
+        ///        {
+        ///            return new Classx()
+        ///            {
+        ///                A = A,
+        ///                B = B
+        ///            };
+        ///        }
+        ///
+        ///        object ICloneable.Clone()
+        ///        { [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _002_DetecCloneOnMembers {
+            get {
+                return ResourceManager.GetString("_002_DetecCloneOnMembers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class Classx : ICloneable
+        ///    {
+        ///        public string A { get; set; }
+        ///        public string B { get; set; }
+        ///
+        ///        public Classx Clone()
+        ///        {
+        ///            return new Classx()
+        ///            {
+        ///                A = A,
+        ///                B = B
+        ///            };
+        ///        }
+        ///
+        ///        object ICloneable.Clone()
+        ///        { [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _002_DetecCloneOnMembers_FIXED {
+            get {
+                return ResourceManager.GetString("_002_DetecCloneOnMembers_FIXED", resourceCulture);
             }
         }
     }

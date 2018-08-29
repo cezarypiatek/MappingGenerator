@@ -16,6 +16,8 @@ namespace MappingGenerator
         private readonly SyntaxGenerator syntaxGenerator;
         private readonly IAssemblySymbol contextAssembly;
 
+        public bool MapComplexTypesEvenHasTheSameType { get; set; } = false;
+
         public MappingEngine(SemanticModel semanticModel, SyntaxGenerator syntaxGenerator, IAssemblySymbol contextAssembly)
         {
             this.semanticModel = semanticModel;
@@ -72,7 +74,7 @@ namespace MappingGenerator
             }
 
             
-            if (element.ExpressionType.Equals(targetType) == false && ObjectHelper.IsSimpleType(targetType)==false && ObjectHelper.IsSimpleType(element.ExpressionType)==false)
+            if ((element.ExpressionType.Equals(targetType) == false  || MapComplexTypesEvenHasTheSameType) && ObjectHelper.IsSimpleType(targetType)==false && ObjectHelper.IsSimpleType(element.ExpressionType)==false)
             {
                 return TryToCreateMappingExpression(element, targetType, mappingPath);
             }
@@ -132,7 +134,8 @@ namespace MappingGenerator
             return new MappingElement()
             {
                 ExpressionType = targetType,
-                Expression = ((ObjectCreationExpressionSyntax) syntaxGenerator.ObjectCreationExpression(targetType)).AddInitializerWithMapping(subMappingSourceFinder, targetType, semanticModel, syntaxGenerator, this.contextAssembly, mappingPath)
+                Expression = ((ObjectCreationExpressionSyntax) syntaxGenerator.ObjectCreationExpression(targetType))
+                    .AddInitializerWithMapping(subMappingSourceFinder, targetType, semanticModel, syntaxGenerator, this.contextAssembly, mappingPath, mapComplexTypesEvenHasTheSameType: this.MapComplexTypesEvenHasTheSameType)
             };
         }
 
@@ -200,7 +203,7 @@ namespace MappingGenerator
             var isReadonlyCollection = ObjectHelper.IsReadonlyCollection(targetListType);
             var sourceListElementType = MappingHelper.GetElementType(sourceListType);
             var targetListElementType = MappingHelper.GetElementType(targetListType);
-            if (ObjectHelper.IsSimpleType(sourceListElementType) || sourceListElementType.Equals(targetListElementType))
+            if (ObjectHelper.IsSimpleType(sourceListElementType) || (sourceListElementType.Equals(targetListElementType) && MapComplexTypesEvenHasTheSameType ==false))
             {
                 var toListInvocation = AddMaterializeCollectionInvocation(syntaxGenerator, sourceAccess, targetListType);
                 return MappingHelper.WrapInReadonlyCollectionIfNecessary(toListInvocation, isReadonlyCollection, syntaxGenerator);

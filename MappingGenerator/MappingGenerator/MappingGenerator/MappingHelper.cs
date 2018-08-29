@@ -68,10 +68,11 @@ namespace MappingGenerator
             this ObjectCreationExpressionSyntax objectCreationExpression, IMappingSourceFinder mappingSourceFinder,
             ITypeSymbol createdObjectTyp, SemanticModel semanticModel, SyntaxGenerator syntaxGenerator,
             IAssemblySymbol contextAssembly,
-            MappingPath mappingPath = null)
+            MappingPath mappingPath = null,
+            bool mapComplexTypesEvenHasTheSameType = false)
         {
             var propertiesToSet = ObjectHelper.GetFieldsThaCanBeSetPublicly(createdObjectTyp, contextAssembly);
-            var assignments = MapUsingSimpleAssignment(syntaxGenerator, semanticModel, propertiesToSet, mappingSourceFinder, contextAssembly, mappingPath);
+            var assignments = MapUsingSimpleAssignment(syntaxGenerator, semanticModel, propertiesToSet, mappingSourceFinder, contextAssembly, mappingPath, mapComplexTypesEvenHasTheSameType:mapComplexTypesEvenHasTheSameType);
 
             var initializerExpressionSyntax = SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression,new SeparatedSyntaxList<ExpressionSyntax>().AddRange(assignments )).FixInitializerExpressionFormatting(objectCreationExpression);
             return objectCreationExpression.WithInitializer(initializerExpressionSyntax);
@@ -80,13 +81,16 @@ namespace MappingGenerator
 
         public static IEnumerable<ExpressionSyntax> MapUsingSimpleAssignment(SyntaxGenerator generator,
             SemanticModel semanticModel, IEnumerable<IPropertySymbol> targets, IMappingSourceFinder sourceFinder, IAssemblySymbol contextAssembly,
-            MappingPath mappingPath =null, SyntaxNode globalTargetAccessor = null)
+            MappingPath mappingPath =null, SyntaxNode globalTargetAccessor = null, bool mapComplexTypesEvenHasTheSameType=false)
         {
             if (mappingPath == null)
             {
                 mappingPath = new MappingPath();
             }
-            var mappingEngine = new MappingEngine(semanticModel, generator, contextAssembly);
+            var mappingEngine = new MappingEngine(semanticModel, generator, contextAssembly)
+            {
+                MapComplexTypesEvenHasTheSameType = mapComplexTypesEvenHasTheSameType
+            };
             return targets.Select(property => new
                 {
                     source = sourceFinder.FindMappingSource(property.Name, property.Type),
@@ -123,6 +127,33 @@ namespace MappingGenerator
 
             var accessAsReadonly = generator.MemberAccessExpression(node, "AsReadOnly");
             return generator.InvocationExpression(accessAsReadonly);
+        }
+
+        public static TypeDeclarationSyntax AddMethods(this TypeDeclarationSyntax typeDeclaration, MethodDeclarationSyntax[] newMethods)
+        {
+            var list = newMethods.ToList();
+
+            var newMembers = typeDeclaration.Members.Select(x =>
+            {
+                if (x is MethodDeclarationSyntax md)
+                {
+                    foreach (var member in list)
+                    {
+                        //TODO:verify parameters list
+                        //TODO:Check explicit interface implementation
+                        if (md.Identifier.Text == member.Identifier.Text && 
+                            md.ReturnType.ToString() == member.ReturnType.ToString() &&
+                            md.ParameterList.Parameters.Count == member.ParameterList.Parameters.Count)
+                        {
+                            list.Remove(member);
+                            return member;
+                        }
+                    }
+                }
+                return x;
+            });
+
+            return typeDeclaration.WithMembers(newMembers.Concat(list));
         }
     }
 }

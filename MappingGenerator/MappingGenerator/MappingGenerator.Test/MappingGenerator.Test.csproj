@@ -77,6 +77,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>ExplicitConversionTestCases.resx</DependentUpon>
     </Compile>
+    <Compile Update="ImplementCloneMethod\ImplementCloneMethodTestCases.Designer.cs">
+      <DependentUpon>ImplementCloneMethodTestCases.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
     <Compile Update="MappingGenerator\MappingGeneratorTestCases.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -102,6 +107,10 @@
     <EmbeddedResource Update="ExplicitConversions\ExplicitConversionTestCases.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ExplicitConversionTestCases.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="ImplementCloneMethod\ImplementCloneMethodTestCases.resx">
+      <LastGenOutput>ImplementCloneMethodTestCases.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="MappingGenerator\MappingGeneratorTestCases.resx">
       <Generator>ResXFileCodeGenerator</Generator>

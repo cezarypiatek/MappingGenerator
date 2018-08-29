@@ -75,7 +75,8 @@ namespace MappingGenerator
             var contextAssembly = semanticModel.FindContextAssembly(objectInitializer);
             var oldObjCreation = objectInitializer.FindContainer<ObjectCreationExpressionSyntax>();
             var createdObjectType = ModelExtensions.GetTypeInfo(semanticModel, oldObjCreation).Type;
-            var newObjectCreation = oldObjCreation.AddInitializerWithMapping(mappingSourceFinder, createdObjectType, semanticModel, syntaxGenerator, contextAssembly);
+            var mappingEngine = await MappingEngine.Create(document, cancellationToken, semanticModel.FindContextAssembly(objectInitializer));
+            var newObjectCreation = mappingEngine.AddInitializerWithMapping(oldObjCreation, mappingSourceFinder, createdObjectType);
             return await document.ReplaceNodes(oldObjCreation, newObjectCreation, cancellationToken);
         }
     }

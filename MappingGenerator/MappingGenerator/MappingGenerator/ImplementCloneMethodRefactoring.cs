@@ -52,7 +52,7 @@ namespace MappingGenerator
             if (newClassDeclaration.BaseList == null || newClassDeclaration.BaseList.Types.Any(x => x.Type.ToString().Contains("ICloneable")) == false)
             {
                 var cloneableInterface = SyntaxFactory.ParseTypeName($"System.ICloneable");
-                newClassDeclaration = generator.AddBaseType(newClassDeclaration, cloneableInterface) as TypeDeclarationSyntax;
+                newClassDeclaration = generator.AddInterfaceType(newClassDeclaration, cloneableInterface.WithAdditionalAnnotations(Formatter.Annotation)) as TypeDeclarationSyntax;
             }
             
             return await document.ReplaceNodes(typeDeclaration, newClassDeclaration, cancellationToken);

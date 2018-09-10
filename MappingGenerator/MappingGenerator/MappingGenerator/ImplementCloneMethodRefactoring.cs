@@ -32,14 +32,35 @@ namespace MappingGenerator
                 }
                 context.RegisterRefactoring(CodeAction.Create(title: Title, createChangedDocument: c => AddCloneImplementation(context.Document, typeDeclarationSyntax, c), equivalenceKey: Title));
             }
+
+            if (node is MethodDeclarationSyntax md && IsCandidateForCloneMethod(md))
+            {
+                context.RegisterRefactoring(CodeAction.Create(title: Title, createChangedDocument: c => ImplementCloneMethodBody(context.Document, md, c), equivalenceKey: Title));
+            }
+        }
+
+        private async Task<Document> ImplementCloneMethodBody(Document document, MethodDeclarationSyntax methodDeclaration, CancellationToken cancellationToken)
+        {
+            var generator = SyntaxGenerator.GetGenerator(document);
+            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+            var methodSymbol =  semanticModel.GetDeclaredSymbol(methodDeclaration);
+            var cloneExpression = CreateCloneExpression(generator, semanticModel, methodSymbol.ReturnType as INamedTypeSymbol);
+            return await document.ReplaceNodes(methodDeclaration.Body, ((BaseMethodDeclarationSyntax) generator.MethodDeclaration(methodSymbol, cloneExpression)).Body, cancellationToken);
+        }
+
+        private bool IsCandidateForCloneMethod(MethodDeclarationSyntax md)
+        {
+            return md.ParameterList.Parameters.Count == 0 &&
+                   md.ReturnType.ToString() == FindContainingTypeDeclaration(md)?.Identifier.ToString();
+        }
+
+        private static TypeDeclarationSyntax FindContainingTypeDeclaration(SyntaxNode node)
+        {
+            return node.FindNearestContainer<ClassDeclarationSyntax, StructDeclarationSyntax>() as TypeDeclarationSyntax;
         }
 
         private async Task<Document> AddCloneImplementation(Document document, TypeDeclarationSyntax typeDeclaration, CancellationToken cancellationToken)
         {
-            //TODO:
-            //public Foo Clone() { /* your code */ }
-            //object ICloneable.Clone() { return Clone(); }
-
             var generator = SyntaxGenerator.GetGenerator(document);
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             //TODO: If method exists, replace it
@@ -88,7 +109,7 @@ namespace MappingGenerator
             //TODO: If subtypes contains clone method use it, remember about casting
             var mappingEngine = new CloneMappingEngine(semanticModel, generator, type.ContainingAssembly);
             var newExpression = mappingEngine.MapExpression((ExpressionSyntax)generator.ThisExpression(), type, type);
-            return new[] { generator.ReturnStatement(newExpression) };
+            return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };
         }
     }
 

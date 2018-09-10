@@ -5,7 +5,12 @@ using System.Collections.ObjectModel;
 
 namespace MappingGenerator.Test.MappingGenerator.TestCaseData
 {
-    public class UserDTO : System.ICloneable
+    public class BaseDTO
+    {
+        public long Id { get; set;}
+    }
+
+    public class UserDTO : BaseDTO, System.ICloneable
     {
         public string FirstName { get; }
         public string LastName { get; private set; }
@@ -53,7 +58,8 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                     FlatNo = thisAddresse.FlatNo,
                     BuildingNo = thisAddresse.BuildingNo
                 }).ToList().AsReadOnly(),
-                UnitId = UnitId
+                UnitId = UnitId,
+                Id = Id
             };
         }
 

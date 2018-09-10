@@ -68,15 +68,18 @@ namespace MappingGenerator.Test.ImplementCloneMethod {
         ///
         ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         ///{
-        ///    public class [|UserDTO|]
+        ///    public class BaseDTO
+        ///    {
+        ///        public long Id { get; set;}
+        ///    }
+        ///
+        ///    public class [|UserDTO|] : BaseDTO
         ///    {
         ///        public string FirstName { get; }
         ///        public string LastName { get; private set; }
         ///        public int Age { get; set; }
         ///        public int Cash { get;}
-        ///        public AccountDTO Account { get; private set; }
-        ///        public List&lt;AccountDTO&gt; Debs { get; set; }
-        ///        public UserSou [rest of string was truncated]&quot;;.
+        ///        public AccountDTO Account { get; p [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _001_DeepClone {
             get {
@@ -92,15 +95,18 @@ namespace MappingGenerator.Test.ImplementCloneMethod {
         ///
         ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         ///{
-        ///    public class UserDTO : System.ICloneable
+        ///    public class BaseDTO
+        ///    {
+        ///        public long Id { get; set;}
+        ///    }
+        ///
+        ///    public class UserDTO : BaseDTO, System.ICloneable
         ///    {
         ///        public string FirstName { get; }
         ///        public string LastName { get; private set; }
         ///        public int Age { get; set; }
         ///        public int Cash { get;}
-        ///        public AccountDTO Account { get; private set; }
-        ///        public List&lt;AccountDTO&gt; Debs { get; set; }
-        ///       [rest of string was truncated]&quot;;.
+        ///        public AccountDTO A [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _001_DeepClone_FIXED {
             get {
@@ -167,6 +173,55 @@ namespace MappingGenerator.Test.ImplementCloneMethod {
         internal static string _002_DetecCloneOnMembers_FIXED {
             get {
                 return ResourceManager.GetString("_002_DetecCloneOnMembers_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class ClassX
+        ///    {
+        ///        public string A { get; set; }
+        ///        public string B { get; set; }
+        ///
+        ///        public ClassX [|Clone|]()
+        ///        {
+        ///        }
+        ///    }
+        ///}.
+        /// </summary>
+        internal static string _003_ImplementCloneMethodBody {
+            get {
+                return ResourceManager.GetString("_003_ImplementCloneMethodBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class ClassX
+        ///    {
+        ///        public string A { get; set; }
+        ///        public string B { get; set; }
+        ///
+        ///        public ClassX Clone()
+        ///        {
+        ///            return new ClassX()
+        ///            {
+        ///                A = A,
+        ///                B = B
+        ///            };
+        ///        }
+        ///    }
+        ///}.
+        /// </summary>
+        internal static string _003_ImplementCloneMethodBody_FIXED {
+            get {
+                return ResourceManager.GetString("_003_ImplementCloneMethodBody_FIXED", resourceCulture);
             }
         }
     }

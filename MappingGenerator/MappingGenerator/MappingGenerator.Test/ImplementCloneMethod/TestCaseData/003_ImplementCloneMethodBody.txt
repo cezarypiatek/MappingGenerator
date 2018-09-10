@@ -1,0 +1,14 @@
+﻿using System;
+
+namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+{
+    public class ClassX
+    {
+        public string A { get; set; }
+        public string B { get; set; }
+
+        public ClassX [|Clone|]()
+        {
+        }
+    }
+}

@@ -26,6 +26,14 @@ namespace MappingGenerator.Test.ImplementCloneMethod
             TestCodeRefactoring(test, fixedCode);
         }
 
+        [Test]
+        public void should_be_able_to_implement_clone_method_body()
+        {
+            var test = ImplementCloneMethodTestCases._003_ImplementCloneMethodBody;
+            var fixedCode = ImplementCloneMethodTestCases._003_ImplementCloneMethodBody_FIXED;
+            TestCodeRefactoring(test, fixedCode);
+        }
+
         protected override string LanguageName => LanguageNames.CSharp;
         protected override CodeRefactoringProvider CreateProvider()
         {

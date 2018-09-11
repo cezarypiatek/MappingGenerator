@@ -1,0 +1,91 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+
+namespace TestAutoMapper.Identity
+{
+    public class TestMapper
+    {
+        public static UserDTO Map(UserDTO old)
+        {
+            return new UserDTO()
+            {
+                Age = old.Age,
+                Debs = old.Debs.Select(oldDeb => oldDeb.Clone() as AccountDTO).ToList(),
+                Source = new UserSourceDTO(providerName: old.Source.ProviderName, providerAddress: old.Source.ProviderAddress),
+                Login = old.Login,
+                ImageData = old.ImageData.ToArray(),
+                LuckyNumbers = old.LuckyNumbers.ToList(),
+                Total = old.Total,
+                MainAddress = new AddressDTO()
+                {
+                    City = old.MainAddress.City,
+                    ZipCode = old.MainAddress.ZipCode,
+                    Street = old.MainAddress.Street,
+                    FlatNo = old.MainAddress.FlatNo,
+                    BuildingNo = old.MainAddress.BuildingNo
+                },
+                Addresses = old.Addresses.Select(oldAddresse => new AddressDTO()
+                {
+                    City = oldAddresse.City,
+                    ZipCode = oldAddresse.ZipCode,
+                    Street = oldAddresse.Street,
+                    FlatNo = oldAddresse.FlatNo,
+                    BuildingNo = oldAddresse.BuildingNo
+                }).ToList().AsReadOnly(),
+                UnitId = old.UnitId
+            };
+        }
+    }
+
+    public class UserDTO
+    {
+        public string FirstName { get; }
+        public string LastName { get; private set; }
+        public int Age { get; set; }
+        public int Cash { get; }
+        public AccountDTO Account { get; private set; }
+        public List<AccountDTO> Debs { get; set; }
+        public UserSourceDTO Source { get; set; }
+        public string Login { get; set; }
+        public byte[] ImageData { get; set; }
+        public List<int> LuckyNumbers { get; set; }
+        public int Total { get; set; }
+        public AddressDTO MainAddress { get; set; }
+        public ReadOnlyCollection<AddressDTO> Addresses { get; set; }
+        public int UnitId { get; set; }
+    }
+
+    public class UserSourceDTO
+    {
+        public string ProviderName { get; set; }
+        public string ProviderAddress { get; set; }
+
+        public UserSourceDTO(string providerName, string providerAddress)
+        {
+            ProviderName = providerName;
+            ProviderAddress = providerAddress;
+        }
+    }
+
+    public class AccountDTO:ICloneable
+    {
+        public string BankName { get; set; }
+        public string Number { get; set; }
+
+        public object Clone()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class AddressDTO
+    {
+        public string City { get; set; }
+        public string ZipCode { get; set; }
+        public string Street { get; set; }
+        public string FlatNo { get; set; }
+        public string BuildingNo { get; set; }
+    }
+}

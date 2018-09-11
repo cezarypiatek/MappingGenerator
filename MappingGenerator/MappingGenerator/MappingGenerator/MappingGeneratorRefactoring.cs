@@ -9,6 +9,7 @@ using Microsoft.CodeAnalysis.CodeRefactorings;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
+using Microsoft.CodeAnalysis.Formatting;
 
 namespace MappingGenerator
 {
@@ -76,6 +77,16 @@ namespace MappingGenerator
 
         private static IEnumerable<SyntaxNode> GenerateMappingCode(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
         {
+
+            if (SymbolHelper.IsIdentityMappingFunction(methodSymbol))
+            {
+                var cloneMappingEngine = new CloneMappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
+                var source = methodSymbol.Parameters[0];
+                var targetType = methodSymbol.ReturnType;
+                var newExpression = cloneMappingEngine.MapExpression((ExpressionSyntax)generator.IdentifierName(source.Name), source.Type, targetType);
+                return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };
+            }
+
             var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
 
             if (SymbolHelper.IsPureMappingFunction(methodSymbol))
@@ -83,7 +94,7 @@ namespace MappingGenerator
                 var source = methodSymbol.Parameters[0];
                 var targetType = methodSymbol.ReturnType;
                 var newExpression = mappingEngine.MapExpression((ExpressionSyntax)generator.IdentifierName(source.Name), source.Type, targetType);
-                return new[] { generator.ReturnStatement(newExpression) };
+                return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };
             }
 
             //TODO: Pure mapping with multiple parameters

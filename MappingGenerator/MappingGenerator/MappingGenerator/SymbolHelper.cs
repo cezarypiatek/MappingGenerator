@@ -45,6 +45,11 @@ namespace MappingGenerator
             return methodSymbol.Parameters.Length == 1 && methodSymbol.ReturnsVoid == false;
         }
 
+        public static bool IsIdentityMappingFunction(IMethodSymbol methodSymbol)
+        {
+            return methodSymbol.Parameters.Length == 1 && methodSymbol.ReturnType.Equals(methodSymbol.Parameters[0].Type);
+        }
+
         public static bool IsMappingConstructor(IMethodSymbol methodSymbol)
         {
             return methodSymbol.Parameters.Length == 1 && methodSymbol.MethodKind == MethodKind.Constructor;

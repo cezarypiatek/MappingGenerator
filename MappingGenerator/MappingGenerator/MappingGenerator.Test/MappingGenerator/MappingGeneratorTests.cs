@@ -2,8 +2,6 @@
 using Microsoft.CodeAnalysis.CodeRefactorings;
 using NUnit.Framework;
 using RoslynNUnitLight;
-using TestHelper;
-using static MappingGenerator.Test.Helpers.DiagnosticHelper;
 using static MappingGenerator.Test.MappingGenerator.MappingGeneratorTestCases;
 
 namespace MappingGenerator.Test.Mapping
@@ -44,24 +42,38 @@ namespace MappingGenerator.Test.Mapping
         [Test]
         public void should_be_able_to_generate_mapping_constructor_with_single_parameter()
         {
-            DiagnosticResultLocation[] locations = LocationFromTestFile(25, 17);
             TestCodeRefactoring(_006_ConstructorWithSingleParameter, _006_ConstructorWithSingleParameter_FIXED);
         }
 
         [Test]
         public void should_be_able_to_generate_mapping_constructor_with_multiple_parameters()
         {
-            DiagnosticResultLocation[] locations = LocationFromTestFile(25, 17);
             TestCodeRefactoring(_007_ConstructorWithMultipleParameters, _007_ConstructorWithMultipleParameters_FIXED);
         }
 
         [Test]
         public void should_be_able_to_generate_mapping_for_recursive_types()
         {
-            DiagnosticResultLocation[] locations = LocationFromTestFile(11, 25);
             TestCodeRefactoring(_008_StopRecursingMapping, _008_StopRecursingMapping_Fixed);
         }
 
+        [Test]
+        public void should_be_able_to_generate_identity_mapping_function()
+        {
+            TestCodeRefactoring(_009_IdentityFunctionMapping, _009_IdentityFunctionMapping_FIXED);
+        }
+
+        [Test]
+        public void should_be_able_to_generate_identity_mapping_function_for_simple_type()
+        {
+            TestCodeRefactoring(_010_IdentityFunctionMappingForSimpleType, _010_IdentityFunctionMappingForSimpleType_FIXED);
+        }
+
+        [Test]
+        public void should_be_able_to_generate_identity_mapping_function_for_collections()
+        {
+            TestCodeRefactoring(_011_IdentityFunctionMappingForCollection, _011_IdentityFunctionMappingForCollection_FIXED);
+        }
 
         protected override string LanguageName => LanguageNames.CSharp;
 

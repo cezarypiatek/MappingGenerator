@@ -449,5 +449,157 @@ namespace MappingGenerator.Test.MappingGenerator {
                 return ResourceManager.GetString("_008_StopRecursingMapping_Fixed", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Collections.ObjectModel;
+        ///using System.Linq;
+        ///
+        ///namespace TestAutoMapper.Identity
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO [|Map|](UserDTO old)
+        ///        {
+        ///            throw new NotImplementedException();
+        ///        }
+        ///    }
+        ///
+        ///    public class UserDTO
+        ///    {
+        ///        public string FirstName { get; }
+        ///        public string LastName { get; private set; }
+        ///        public int Age { get; set; }
+        ///        public int Cash { g [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _009_IdentityFunctionMapping {
+            get {
+                return ResourceManager.GetString("_009_IdentityFunctionMapping", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Collections.ObjectModel;
+        ///using System.Linq;
+        ///
+        ///namespace TestAutoMapper.Identity
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO Map(UserDTO old)
+        ///        {
+        ///            return new UserDTO()
+        ///            {
+        ///                Age = old.Age,
+        ///                Debs = old.Debs.Select(oldDeb =&gt; oldDeb.Clone() as AccountDTO).ToList(),
+        ///                Source = new UserSourceDTO(providerName: old.Source.ProviderName, providerAddress [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _009_IdentityFunctionMapping_FIXED {
+            get {
+                return ResourceManager.GetString("_009_IdentityFunctionMapping_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Collections.ObjectModel;
+        ///using System.Linq;
+        ///
+        ///namespace TestAutoMapper.Identity
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static long [|Map|](long old)
+        ///        {
+        ///            throw new NotImplementedException();
+        ///        }
+        ///    }
+        ///}.
+        /// </summary>
+        internal static string _010_IdentityFunctionMappingForSimpleType {
+            get {
+                return ResourceManager.GetString("_010_IdentityFunctionMappingForSimpleType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Collections.ObjectModel;
+        ///using System.Linq;
+        ///
+        ///namespace TestAutoMapper.Identity
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static long Map(long old)
+        ///        {
+        ///            return old;
+        ///        }
+        ///    }
+        ///}.
+        /// </summary>
+        internal static string _010_IdentityFunctionMappingForSimpleType_FIXED {
+            get {
+                return ResourceManager.GetString("_010_IdentityFunctionMappingForSimpleType_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Collections.ObjectModel;
+        ///using System.Linq;
+        ///
+        ///namespace TestAutoMapper.Identity
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static List&lt;UserDTO&gt; [|Map|](List&lt;UserDTO&gt; old)
+        ///        {
+        ///            throw new NotImplementedException();
+        ///        }
+        ///    }
+        ///
+        ///    public class UserDTO
+        ///    {
+        ///        public string FirstName { get; }
+        ///        public string LastName { get; private set; }
+        ///        public int Age { get; set; }
+        ///        public  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _011_IdentityFunctionMappingForCollection {
+            get {
+                return ResourceManager.GetString("_011_IdentityFunctionMappingForCollection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Collections.ObjectModel;
+        ///using System.Linq;
+        ///
+        ///namespace TestAutoMapper.Identity
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static List&lt;UserDTO&gt; Map(List&lt;UserDTO&gt; old)
+        ///        {
+        ///            return old.Select(oldElement =&gt; new UserDTO()
+        ///            {
+        ///                Age = oldElement.Age,
+        ///                Debs = oldElement.Debs.Select(oldElementDeb =&gt; oldElementDeb.Clone() as AccountDTO).ToList(),
+        ///                Source = new Use [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _011_IdentityFunctionMappingForCollection_FIXED {
+            get {
+                return ResourceManager.GetString("_011_IdentityFunctionMappingForCollection_FIXED", resourceCulture);
+            }
+        }
     }
 }

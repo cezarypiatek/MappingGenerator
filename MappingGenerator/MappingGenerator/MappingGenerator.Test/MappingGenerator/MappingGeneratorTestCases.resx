@@ -166,4 +166,22 @@
   <data name="_008_StopRecursingMapping_Fixed" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>TestCaseData\008_StopRecursingMapping_Fixed.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="_009_IdentityFunctionMapping" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\009_IdentityFunctionMapping.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_009_IdentityFunctionMapping_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\009_IdentityFunctionMapping_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_010_IdentityFunctionMappingForSimpleType" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\010_IdentityFunctionMappingForSimpleType.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_010_IdentityFunctionMappingForSimpleType_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\010_IdentityFunctionMappingForSimpleType_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_011_IdentityFunctionMappingForCollection" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\011_IdentityFunctionMappingForCollection.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_011_IdentityFunctionMappingForCollection_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\011_IdentityFunctionMappingForCollection_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

@@ -27,13 +27,13 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                 FlatNo = src.MainAddress.FlatNo,
                 BuildingNo = src.MainAddress.BuildingNo
             };
-            dst.Addresses = src.Addresses.Select(srcAddresse => new AddressDTO()
+            dst.Addresses = src.Addresses.Select(srcAddress => new AddressDTO()
             {
-                City = srcAddresse.City,
-                ZipCode = srcAddresse.ZipCode,
-                Street = srcAddresse.Street,
-                FlatNo = srcAddresse.FlatNo,
-                BuildingNo = srcAddresse.BuildingNo
+                City = srcAddress.City,
+                ZipCode = srcAddress.ZipCode,
+                Street = srcAddress.Street,
+                FlatNo = srcAddress.FlatNo,
+                BuildingNo = srcAddress.BuildingNo
             }).ToList().AsReadOnly();
             dst.UnitId = src.Unit.Id;
         }

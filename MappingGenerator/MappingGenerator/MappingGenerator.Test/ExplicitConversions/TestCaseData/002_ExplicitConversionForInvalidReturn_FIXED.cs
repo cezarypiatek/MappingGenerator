@@ -11,13 +11,13 @@ namespace MappingGenerator.Test.ExplicitConversions.TestCaseData
 
         public ReadOnlyCollection<AddressDTO> DoSomething(IList<AddressEntity> addresses)
         {
-            return addresses.Select(addresse => new AddressDTO()
+            return addresses.Select(address => new AddressDTO()
             {
-                FlatNo = addresse.FlatNo,
-                BuildtingNo = addresse.BuildtingNo,
-                Street = addresse.Street,
-                ZipCode = addresse.ZipCode,
-                City = addresse.City
+                FlatNo = address.FlatNo,
+                BuildtingNo = address.BuildtingNo,
+                Street = address.Street,
+                ZipCode = address.ZipCode,
+                City = address.City
             }).ToList().AsReadOnly();
         }
     }

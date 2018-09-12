@@ -26,13 +26,13 @@ namespace TestAutoMapper.Identity
                     FlatNo = oldElement.MainAddress.FlatNo,
                     BuildingNo = oldElement.MainAddress.BuildingNo
                 },
-                Addresses = oldElement.Addresses.Select(oldElementAddresse => new AddressDTO()
+                Addresses = oldElement.Addresses.Select(oldElementAddress => new AddressDTO()
                 {
-                    City = oldElementAddresse.City,
-                    ZipCode = oldElementAddresse.ZipCode,
-                    Street = oldElementAddresse.Street,
-                    FlatNo = oldElementAddresse.FlatNo,
-                    BuildingNo = oldElementAddresse.BuildingNo
+                    City = oldElementAddress.City,
+                    ZipCode = oldElementAddress.ZipCode,
+                    Street = oldElementAddress.Street,
+                    FlatNo = oldElementAddress.FlatNo,
+                    BuildingNo = oldElementAddress.BuildingNo
                 }).ToList().AsReadOnly(),
                 UnitId = oldElement.UnitId
             }).ToList();

@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
+using Pluralize.NET;
 
 namespace MappingGenerator
 {
@@ -311,11 +312,13 @@ namespace MappingGenerator
         {
             if (proposalLocalName.EndsWith("s"))
             {
-                return proposalLocalName.Substring(0, proposalLocalName.Length - 1);
+                return Pluralizer.Singularize(proposalLocalName);
             }
 
             return proposalLocalName;
         }
+
+        private static Pluralizer Pluralizer = new Pluralizer();
 
         private static SyntaxNode AddMaterializeCollectionInvocation(SyntaxGenerator generator, SyntaxNode sourceAccess, ITypeSymbol targetListType)
         {

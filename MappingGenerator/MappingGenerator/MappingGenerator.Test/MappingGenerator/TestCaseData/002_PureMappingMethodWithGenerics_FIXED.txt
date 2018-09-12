@@ -29,13 +29,13 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                     FlatNo = entity.MainAddress.FlatNo,
                     BuildingNo = entity.MainAddress.BuildingNo
                 },
-                Addresses = entity.Addresses.Select(entityAddresse => new AddressDTO()
+                Addresses = entity.Addresses.Select(entityAddress => new AddressDTO()
                 {
-                    City = entityAddresse.City,
-                    ZipCode = entityAddresse.ZipCode,
-                    Street = entityAddresse.Street,
-                    FlatNo = entityAddresse.FlatNo,
-                    BuildingNo = entityAddresse.BuildingNo
+                    City = entityAddress.City,
+                    ZipCode = entityAddress.ZipCode,
+                    Street = entityAddress.Street,
+                    FlatNo = entityAddress.FlatNo,
+                    BuildingNo = entityAddress.BuildingNo
                 }).ToList().AsReadOnly(),
                 UnitId = entity.Unit.Id
             };

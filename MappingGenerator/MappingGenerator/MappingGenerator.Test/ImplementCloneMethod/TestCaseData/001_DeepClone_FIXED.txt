@@ -50,13 +50,13 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                     FlatNo = MainAddress.FlatNo,
                     BuildingNo = MainAddress.BuildingNo
                 },
-                Addresses = Addresses.Select(thisAddresse => new AddressDTO()
+                Addresses = Addresses.Select(thisAddress => new AddressDTO()
                 {
-                    City = thisAddresse.City,
-                    ZipCode = thisAddresse.ZipCode,
-                    Street = thisAddresse.Street,
-                    FlatNo = thisAddresse.FlatNo,
-                    BuildingNo = thisAddresse.BuildingNo
+                    City = thisAddress.City,
+                    ZipCode = thisAddress.ZipCode,
+                    Street = thisAddress.Street,
+                    FlatNo = thisAddress.FlatNo,
+                    BuildingNo = thisAddress.BuildingNo
                 }).ToList().AsReadOnly(),
                 UnitId = UnitId,
                 Id = Id

@@ -109,6 +109,9 @@ CS7036 There is no argument given that corresponds to the required formal parame
 - Complete empty initialization block
 ![Generate initialization bloc](doc/emptyInitialization.gif)
 
+- Complete empty initialization block in lambda expression `Expression<Func<T,T2>> = (T) => new T2{}`
+![initialization block in lambda expression](https://user-images.githubusercontent.com/7759991/41869113-4704c6f0-78b8-11e8-8c3c-47a6b5bf308c.gif)
+
 - Provide local accessoble variables as parameters for method and constructor invocation
 ![locals as parameters](doc/localsforconstructor.gif)
 

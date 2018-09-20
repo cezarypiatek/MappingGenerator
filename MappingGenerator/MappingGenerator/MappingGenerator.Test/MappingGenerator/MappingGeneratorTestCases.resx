@@ -184,4 +184,28 @@
   <data name="_011_IdentityFunctionMappingForCollection_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>TestCaseData\011_IdentityFunctionMappingForCollection_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="_012_CollectionMappingWithSingularLambdaParameterName" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\012_CollectionMappingWithSingularLambdaParameterName.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_012_CollectionMappingWithSingularLambdaParameterName_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\012_CollectionMappingWithSingularLambdaParameterName_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_013_CollectionMappingWithPrefixedLambdaParameterName" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\013_CollectionMappingWithPrefixedLambdaParameterName.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_013_CollectionMappingWithPrefixedLambdaParameterName_FIXED_" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\013_CollectionMappingWithPrefixedLambdaParameterName_FIXED..txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_014_CollectionMappingWithGenericName" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\014_CollectionMappingWithGenericName.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_014_CollectionMappingWithGenericName_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\014_CollectionMappingWithGenericName_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_015_CollectionMappingWithPostfixGenericName" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\015_CollectionMappingWithPostfixGenericName.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_015_CollectionMappingWithPostfixGenericName_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\015_CollectionMappingWithPostfixGenericName_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

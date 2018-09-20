@@ -118,6 +118,8 @@ CS7036 There is no argument given that corresponds to the required formal parame
 - Create missing mapping lambda
 ![mapping lambda](doc/mapping_lambda.gif)
 
+-  Generate ICloneable interface implementation
+ ![generate clone method](https://user-images.githubusercontent.com/7759991/44867726-f45c0080-ac88-11e8-87e9-feed8242af79.gif)
 
 ## Object scaffolding
 

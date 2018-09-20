@@ -64,53 +64,7 @@ namespace MappingGenerator
                 .WithLeadingTrivia(SyntaxTriviaList.Create(SyntaxFactory.EndOfLine(Environment.NewLine)));
         }
 
-        public static ObjectCreationExpressionSyntax AddInitializerWithMapping(
-            this ObjectCreationExpressionSyntax objectCreationExpression, IMappingSourceFinder mappingSourceFinder,
-            ITypeSymbol createdObjectTyp, SemanticModel semanticModel, SyntaxGenerator syntaxGenerator,
-            MappingPath mappingPath=null)
-        {
-            var propertiesToSet = ObjectHelper.GetFieldsThaCanBeSetPublicly(createdObjectTyp);
-            var assignments = MapUsingSimpleAssignment(syntaxGenerator, semanticModel, propertiesToSet, mappingSourceFinder, mappingPath);
-
-            var initializerExpressionSyntax = SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression,new SeparatedSyntaxList<ExpressionSyntax>().AddRange(assignments )).FixInitializerExpressionFormatting(objectCreationExpression);
-            return objectCreationExpression.WithInitializer(initializerExpressionSyntax);
-        }
-
-
-        public static IEnumerable<ExpressionSyntax> MapUsingSimpleAssignment(SyntaxGenerator generator,
-            SemanticModel semanticModel, IEnumerable<IPropertySymbol> targets, IMappingSourceFinder sourceFinder,
-            MappingPath mappingPath =null, SyntaxNode globalTargetAccessor = null)
-        {
-            if (mappingPath == null)
-            {
-                mappingPath = new MappingPath();
-            }
-            var mappingEngine = new MappingEngine(semanticModel, generator);
-            return targets.Select(property => new
-                {
-                    source = sourceFinder.FindMappingSource(property.Name, property.Type),
-                    target = new MappingElement()
-                    {
-                        Expression = (ExpressionSyntax) CreateAccessPropertyExpression(globalTargetAccessor, property, generator),
-                        ExpressionType = property.Type
-                    }
-                })
-                .Where(x=>x.source!=null)
-                .Select(pair =>
-                {
-                    var sourceExpression = mappingEngine.MapExpression(pair.source, pair.target.ExpressionType, mappingPath.Clone()).Expression;
-                    return (ExpressionSyntax) generator.AssignmentStatement(pair.target.Expression, sourceExpression);
-                }).ToList();
-        }
-
-        private static SyntaxNode CreateAccessPropertyExpression(SyntaxNode globalTargetAccessor, IPropertySymbol property, SyntaxGenerator generator)
-        {
-            if (globalTargetAccessor == null)
-            {
-                return SyntaxFactory.IdentifierName(property.Name);
-            }
-            return generator.MemberAccessExpression(globalTargetAccessor, property.Name);
-        }
+       
 
         public static SyntaxNode WrapInReadonlyCollectionIfNecessary(this SyntaxNode node, bool isReadonly,
             SyntaxGenerator generator)
@@ -122,6 +76,33 @@ namespace MappingGenerator
 
             var accessAsReadonly = generator.MemberAccessExpression(node, "AsReadOnly");
             return generator.InvocationExpression(accessAsReadonly);
+        }
+
+        public static TypeDeclarationSyntax AddMethods(this TypeDeclarationSyntax typeDeclaration, MethodDeclarationSyntax[] newMethods)
+        {
+            var list = newMethods.ToList();
+
+            var newMembers = typeDeclaration.Members.Select(x =>
+            {
+                if (x is MethodDeclarationSyntax md)
+                {
+                    foreach (var member in list)
+                    {
+                        //TODO:verify parameters list
+                        //TODO:Check explicit interface implementation
+                        if (md.Identifier.Text == member.Identifier.Text && 
+                            md.ReturnType.ToString() == member.ReturnType.ToString() &&
+                            md.ParameterList.Parameters.Count == member.ParameterList.Parameters.Count)
+                        {
+                            list.Remove(member);
+                            return member;
+                        }
+                    }
+                }
+                return x;
+            });
+
+            return typeDeclaration.WithMembers(newMembers.Concat(list));
         }
     }
 }

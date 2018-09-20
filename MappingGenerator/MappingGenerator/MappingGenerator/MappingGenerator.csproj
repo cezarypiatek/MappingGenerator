@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
@@ -28,6 +28,7 @@
    
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="2.8.2" PrivateAssets="all" />
+    <PackageReference Include="Pluralize.NET" Version="0.1.84" />
     <PackageReference Update="NETStandard.Library" PrivateAssets="all" />
   </ItemGroup>
 
@@ -36,6 +37,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="ExplicitConversionCodeFixProvider.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="ImplementCloneMethodRefactoring.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="MappingGeneratorRefactoring.cs">

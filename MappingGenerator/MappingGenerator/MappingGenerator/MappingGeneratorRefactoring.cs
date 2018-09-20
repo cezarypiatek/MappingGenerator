@@ -1,4 +1,3 @@
-using System;
 using System.Composition;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,13 +5,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
-using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CodeRefactorings;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
-using Microsoft.CodeAnalysis.Rename;
-using Microsoft.CodeAnalysis.Text;
+using Microsoft.CodeAnalysis.Formatting;
 
 namespace MappingGenerator
 {
@@ -26,6 +23,11 @@ namespace MappingGenerator
             var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
             var node = root.FindNode(context.Span);
 
+            await TryToRegisterRefactoring(context, node);
+        }
+
+        private async Task TryToRegisterRefactoring(CodeRefactoringContext context, SyntaxNode node)
+        {
             switch (node)
             {
                 case MethodDeclarationSyntax methodDeclaration:
@@ -56,6 +58,11 @@ namespace MappingGenerator
                         context.RegisterRefactoring(CodeAction.Create(title: title, createChangedDocument: c => GenerateMappingMethodBody(context.Document, constructorDeclaration, c), equivalenceKey: title));
                     }
                     break;
+                case IdentifierNameSyntax _:
+                case ParameterListSyntax _:
+                   await TryToRegisterRefactoring(context, node.Parent);
+                break;
+                    
             }
         }
 
@@ -70,14 +77,24 @@ namespace MappingGenerator
 
         private static IEnumerable<SyntaxNode> GenerateMappingCode(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
         {
-            var mappingEngine = new MappingEngine(semanticModel, generator);
+
+            if (SymbolHelper.IsIdentityMappingFunction(methodSymbol))
+            {
+                var cloneMappingEngine = new CloneMappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
+                var source = methodSymbol.Parameters[0];
+                var targetType = methodSymbol.ReturnType;
+                var newExpression = cloneMappingEngine.MapExpression((ExpressionSyntax)generator.IdentifierName(source.Name), source.Type, targetType);
+                return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };
+            }
+
+            var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
 
             if (SymbolHelper.IsPureMappingFunction(methodSymbol))
             {
                 var source = methodSymbol.Parameters[0];
                 var targetType = methodSymbol.ReturnType;
                 var newExpression = mappingEngine.MapExpression((ExpressionSyntax)generator.IdentifierName(source.Name), source.Type, targetType);
-                return new[] { generator.ReturnStatement(newExpression) };
+                return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };
             }
 
             //TODO: Pure mapping with multiple parameters
@@ -86,9 +103,9 @@ namespace MappingGenerator
             {
                 var source = methodSymbol.Parameters[0];
                 var target = methodSymbol.Parameters[1];
-                var targets = ObjectHelper.GetFieldsThaCanBeSetPublicly(target.Type);
+                var targets = ObjectHelper.GetFieldsThaCanBeSetPublicly(target.Type, methodSymbol.ContainingAssembly);
                 var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator);
-                return MappingHelper.MapUsingSimpleAssignment(generator, semanticModel, targets, sourceFinder, globalTargetAccessor: generator.IdentifierName(target.Name));
+                return mappingEngine.MapUsingSimpleAssignment(generator, targets, sourceFinder, globalTargetAccessor: generator.IdentifierName(target.Name));
             }
 
             if (SymbolHelper.IsUpdateThisObjectFunction(methodSymbol))
@@ -96,14 +113,14 @@ namespace MappingGenerator
                 var source = methodSymbol.Parameters[0];
                 var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator);
                 var targets = ObjectHelper.GetFieldsThaCanBeSetPrivately(methodSymbol.ContainingType);
-                return MappingHelper.MapUsingSimpleAssignment(generator, semanticModel, targets, sourceFinder);
+                return mappingEngine.MapUsingSimpleAssignment(generator, targets, sourceFinder);
             }
 
             if (SymbolHelper.IsMultiParameterUpdateThisObjectFunction(methodSymbol))
             {
                 var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters);
                 var targets = ObjectHelper.GetFieldsThaCanBeSetPrivately(methodSymbol.ContainingType);
-                return MappingHelper.MapUsingSimpleAssignment(generator, semanticModel, targets, sourceFinder);
+                return mappingEngine.MapUsingSimpleAssignment(generator, targets, sourceFinder);
             }
 
             if (SymbolHelper.IsMappingConstructor(methodSymbol))
@@ -111,14 +128,14 @@ namespace MappingGenerator
                 var source = methodSymbol.Parameters[0];
                 var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator);
                 var targets = ObjectHelper.GetFieldsThaCanBeSetFromConstructor(methodSymbol.ContainingType);
-                return MappingHelper.MapUsingSimpleAssignment(generator, semanticModel, targets, sourceFinder);
+                return mappingEngine.MapUsingSimpleAssignment(generator, targets, sourceFinder);
             }
 
             if (SymbolHelper.IsMultiParameterMappingConstructor(methodSymbol))
             {
                 var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters);
                 var targets = ObjectHelper.GetFieldsThaCanBeSetFromConstructor(methodSymbol.ContainingType);
-                return MappingHelper.MapUsingSimpleAssignment(generator, semanticModel, targets, sourceFinder);
+                return mappingEngine.MapUsingSimpleAssignment(generator, targets, sourceFinder);
             }
             return Enumerable.Empty<SyntaxNode>();
         }

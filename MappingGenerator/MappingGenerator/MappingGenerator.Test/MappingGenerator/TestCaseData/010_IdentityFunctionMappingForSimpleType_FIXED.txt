@@ -1,0 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+
+namespace TestAutoMapper.Identity
+{
+    public class TestMapper
+    {
+        public static long Map(long old)
+        {
+            return old;
+        }
+    }
+}

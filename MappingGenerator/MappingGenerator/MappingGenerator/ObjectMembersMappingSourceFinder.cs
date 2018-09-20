@@ -19,12 +19,14 @@ namespace MappingGenerator
         private readonly SyntaxGenerator generator;
         private readonly Lazy<IReadOnlyList<IPropertySymbol>> sourceProperties;
         private readonly Lazy<IReadOnlyList<IMethodSymbol>> sourceMethods;
+        private readonly string potentialPrefix;
 
         public ObjectMembersMappingSourceFinder(ITypeSymbol sourceType, SyntaxNode sourceGlobalAccessor, SyntaxGenerator generator)
         {
             this.sourceType = sourceType;
             this.sourceGlobalAccessor = sourceGlobalAccessor;
             this.generator = generator;
+            this.potentialPrefix = NameHelper.ToLocalVariableName(sourceGlobalAccessor.ToFullString());
             this.sourceProperties = new Lazy<IReadOnlyList<IPropertySymbol>>(() => ObjectHelper.GetPublicPropertySymbols(sourceType)
                 .Where(property => property.GetMethod!=null)
                 .ToList());
@@ -40,7 +42,7 @@ namespace MappingGenerator
         private MappingElement FindSource(string targetName)
         {
             //Direct 1-1 mapping
-            var matchedSourceProperty = sourceProperties.Value.FirstOrDefault(x => x.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase));
+            var matchedSourceProperty = sourceProperties.Value.FirstOrDefault(x => x.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase) || $"{potentialPrefix}{x.Name}".Equals(targetName, StringComparison.OrdinalIgnoreCase));
             if (matchedSourceProperty != null)
             {
                 return new MappingElement()

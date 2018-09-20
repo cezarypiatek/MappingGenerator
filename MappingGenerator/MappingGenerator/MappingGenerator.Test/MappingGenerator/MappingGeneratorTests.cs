@@ -75,6 +75,33 @@ namespace MappingGenerator.Test.Mapping
             TestCodeRefactoring(_011_IdentityFunctionMappingForCollection, _011_IdentityFunctionMappingForCollection_FIXED);
         }
 
+        [Test]
+        public void should_be_able_to_generate_collection_mapping_with_lambda_parameter_name_in_singular_form()
+        {
+            TestCodeRefactoring(_012_CollectionMappingWithSingularLambdaParameterName, _012_CollectionMappingWithSingularLambdaParameterName_FIXED);
+        }
+
+
+        [Test]
+        public void should_be_able_to_generate_collection_mapping_with_lambda_parameter_name_with_variable_name_as_prefix()
+        {
+            TestCodeRefactoring(_013_CollectionMappingWithPrefixedLambdaParameterName, _013_CollectionMappingWithPrefixedLambdaParameterName_FIXED_);
+        }
+
+
+        [Test]
+        public void should_be_able_to_generate_collection_mapping_with_lambda_parameter_from_generic_name()
+        {
+            TestCodeRefactoring(_014_CollectionMappingWithGenericName, _014_CollectionMappingWithGenericName_FIXED);
+        }
+
+
+        [Test]
+        public void should_be_able_to_generate_collection_mapping_with_lambda_parameter_from_postfiex_generic_name()
+        {
+            TestCodeRefactoring(_015_CollectionMappingWithPostfixGenericName, _015_CollectionMappingWithPostfixGenericName_FIXED);
+        }
+
         protected override string LanguageName => LanguageNames.CSharp;
 
         protected override CodeRefactoringProvider CreateProvider()

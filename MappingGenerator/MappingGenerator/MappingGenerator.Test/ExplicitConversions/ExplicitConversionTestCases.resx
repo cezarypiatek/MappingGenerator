@@ -119,21 +119,27 @@
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="_001_ExplicitConversionForInvalidAssigment" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\001_ExplicitConversionForInvalidAssigment.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\001_ExplicitConversionForInvalidAssigment.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_001_ExplicitConversionForInvalidAssigment_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\001_ExplicitConversionForInvalidAssigment_FIXED.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\001_ExplicitConversionForInvalidAssigment_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_002_ExplicitConversionForInvalidReturn" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\002_ExplicitConversionForInvalidReturn.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\002_ExplicitConversionForInvalidReturn.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_002_ExplicitConversionForInvalidReturn_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\002_ExplicitConversionForInvalidReturn_FIXED.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\002_ExplicitConversionForInvalidReturn_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_003_ExplicitConversionForInvalidYield" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\003_ExplicitConversionForInvalidYield.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\003_ExplicitConversionForInvalidYield.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_003_ExplicitConversionForInvalidYield_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\003_ExplicitConversionForInvalidYield_FIXED.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\003_ExplicitConversionForInvalidYield_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_004_ExplicitConversionForInvalidAssigmentInInitBlock" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\004_ExplicitConversionForInvalidAssigmentInInitBlock.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_004_ExplicitConversionForInvalidAssigmentInInitBlock_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\004_ExplicitConversionForInvalidAssigmentInInitBlock_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
 </root>

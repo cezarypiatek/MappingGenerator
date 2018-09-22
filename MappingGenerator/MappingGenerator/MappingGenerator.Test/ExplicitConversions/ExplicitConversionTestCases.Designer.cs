@@ -158,10 +158,10 @@ namespace MappingGenerator.Test.ExplicitConversions {
         ///
         ///        public ReadOnlyCollection&lt;AddressDTO&gt; DoSomething(IList&lt;AddressEntity&gt; addresses)
         ///        {
-        ///            return addresses.Select(addresse =&gt; new AddressDTO()
+        ///            return addresses.Select(address =&gt; new AddressDTO()
         ///            {
-        ///                FlatNo = addresse.FlatNo,
-        ///                Bui [rest of string was truncated]&quot;;.
+        ///                FlatNo = address.FlatNo,
+        ///                Build [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _002_ExplicitConversionForInvalidReturn_FIXED {
             get {
@@ -208,20 +208,74 @@ namespace MappingGenerator.Test.ExplicitConversions {
         ///
         ///        public IEnumerable&lt;AddressDTO&gt; DoSomething(AddressEntity address)
         ///        {
-        ///            yield return address;
-        ///        }
-        ///    }
-        ///
-        ///    public class AddressDTO
-        ///    {
-        ///        public string FlatNo { get; set; }
-        ///        public string BuildtingNo { get; set; }
-        ///        public string Street { get; set; }
-        ///      [rest of string was truncated]&quot;;.
+        ///            yield return new AddressDTO()
+        ///            {
+        ///                FlatNo = address.FlatNo,
+        ///                BuildtingNo = address.BuildtingNo,
+        ///                Street = address.Street,
+        ///                ZipCode = address.ZipCo [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _003_ExplicitConversionForInvalidYield_FIXED {
             get {
                 return ResourceManager.GetString("_003_ExplicitConversionForInvalidYield_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///
+        ///namespace MappingGenerator.Test.ExplicitConversions.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public AddressDTO Address { get; set; }
+        ///
+        ///        public UserDTO DoSomething()
+        ///        {
+        ///            var addressEntity = new AddressEntity();
+        ///            return new UserDTO{
+        ///                Address = addressEntity
+        ///            }
+        ///        }
+        ///    }
+        ///
+        ///    public class UserDTO{
+        ///        public AddressDTO Address {get; set;} [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _004_ExplicitConversionForInvalidAssigmentInInitBlock {
+            get {
+                return ResourceManager.GetString("_004_ExplicitConversionForInvalidAssigmentInInitBlock", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///
+        ///namespace MappingGenerator.Test.ExplicitConversions.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public AddressDTO Address { get; set; }
+        ///
+        ///        public UserDTO DoSomething()
+        ///        {
+        ///            var addressEntity = new AddressEntity();
+        ///            return new UserDTO{
+        ///                Address = addressEntity
+        ///            }
+        ///        }
+        ///    }
+        ///
+        ///    public class UserDTO{
+        ///        public AddressDTO Address {get; set;} [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _004_ExplicitConversionForInvalidAssigmentInInitBlock_FIXED {
+            get {
+                return ResourceManager.GetString("_004_ExplicitConversionForInvalidAssigmentInInitBlock_FIXED", resourceCulture);
             }
         }
     }

@@ -52,22 +52,22 @@ namespace MappingGenerator
             {
                 if (proposalLocalName.EndsWith(collectionName, StringComparison.OrdinalIgnoreCase))
                 {
-                    proposalLocalName = proposalLocalName.Substring(0, proposalLocalName.Length - collectionName.Length - 1);
+                    proposalLocalName = proposalLocalName.Substring(0, proposalLocalName.Length - collectionName.Length);
                     break;
                 }
             }
 
-            if (proposalLocalName.EndsWith("Set"))
-            {
-                return $"{proposalLocalName}Element";
-            }
-
-            if (proposalLocalName.EndsWith("s"))
+            if (IsPluralForm(proposalLocalName))
             {
                 return Pluralizer.Singularize(proposalLocalName);
             }
 
             return proposalLocalName;
+        }
+
+        private static bool IsPluralForm(string proposalLocalName)
+        {
+            return string.Equals(Pluralizer.Pluralize(proposalLocalName), proposalLocalName, StringComparison.OrdinalIgnoreCase);
         }
     }
 

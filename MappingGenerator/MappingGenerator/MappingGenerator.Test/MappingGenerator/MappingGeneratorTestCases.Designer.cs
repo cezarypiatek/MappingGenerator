@@ -862,5 +862,201 @@ namespace MappingGenerator.Test.MappingGenerator {
                 return ResourceManager.GetString("_015_CollectionMappingWithPostfixGenericName_FIXED", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Linq;
+        ///
+        ///namespace TestAutoMapper.Identity.X
+        ///{
+        ///    public class XX
+        ///    {
+        ///        public int Id { get; set; }
+        ///        public string Name { get; set; }
+        ///    }
+        ///
+        ///    public class YY
+        ///    {
+        ///        public int Id { get; set; }
+        ///        public string Name { get; set; }
+        ///    }
+        ///
+        ///    public static class Mapper{
+        ///
+        ///        public static List&lt;YY&gt; [|Map|](List&lt;XX&gt; people)
+        ///        {
+        ///        }
+        ///    }
+        ///}.
+        /// </summary>
+        internal static string _016_CollectionMappingWithIrregularSingularLambdaParameterName {
+            get {
+                return ResourceManager.GetString("_016_CollectionMappingWithIrregularSingularLambdaParameterName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Linq;
+        ///
+        ///namespace TestAutoMapper.Identity.X
+        ///{
+        ///    public class XX
+        ///    {
+        ///        public int Id { get; set; }
+        ///        public string Name { get; set; }
+        ///    }
+        ///
+        ///    public class YY
+        ///    {
+        ///        public int Id { get; set; }
+        ///        public string Name { get; set; }
+        ///    }
+        ///
+        ///    public static class Mapper{
+        ///
+        ///        public static List&lt;YY&gt; Map(List&lt;XX&gt; people)
+        ///        {
+        ///            return people.Select(person =&gt; new YY()
+        ///            {
+        ///  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _016_CollectionMappingWithIrregularSingularLambdaParameterName_FIXED {
+            get {
+                return ResourceManager.GetString("_016_CollectionMappingWithIrregularSingularLambdaParameterName_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Linq;
+        ///
+        ///namespace TestAutoMapper.Identity.X
+        ///{
+        ///    public class XX
+        ///    {
+        ///        public int Id { get; set; }
+        ///        public string Name { get; set; }
+        ///    }
+        ///
+        ///    public class YY
+        ///    {
+        ///        public int Id { get; set; }
+        ///        public string Name { get; set; }
+        ///    }
+        ///
+        ///    public static class Mapper{
+        ///
+        ///        public static List&lt;YY&gt; [|Map|](List&lt;XX&gt; relatedPeople)
+        ///        {
+        ///        }
+        ///    }
+        ///}.
+        /// </summary>
+        internal static string _017_CollectionMappingWithIrregularCamelCaseSingularLambdaParameterName {
+            get {
+                return ResourceManager.GetString("_017_CollectionMappingWithIrregularCamelCaseSingularLambdaParameterName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Linq;
+        ///
+        ///namespace TestAutoMapper.Identity.X
+        ///{
+        ///    public class XX
+        ///    {
+        ///        public int Id { get; set; }
+        ///        public string Name { get; set; }
+        ///    }
+        ///
+        ///    public class YY
+        ///    {
+        ///        public int Id { get; set; }
+        ///        public string Name { get; set; }
+        ///    }
+        ///
+        ///    public static class Mapper{
+        ///
+        ///        public static List&lt;YY&gt; Map(List&lt;XX&gt; relatedPeople)
+        ///        {
+        ///            return relatedPeople.Select(relatedPerson =&gt; new Y [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _017_CollectionMappingWithIrregularCamelCaseSingularLambdaParameterName_FIXED {
+            get {
+                return ResourceManager.GetString("_017_CollectionMappingWithIrregularCamelCaseSingularLambdaParameterName_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Collections.ObjectModel;
+        ///using System.Linq;
+        ///
+        ///namespace TestAutoMapper.Identity.X
+        ///{
+        ///    public class XX
+        ///    {
+        ///        public int Id { get; set; }
+        ///        public string Name { get; set; }
+        ///    }
+        ///
+        ///    public class ZZ
+        ///    {
+        ///        public int Id { get; set; }
+        ///        public string Name { get; set; }
+        ///    }
+        ///
+        ///    public static class Mapper{
+        ///
+        ///        public static List&lt;ZZ&gt; [|MapNew|](List&lt;XX&gt; userList)
+        ///        {
+        ///        }
+        ///    }
+        ///}.
+        /// </summary>
+        internal static string _018_CollectionMappingWithPostfixGenericNameInSingular {
+            get {
+                return ResourceManager.GetString("_018_CollectionMappingWithPostfixGenericNameInSingular", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Collections.ObjectModel;
+        ///using System.Linq;
+        ///
+        ///namespace TestAutoMapper.Identity.X
+        ///{
+        ///    public class XX
+        ///    {
+        ///        public int Id { get; set; }
+        ///        public string Name { get; set; }
+        ///    }
+        ///
+        ///    public class ZZ
+        ///    {
+        ///        public int Id { get; set; }
+        ///        public string Name { get; set; }
+        ///    }
+        ///
+        ///    public static class Mapper{
+        ///
+        ///        public static List&lt;ZZ&gt; MapNew(List&lt;XX&gt; userList)
+        ///        {
+        ///            return usersL [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _018_CollectionMappingWithPostfixGenericNameInSingular_FIXED {
+            get {
+                return ResourceManager.GetString("_018_CollectionMappingWithPostfixGenericNameInSingular_FIXED", resourceCulture);
+            }
+        }
     }
 }

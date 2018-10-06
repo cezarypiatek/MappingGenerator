@@ -1,4 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Collections.Immutable;
+using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeRefactorings;
 using NUnit.Framework;
 using RoslynNUnitLight;
@@ -120,11 +122,28 @@ namespace MappingGenerator.Test.Mapping
             TestCodeRefactoring(_018_CollectionMappingWithPostfixGenericNameInSingular, _018_CollectionMappingWithPostfixGenericNameInSingular_FIXED);
         }
 
+        [Test]
+        public void should_be_able_to_map_properties_inherited_from_class_declared_in_external_library()
+        {
+            TestCodeRefactoring(_019_MappingPropertiesInheritedFromLibraryClass, _019_MappingPropertiesInheritedFromLibraryClass_FIXED);
+        }
+
+        [Test]
+        public void should_be_able_to_map_properties_inside_constructor_inherited_from_class_declared_in_external_library()
+        {
+            TestCodeRefactoring(_020_MappingPropertiesInConstructorInheritedFromLibraryClass, _020_MappingPropertiesInConstructorInheritedFromLibraryClass_FIXED);
+        }
+
         protected override string LanguageName => LanguageNames.CSharp;
 
         protected override CodeRefactoringProvider CreateProvider()
         {
             return new MappingGeneratorRefactoring();
         }
+
+        protected override ImmutableList<MetadataReference> References { get => new MetadataReference[]
+        {
+            MetadataReference.CreateFromFile(typeof(IdentityUser).Assembly.Location)
+        }.ToImmutableList();}
     }
 }

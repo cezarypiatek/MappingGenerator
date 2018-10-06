@@ -1051,11 +1051,118 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public static List&lt;ZZ&gt; MapNew(List&lt;XX&gt; userList)
         ///        {
-        ///            return usersL [rest of string was truncated]&quot;;.
+        ///            return userLi [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _018_CollectionMappingWithPostfixGenericNameInSingular_FIXED {
             get {
                 return ResourceManager.GetString("_018_CollectionMappingWithPostfixGenericNameInSingular_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using Microsoft.AspNet.Identity.EntityFramework;
+        ///using System;
+        ///
+        ///namespace TestAutoMapper
+        ///{
+        ///    public static class ExternalUserTest
+        ///    {
+        ///        public static ApplicationUserEntity [|ToEntity|](this UserModel model)
+        ///        {
+        ///           throw new NotImplementedException();
+        ///        }
+        ///    }
+        ///
+        ///    public class UserModel
+        ///    {
+        ///        public string NewProperty1 { get; set; }
+        ///        public string NewProperty2 { get; set; }
+        ///
+        ///        public virtual string Email { get; set; }
+        ///
+        ///        public vi [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _019_MappingPropertiesInheritedFromLibraryClass {
+            get {
+                return ResourceManager.GetString("_019_MappingPropertiesInheritedFromLibraryClass", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using Microsoft.AspNet.Identity.EntityFramework;
+        ///using System;
+        ///
+        ///namespace TestAutoMapper
+        ///{
+        ///    public static class ExternalUserTest
+        ///    {
+        ///        public static ApplicationUserEntity ToEntity(this UserModel model)
+        ///        {
+        ///            return new ApplicationUserEntity()
+        ///            {
+        ///                NewProperty1 = model.NewProperty1,
+        ///                NewProperty2 = model.NewProperty2,
+        ///                Email = model.Email,
+        ///                EmailConfirmed = model.EmailConfirmed,
+        ///                Pas [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _019_MappingPropertiesInheritedFromLibraryClass_FIXED {
+            get {
+                return ResourceManager.GetString("_019_MappingPropertiesInheritedFromLibraryClass_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using Microsoft.AspNet.Identity.EntityFramework;
+        ///using System;
+        ///
+        ///namespace TestAutoMapper
+        ///{
+        ///    public class UserModel
+        ///    {
+        ///        public string NewProperty1 { get; set; }
+        ///        public string NewProperty2 { get; set; }
+        ///
+        ///        public virtual string Email { get; set; }
+        ///
+        ///        public virtual bool EmailConfirmed { get; set; }
+        ///
+        ///        public virtual string PasswordHash { get; set; }
+        ///
+        ///        public virtual string SecurityStamp { get; set; }
+        ///
+        ///        public virtual string PhoneNumber { g [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _020_MappingPropertiesInConstructorInheritedFromLibraryClass {
+            get {
+                return ResourceManager.GetString("_020_MappingPropertiesInConstructorInheritedFromLibraryClass", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using Microsoft.AspNet.Identity.EntityFramework;
+        ///using System;
+        ///
+        ///namespace TestAutoMapper
+        ///{
+        ///    public class UserModel
+        ///    {
+        ///        public string NewProperty1 { get; set; }
+        ///        public string NewProperty2 { get; set; }
+        ///
+        ///        public virtual string Email { get; set; }
+        ///
+        ///        public virtual bool EmailConfirmed { get; set; }
+        ///
+        ///        public virtual string PasswordHash { get; set; }
+        ///
+        ///        public virtual string SecurityStamp { get; set; }
+        ///
+        ///        public virtual string PhoneNumber { g [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _020_MappingPropertiesInConstructorInheritedFromLibraryClass_FIXED {
+            get {
+                return ResourceManager.GetString("_020_MappingPropertiesInConstructorInheritedFromLibraryClass_FIXED", resourceCulture);
             }
         }
     }

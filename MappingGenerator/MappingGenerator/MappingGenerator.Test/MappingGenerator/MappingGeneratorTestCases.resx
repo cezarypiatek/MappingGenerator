@@ -226,4 +226,16 @@
   <data name="_018_CollectionMappingWithPostfixGenericNameInSingular_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>TestCaseData\018_CollectionMappingWithPostfixGenericNameInSingular_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="_019_MappingPropertiesInheritedFromLibraryClass" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\019_MappingPropertiesInheritedFromLibraryClass.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_019_MappingPropertiesInheritedFromLibraryClass_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\019_MappingPropertiesInheritedFromLibraryClass_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_020_MappingPropertiesInConstructorInheritedFromLibraryClass" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\020_MappingPropertiesInConstructorInheritedFromLibraryClass.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_020_MappingPropertiesInConstructorInheritedFromLibraryClass_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\020_MappingPropertiesInConstructorInheritedFromLibraryClass_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

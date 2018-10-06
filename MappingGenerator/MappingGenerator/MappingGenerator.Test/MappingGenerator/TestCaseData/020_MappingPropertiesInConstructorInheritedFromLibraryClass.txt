@@ -1,0 +1,34 @@
+﻿using Microsoft.AspNet.Identity.EntityFramework;
+using System;
+
+namespace TestAutoMapper
+{
+    public class UserModel
+    {
+        public string NewProperty1 { get; set; }
+        public string NewProperty2 { get; set; }
+
+        public virtual string Email { get; set; }
+
+        public virtual bool EmailConfirmed { get; set; }
+
+        public virtual string PasswordHash { get; set; }
+
+        public virtual string SecurityStamp { get; set; }
+
+        public virtual string PhoneNumber { get; set; }
+        public virtual bool PhoneNumberConfirmed { get; set; }
+
+    }
+
+    public  class ApplicationUserEntity: IdentityUser
+    {
+        public string NewProperty1 { get; set; }
+        public string NewProperty2 { get; set; }
+
+        public [|ApplicationUserEntity|](UserModel model)
+        {
+           throw new NotImplementedException();
+        }
+    }
+}

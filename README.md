@@ -12,6 +12,9 @@
 
 You can download it as Visual Studio Extension from [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=54748ff9-45fc-43c2-8ec5-cf7912bc3b84.mappinggenerator).
 
+## Motivation
+[The reasons behind why I don't use AutoMapper](https://cezarypiatek.github.io/post/why-i-dont-use-automapper/)
+
 ## Further Development
 If you find this extension useful (you feel it helps you on the daily basis) you can support further development by buying me a coffee (it's simple, just click the button below). Sometimes it's hard to stay awake till midnight implementing new features, coffee helps me with that. I'm really appreciate for your support.
 

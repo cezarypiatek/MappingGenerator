@@ -81,6 +81,13 @@ namespace MappingGenerator
         
         public static bool CanBeSetPublicly(this IPropertySymbol property, bool isInternalAccessible)
         {
+            if (IsDeclaredOutsideTheSourcecode(property))
+            {
+                return property.IsReadOnly == false && 
+                       property.SetMethod != null &&
+                       property.SetMethod.DeclaredAccessibility == Accessibility.Public;
+            }
+
             var propertyDeclaration = property.DeclaringSyntaxReferences.Select(x => x.GetSyntax()).OfType<PropertyDeclarationSyntax>().FirstOrDefault();
             if (propertyDeclaration?.AccessorList == null)
             {
@@ -92,6 +99,15 @@ namespace MappingGenerator
 
         public static bool CanBeSetOnlyFromConstructor(this IPropertySymbol property)
         {
+            if (IsDeclaredOutsideTheSourcecode(property))
+            {
+                return property.IsReadOnly ||
+                       (property.SetMethod != null &&
+                       new[] {Accessibility.Public, Accessibility.Protected}.Contains(property.SetMethod.DeclaredAccessibility)
+                       );
+            }
+
+
             var propertyDeclaration = property.DeclaringSyntaxReferences.Select(x => x.GetSyntax()).OfType<PropertyDeclarationSyntax>().FirstOrDefault();
             if (propertyDeclaration?.AccessorList == null)
             {
@@ -104,6 +120,11 @@ namespace MappingGenerator
             }
 
             return propertyDeclaration.AccessorList.Accessors.Count == 1 && propertyDeclaration.AccessorList.Accessors.SingleOrDefault(IsAutoGetter) != null;
+        }
+
+        private static bool IsDeclaredOutsideTheSourcecode(IPropertySymbol property)
+        {
+            return property.DeclaringSyntaxReferences.Length == 0;
         }
 
         private static bool HasPrivateSetter(PropertyDeclarationSyntax propertyDeclaration)

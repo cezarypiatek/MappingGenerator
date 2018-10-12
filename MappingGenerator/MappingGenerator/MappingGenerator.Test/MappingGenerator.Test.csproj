@@ -7,12 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="ExplicitConversions\TestCaseData\001_ExplicitConversionForInvalidAssigment.cs" />
-    <Compile Remove="ExplicitConversions\TestCaseData\001_ExplicitConversionForInvalidAssigment_FIXED.cs" />
-    <Compile Remove="ExplicitConversions\TestCaseData\002_ExplicitConversionForInvalidReturn.cs" />
-    <Compile Remove="ExplicitConversions\TestCaseData\002_ExplicitConversionForInvalidReturn_FIXED.cs" />
-    <Compile Remove="ExplicitConversions\TestCaseData\003_ExplicitConversionForInvalidYield.cs" />
-    <Compile Remove="ExplicitConversions\TestCaseData\003_ExplicitConversionForInvalidYield_FIXED.cs" />
     <Compile Remove="Splatting\TestCaseData\001_SplattingInMethodInvocation.cs" />
     <Compile Remove="Splatting\TestCaseData\001_SplattingInMethodInvocationWithNamedParameters_FIXED.cs" />
     <Compile Remove="Splatting\TestCaseData\001_SplattingInMethodInvocation_FIXED.cs" />
@@ -30,12 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="ExplicitConversions\TestCaseData\001_ExplicitConversionForInvalidAssigment.cs" />
-    <None Include="ExplicitConversions\TestCaseData\001_ExplicitConversionForInvalidAssigment_FIXED.cs" />
-    <None Include="ExplicitConversions\TestCaseData\002_ExplicitConversionForInvalidReturn.cs" />
-    <None Include="ExplicitConversions\TestCaseData\002_ExplicitConversionForInvalidReturn_FIXED.cs" />
-    <None Include="ExplicitConversions\TestCaseData\003_ExplicitConversionForInvalidYield.cs" />
-    <None Include="ExplicitConversions\TestCaseData\003_ExplicitConversionForInvalidYield_FIXED.cs" />
     <None Include="Splatting\TestCaseData\003_SplattingWithBestOverloadMatch_FIXED.cs" />
     <None Include="Splatting\TestCaseData\003_SplattingWithBestOverloadMatch.cs" />
     <None Include="Splatting\TestCaseData\001_SplattingInMethodInvocation_FIXED.cs" />
@@ -54,6 +42,7 @@
 
   <ItemGroup>
     <PackageReference Include="Appveyor.TestLogger" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNet.Identity.EntityFramework" Version="2.2.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="2.8.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" Version="2.8.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />

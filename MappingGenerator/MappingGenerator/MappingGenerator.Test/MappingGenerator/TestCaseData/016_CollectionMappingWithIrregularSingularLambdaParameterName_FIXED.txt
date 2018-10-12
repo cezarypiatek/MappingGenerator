@@ -1,0 +1,30 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace TestAutoMapper.Identity.X
+{
+    public class XX
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class YY
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    public static class Mapper{
+
+        public static List<YY> Map(List<XX> people)
+        {
+            return people.Select(person => new YY()
+            {
+                Id = person.Id,
+                Name = person.Name
+            }).ToList();
+        }
+    }
+}

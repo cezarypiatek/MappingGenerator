@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,69 +7,9 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
-using Pluralize.NET;
 
 namespace MappingGenerator
 {
-    public class NameHelper
-    {
-        private static readonly char[] ForbiddenSigns = new[] {'.', '[', ']', '(', ')'};
-        private static Pluralizer Pluralizer = new Pluralizer();
-
-        public static string CreateLambdaParameterName(SyntaxNode sourceList)
-        {
-            var originalName = sourceList.ToFullString();
-            var localVariableName = ToLocalVariableName(originalName);
-            var finalName = ToSingularLocalVariableName(localVariableName);
-            if (originalName == finalName)
-            {
-                return $"{finalName}Element";
-            }
-            return finalName;
-        }
-
-        public static string ToLocalVariableName(string proposalLocalName)
-        {
-            var withoutForbiddenSigns = string.Join("",proposalLocalName.Trim().Split(ForbiddenSigns).Where(x=> string.IsNullOrWhiteSpace(x) == false).Select(x=>
-            {
-                var cleanElement = x.Trim();
-                return $"{cleanElement.Substring(0, 1).ToUpper()}{cleanElement.Substring(1)}";
-            }));
-            return $"{withoutForbiddenSigns.Substring(0, 1).ToLower()}{withoutForbiddenSigns.Substring(1)}";
-        }
-
-        private static readonly string[] collectionSynonym = new[] {"List", "Collection", "Set", "Queue", "Dictionary", "Stack", "Array"};
-
-        private static string ToSingularLocalVariableName(string proposalLocalName)
-        {
-            if (collectionSynonym.Any(x=> x.Equals(proposalLocalName, StringComparison.OrdinalIgnoreCase)))
-            {
-                return "item";
-            }
-
-            foreach (var collectionName in collectionSynonym)
-            {
-                if (proposalLocalName.EndsWith(collectionName, StringComparison.OrdinalIgnoreCase))
-                {
-                    proposalLocalName = proposalLocalName.Substring(0, proposalLocalName.Length - collectionName.Length - 1);
-                    break;
-                }
-            }
-
-            if (proposalLocalName.EndsWith("Set"))
-            {
-                return $"{proposalLocalName}Element";
-            }
-
-            if (proposalLocalName.EndsWith("s"))
-            {
-                return Pluralizer.Singularize(proposalLocalName);
-            }
-
-            return proposalLocalName;
-        }
-    }
-
     public class MappingEngine
     {
         protected readonly SemanticModel semanticModel;

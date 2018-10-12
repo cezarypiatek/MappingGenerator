@@ -30,6 +30,12 @@ namespace MappingGenerator.Test.ExplicitConversions
 
         }
 
+        [Test]
+        public void should_be_able_to_generate_conversion_for_invalid_assignment_statement_in_init_block()
+        {
+            VerifyCSharpFix(ExplicitConversionTestCases._004_ExplicitConversionForInvalidAssigmentInInitBlock, ExplicitConversionTestCases._004_ExplicitConversionForInvalidAssigmentInInitBlock_FIXED, ExplicitConversionCodeFixProvider.CS0029, 0);
+        }
+
         protected override CodeFixProvider GetCSharpCodeFixProvider()
         {
             return new ExplicitConversionCodeFixProvider();

@@ -1,4 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Collections.Immutable;
+using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeRefactorings;
 using NUnit.Framework;
 using RoslynNUnitLight;
@@ -102,11 +104,46 @@ namespace MappingGenerator.Test.Mapping
             TestCodeRefactoring(_015_CollectionMappingWithPostfixGenericName, _015_CollectionMappingWithPostfixGenericName_FIXED);
         }
 
+        [Test]
+        public void should_be_able_to_generate_collection_mapping_with_lambda_parameter_with_irregular_noun()
+        {
+            TestCodeRefactoring(_016_CollectionMappingWithIrregularSingularLambdaParameterName, _016_CollectionMappingWithIrregularSingularLambdaParameterName_FIXED);
+        }
+
+        [Test]
+        public void should_be_able_to_generate_collection_mapping_with_lambda_parameter_with_irregular_camelcase_noun()
+        {
+            TestCodeRefactoring(_017_CollectionMappingWithIrregularCamelCaseSingularLambdaParameterName, _017_CollectionMappingWithIrregularCamelCaseSingularLambdaParameterName_FIXED);
+        }
+
+        [Test]
+        public void should_be_able_to_generate_collection_mapping_with_lambda_parameter_from_postfiex_generic_name_singular()
+        {
+            TestCodeRefactoring(_018_CollectionMappingWithPostfixGenericNameInSingular, _018_CollectionMappingWithPostfixGenericNameInSingular_FIXED);
+        }
+
+        [Test]
+        public void should_be_able_to_map_properties_inherited_from_class_declared_in_external_library()
+        {
+            TestCodeRefactoring(_019_MappingPropertiesInheritedFromLibraryClass, _019_MappingPropertiesInheritedFromLibraryClass_FIXED);
+        }
+
+        [Test]
+        public void should_be_able_to_map_properties_inside_constructor_inherited_from_class_declared_in_external_library()
+        {
+            TestCodeRefactoring(_020_MappingPropertiesInConstructorInheritedFromLibraryClass, _020_MappingPropertiesInConstructorInheritedFromLibraryClass_FIXED);
+        }
+
         protected override string LanguageName => LanguageNames.CSharp;
 
         protected override CodeRefactoringProvider CreateProvider()
         {
             return new MappingGeneratorRefactoring();
         }
+
+        protected override ImmutableList<MetadataReference> References { get => new MetadataReference[]
+        {
+            MetadataReference.CreateFromFile(typeof(IdentityUser).Assembly.Location)
+        }.ToImmutableList();}
     }
 }

@@ -10,13 +10,13 @@
     <PackageId>MappingGenerator</PackageId>
     <PackageVersion>1.0.0.0</PackageVersion>
     <Authors>cepi</Authors>
-    <PackageLicenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</PackageLicenseUrl>
-    <PackageProjectUrl>http://PROJECT_URL_HERE_OR_DELETE_THIS_LINE</PackageProjectUrl>
-    <PackageIconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</PackageIconUrl>
-    <RepositoryUrl>http://REPOSITORY_URL_HERE_OR_DELETE_THIS_LINE</RepositoryUrl>
+    <PackageLicenseUrl>https://github.com/cezarypiatek/MappingGenerator/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/cezarypiatek/MappingGenerator</PackageProjectUrl>
+    <PackageIconUrl>https://github.com/cezarypiatek/MappingGenerator/raw/master/MappingGenerator/MappingGenerator/MappingGenerator.Vsix/icon.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/cezarypiatek/MappingGenerator</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Description>MappingGenerator</Description>
-    <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
+    <PackageReleaseNotes></PackageReleaseNotes>
     <Copyright>Copyright</Copyright>
     <PackageTags>MappingGenerator, analyzers</PackageTags>
     <NoPackageAnalysis>true</NoPackageAnalysis>

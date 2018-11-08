@@ -1,0 +1,18 @@
+﻿namespace Scaffolding
+{
+   public static class SampleClass
+   {
+      public static AnotherClass DoSth()
+      {
+          return new AnotherClass();
+      }
+
+
+      public class AnotherClass
+      {
+            public AnotherClass(string parameter1, int parameter2)
+            {
+            }
+      }
+   }
+}

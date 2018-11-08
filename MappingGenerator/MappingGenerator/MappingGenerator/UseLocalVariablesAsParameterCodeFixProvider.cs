@@ -15,6 +15,33 @@ using Microsoft.CodeAnalysis.Editing;
 
 namespace MappingGenerator
 {
+    public class CodeFixHelper
+    {
+        public static async Task<Document> FixInvocationWithParameters(Document document,
+            IInvocation invocation,
+            bool generateNamedParameters,
+            SemanticModel semanticModel,
+            IMappingSourceFinder mappingSourceFinder,
+            CancellationToken cancellationToken)
+        {
+            var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
+            var overloadParameterSets = invocation.GetOverloadParameterSets(semanticModel);
+            if (overloadParameterSets != null)
+            {
+                var contextAssembly = semanticModel.FindContextAssembly(invocation.SourceNode);
+                var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
+                var parametersMatch = MethodHelper.FindBestParametersMatch(mappingSourceFinder, overloadParameterSets);
+                if (parametersMatch != null)
+                {
+                    var argumentList = parametersMatch.ToArgumentListSyntax(mappingEngine, generateNamedParameters);
+                    return await document.ReplaceNodes(invocation.SourceNode, invocation.WithArgumentList(argumentList), cancellationToken);
+                }
+            }
+
+            return document;
+        }
+    }
+
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(UseLocalVariablesAsParameterCodeFixProvider)), Shared]
     public class UseLocalVariablesAsParameterCodeFixProvider : CodeFixProvider
     {
@@ -137,21 +164,8 @@ namespace MappingGenerator
         private async Task<Document> UseLocalVariablesAsParameters(Document document, IInvocation invocation, bool generateNamedParameters, CancellationToken cancellationToken)
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
             var mappingSourceFinder = new LocalScopeMappingSourceFinder(semanticModel, invocation.SourceNode);
-            var overloadParameterSets = invocation.GetOverloadParameterSets(semanticModel);
-            if (overloadParameterSets != null)
-            {
-                var contextAssembly = semanticModel.FindContextAssembly(invocation.SourceNode);
-                var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
-                var parametersMatch = MethodHelper.FindBestParametersMatch(mappingSourceFinder, overloadParameterSets);
-                if (parametersMatch != null)
-                {
-                    var argumentList = parametersMatch.ToArgumentListSyntax(mappingEngine, generateNamedParameters);
-                    return await  document.ReplaceNodes(invocation.SourceNode, invocation.WithArgumentList(argumentList), cancellationToken);
-                }
-            }
-            return document;
+            return await CodeFixHelper.FixInvocationWithParameters(document, invocation, generateNamedParameters, semanticModel, mappingSourceFinder, cancellationToken);
         }
     }
 }

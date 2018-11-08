@@ -71,6 +71,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
+    <Compile Update="InvocationScaffolding\InvocationScaffoldingTestCases.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>InvocationScaffoldingTestCases.resx</DependentUpon>
+    </Compile>
     <Compile Update="MappingGenerator\MappingGeneratorTestCases.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -100,6 +105,10 @@
     <EmbeddedResource Update="ImplementCloneMethod\ImplementCloneMethodTestCases.resx">
       <LastGenOutput>ImplementCloneMethodTestCases.Designer.cs</LastGenOutput>
       <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="InvocationScaffolding\InvocationScaffoldingTestCases.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>InvocationScaffoldingTestCases.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="MappingGenerator\MappingGeneratorTestCases.resx">
       <Generator>ResXFileCodeGenerator</Generator>

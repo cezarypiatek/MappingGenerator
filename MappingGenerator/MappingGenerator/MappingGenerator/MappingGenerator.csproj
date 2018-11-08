@@ -33,25 +33,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="EmptyInitializationBlockRefactoring.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="ExplicitConversionCodeFixProvider.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="ImplementCloneMethodRefactoring.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="MappingGeneratorRefactoring.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Resources.Designer.cs" DesignTime="True" AutoGen="True" DependentUpon="Resources.resx" />
-    <Compile Update="SplattingCodeFixProvider.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="UseLocalVariablesAsParameterCodeFixProvider.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <EmbeddedResource Update="Resources.resx" Generator="ResXFileCodeGenerator" LastGenOutput="Resources.Designer.cs" />
   </ItemGroup>
 

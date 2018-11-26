@@ -68,6 +68,15 @@ namespace MappingGenerator
                 };
             }
 
+            if (ObjectHelper.IsSimpleType(targetType) && SymbolHelper.IsNullable(sourceType, out var underlyingType) )
+            {
+                element = new MappingElement()
+                {
+                    Expression =  (ExpressionSyntax)syntaxGenerator.MemberAccessExpression(element.Expression, "Value"),
+                    ExpressionType = underlyingType
+                };
+            }
+
             if (IsUnwrappingNeeded(targetType, element))
             {
                 return TryToUnwrap(targetType, element);

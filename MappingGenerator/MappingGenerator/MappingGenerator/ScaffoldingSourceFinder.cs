@@ -45,9 +45,9 @@ namespace MappingGenerator
                     .WithTrailingTrivia(SyntaxFactory.Comment(" /* Stop recursive mapping */"));
             }
 
-            if (type.TypeKind == TypeKind.Struct && type.Name == "Nullable" && type is INamedTypeSymbol nullable)
+            if (SymbolHelper.IsNullable(type, out var underlyingType))
             {
-                type = nullable.TypeArguments.First();
+                type = underlyingType;
             }
 
 

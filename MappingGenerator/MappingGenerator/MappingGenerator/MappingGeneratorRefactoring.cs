@@ -42,9 +42,10 @@ namespace MappingGenerator
                         }
 
                         if (SymbolHelper.IsPureMappingFunction(methodSymbol) ||
+                            SymbolHelper.IsMultiParameterPureFunction(methodSymbol) ||
                             SymbolHelper.IsUpdateThisObjectFunction(methodSymbol) ||
                             SymbolHelper.IsUpdateParameterFunction(methodSymbol) ||
-                            SymbolHelper.IsMultiParameterUpdateThisObjectFunction(methodSymbol)
+                            SymbolHelper.IsMultiParameterUpdateThisObjectFunction(methodSymbol) 
                         )
                         {
                             context.RegisterRefactoring(CodeAction.Create(title: title, createChangedDocument: c => GenerateMappingMethodBody(context.Document, methodDeclaration, c), equivalenceKey: title));
@@ -96,8 +97,14 @@ namespace MappingGenerator
                 var newExpression = mappingEngine.MapExpression((ExpressionSyntax)generator.IdentifierName(source.Name), source.Type, targetType);
                 return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };
             }
-
-            //TODO: Pure mapping with multiple parameters
+            
+            if (SymbolHelper.IsMultiParameterPureFunction(methodSymbol))
+            {
+                var targetType = methodSymbol.ReturnType;
+                var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol);
+                var newExpression = mappingEngine.AddInitializerWithMapping((ObjectCreationExpressionSyntax)generator.ObjectCreationExpression(targetType), sourceFinder, targetType);
+                return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };
+            }
 
             if (SymbolHelper.IsUpdateParameterFunction(methodSymbol))
             {

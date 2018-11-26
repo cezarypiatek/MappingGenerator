@@ -181,5 +181,10 @@ namespace MappingGenerator
         {
             return ((INamedTypeSymbol) type).TypeArguments.First();
         }
+
+        public static bool IsMultiParameterPureFunction(IMethodSymbol methodSymbol)
+        {
+            return methodSymbol.Parameters.Length > 1 && methodSymbol.ReturnsVoid == false;
+        }
     }
 }

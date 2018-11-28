@@ -110,8 +110,14 @@ namespace MappingGenerator
 
         public static bool IsSameAssemblyOrHasFriendAccessTo(this IAssemblySymbol assembly, IAssemblySymbol toAssembly)
         {
+            var areEquals = assembly.Equals(toAssembly);
+            if (areEquals  == false  &&  toAssembly == null)
+            {
+                return false;
+            }
+
             return
-                Equals(assembly, toAssembly) ||
+                areEquals ||
                 (assembly.IsInteractive && toAssembly.IsInteractive) ||
                 toAssembly.GivesAccessTo(assembly);
         }

@@ -31,7 +31,7 @@ namespace MappingGenerator
             switch (node)
             {
                 case MethodDeclarationSyntax methodDeclaration:
-                    if (methodDeclaration.ParameterList.Parameters.Count > 0)
+                    if (methodDeclaration.Parent.Kind() != SyntaxKind.InterfaceDeclaration && methodDeclaration.ParameterList.Parameters.Count > 0)
                     {
                         var semanticModel = await context.Document.GetSemanticModelAsync();
                         var methodSymbol = semanticModel.GetDeclaredSymbol(methodDeclaration);

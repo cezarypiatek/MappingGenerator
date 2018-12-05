@@ -119,27 +119,27 @@
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="_001_SplattingInMethodInvocation" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\001_SplattingInMethodInvocation.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\001_SplattingInMethodInvocation.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_001_SplattingInMethodInvocationWithNamedParameters_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\001_SplattingInMethodInvocationWithNamedParameters_FIXED.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\001_SplattingInMethodInvocationWithNamedParameters_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_001_SplattingInMethodInvocation_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\001_SplattingInMethodInvocation_FIXED.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\001_SplattingInMethodInvocation_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_002_SplattingInConstructorInvocation" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\002_SplattingInConstructorInvocation.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\002_SplattingInConstructorInvocation.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_002_SplattingInConstructorInvocationWithNamedParameters_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\002_SplattingInConstructorInvocationWithNamedParameters_FIXED.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\002_SplattingInConstructorInvocationWithNamedParameters_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_002_SplattingInConstructorInvocation_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\002_SplattingInConstructorInvocation_FIXED.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\002_SplattingInConstructorInvocation_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_003_SplattingWithBestOverloadMatch" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\003_SplattingWithBestOverloadMatch.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\003_SplattingWithBestOverloadMatch.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_003_SplattingWithBestOverloadMatch_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\003_SplattingWithBestOverloadMatch_FIXED.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\003_SplattingWithBestOverloadMatch_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
 </root>

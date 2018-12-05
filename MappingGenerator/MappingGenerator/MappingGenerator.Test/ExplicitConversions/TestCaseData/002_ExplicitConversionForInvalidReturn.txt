@@ -11,7 +11,7 @@ namespace MappingGenerator.Test.ExplicitConversions.TestCaseData
 
         public ReadOnlyCollection<AddressDTO> DoSomething(IList<AddressEntity> addresses)
         {
-            return addresses;
+            return [|addresses|];
         }
     }
 

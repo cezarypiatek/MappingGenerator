@@ -9,10 +9,13 @@ namespace MappingGenerator.Test.Splatting.TestCaseData
         public void DoSomething()
         {
             var user = new UserDTO();
-            ProceessUser(user);
+            new SampleClass([|user|]);
         }
+    }
 
-        public void ProceessUser(string firstName, string lastName, int age)
+    public class SampleClass
+    {
+        public SampleClass(string firstName, string lastName, int age)
         {
 
         }

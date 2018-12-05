@@ -1,0 +1,4 @@
+[submodule "MappingGenerator/MappingGenerator/RoslynNunitLight"]
+	path = MappingGenerator/MappingGenerator/RoslynNunitLight
+	url = https://github.com/cezarypiatek/RoslynNUnitLight.NetStandard.git
+	branch = feature/add_diagnosticid_to_testcodefix

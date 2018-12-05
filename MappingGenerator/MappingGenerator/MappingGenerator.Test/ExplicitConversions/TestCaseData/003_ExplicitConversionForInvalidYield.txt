@@ -8,7 +8,7 @@ namespace MappingGenerator.Test.ExplicitConversions.TestCaseData
 
         public IEnumerable<AddressDTO> DoSomething(AddressEntity address)
         {
-            yield return address;
+            yield return [|address|];
         }
     }
 

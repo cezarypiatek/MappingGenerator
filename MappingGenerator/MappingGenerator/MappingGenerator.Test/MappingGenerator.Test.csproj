@@ -7,40 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Splatting\TestCaseData\001_SplattingInMethodInvocation.cs" />
-    <Compile Remove="Splatting\TestCaseData\001_SplattingInMethodInvocationWithNamedParameters_FIXED.cs" />
-    <Compile Remove="Splatting\TestCaseData\001_SplattingInMethodInvocation_FIXED.cs" />
-    <Compile Remove="Splatting\TestCaseData\002_SplattingInConstructorInvocation.cs" />
-    <Compile Remove="Splatting\TestCaseData\002_SplattingInConstructorInvocationWithNamedParameters_FIXED.cs" />
-    <Compile Remove="Splatting\TestCaseData\002_SplattingInConstructorInvocation_FIXED.cs" />
-    <Compile Remove="Splatting\TestCaseData\003_SplattingWithBestOverloadMatch.cs" />
-    <Compile Remove="Splatting\TestCaseData\003_SplattingWithBestOverloadMatch_FIXED.cs" />
-    <Compile Remove="UseLocalVariablesAsParameters\TestCaseData\001_UserLocaVariablesToCompleteMethodInvocation.cs" />
-    <Compile Remove="UseLocalVariablesAsParameters\TestCaseData\001_UserLocaVariablesToCompleteMethodInvocationWithNamedParameters_Fixed.cs" />
-    <Compile Remove="UseLocalVariablesAsParameters\TestCaseData\001_UserLocaVariablesToCompleteMethodInvocation_Fixed.cs" />
-    <Compile Remove="UseLocalVariablesAsParameters\TestCaseData\002_UserLocaVariablesToCompleteConstructorInvocation.cs" />
-    <Compile Remove="UseLocalVariablesAsParameters\TestCaseData\002_UserLocaVariablesToCompleteConstructorInvocationWithNamedParameters_Fixed .cs" />
-    <Compile Remove="UseLocalVariablesAsParameters\TestCaseData\002_UserLocaVariablesToCompleteConstructorInvocation_Fixed.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Splatting\TestCaseData\003_SplattingWithBestOverloadMatch_FIXED.cs" />
-    <None Include="Splatting\TestCaseData\003_SplattingWithBestOverloadMatch.cs" />
-    <None Include="Splatting\TestCaseData\001_SplattingInMethodInvocation_FIXED.cs" />
-    <None Include="Splatting\TestCaseData\002_SplattingInConstructorInvocation_FIXED.cs" />
-    <None Include="Splatting\TestCaseData\002_SplattingInConstructorInvocationWithNamedParameters_FIXED.cs" />
-    <None Include="Splatting\TestCaseData\002_SplattingInConstructorInvocation.cs" />
-    <None Include="Splatting\TestCaseData\001_SplattingInMethodInvocation.cs" />
-    <None Include="Splatting\TestCaseData\001_SplattingInMethodInvocationWithNamedParameters_FIXED.cs" />
-    <None Include="UseLocalVariablesAsParameters\TestCaseData\002_UserLocaVariablesToCompleteConstructorInvocationWithNamedParameters_Fixed .cs" />
-    <None Include="UseLocalVariablesAsParameters\TestCaseData\002_UserLocaVariablesToCompleteConstructorInvocation_Fixed.cs" />
-    <None Include="UseLocalVariablesAsParameters\TestCaseData\002_UserLocaVariablesToCompleteConstructorInvocation.cs" />
-    <None Include="UseLocalVariablesAsParameters\TestCaseData\001_UserLocaVariablesToCompleteMethodInvocationWithNamedParameters_Fixed.cs" />
-    <None Include="UseLocalVariablesAsParameters\TestCaseData\001_UserLocaVariablesToCompleteMethodInvocation.cs" />
-    <None Include="UseLocalVariablesAsParameters\TestCaseData\001_UserLocaVariablesToCompleteMethodInvocation_Fixed.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Appveyor.TestLogger" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNet.Identity.EntityFramework" Version="2.2.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="2.8.2" />
@@ -48,11 +14,11 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="NUnit" Version="3.10.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
-    <PackageReference Include="RoslynNUnitLight.NetStandard" Version="1.2.4" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MappingGenerator\MappingGenerator.csproj" />
+    <ProjectReference Include="..\RoslynNunitLight\RoslynNUnitLight.NetStandard\RoslynNUnitLight.NetStandard.csproj" />
   </ItemGroup>
 
   <ItemGroup>

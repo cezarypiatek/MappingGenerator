@@ -33,11 +33,11 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                 BankName = entity.Account.BankName,
                 Number = entity.Account.Number
             };
-            Debs = entity.Debs.Select(entityDeb => new AccountDTO()
+            Debs = entity.Debs.ConvertAll(entityDeb => new AccountDTO()
             {
                 BankName = entityDeb.BankName,
                 Number = entityDeb.Number
-            }).ToList();
+            });
             Source = new UserSourceDTO(providerName: entity.Source.ProviderName, providerAddress: entity.Source.ProviderAddress);
             ImageData = entity.ImageData;
             LuckyNumbers = entity.LuckyNumbers;
@@ -50,14 +50,14 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                 FlatNo = entity.MainAddress.FlatNo,
                 BuildingNo = entity.MainAddress.BuildingNo
             };
-            Addresses = entity.Addresses.Select(entityAddress => new AddressDTO()
+            Addresses = entity.Addresses.ConvertAll(entityAddress => new AddressDTO()
             {
                 City = entityAddress.City,
                 ZipCode = entityAddress.ZipCode,
                 Street = entityAddress.Street,
                 FlatNo = entityAddress.FlatNo,
                 BuildingNo = entityAddress.BuildingNo
-            }).ToList().AsReadOnly();
+            }).AsReadOnly();
             UnitId = entity.Unit.Id;
         }
     }

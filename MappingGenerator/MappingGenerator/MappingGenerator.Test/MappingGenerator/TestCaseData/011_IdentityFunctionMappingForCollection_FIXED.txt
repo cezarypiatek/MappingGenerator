@@ -9,10 +9,10 @@ namespace TestAutoMapper.Identity
     {
         public static List<UserDTO> Map(List<UserDTO> old)
         {
-            return old.Select(oldElement => new UserDTO()
+            return old.ConvertAll(oldElement => new UserDTO()
             {
                 Age = oldElement.Age,
-                Debs = oldElement.Debs.Select(oldElementDeb => oldElementDeb.Clone() as AccountDTO).ToList(),
+                Debs = oldElement.Debs.ConvertAll(oldElementDeb => oldElementDeb.Clone() as AccountDTO),
                 Source = new UserSourceDTO(providerName: oldElement.Source.ProviderName, providerAddress: oldElement.Source.ProviderAddress),
                 Login = oldElement.Login,
                 ImageData = oldElement.ImageData.ToArray(),
@@ -35,7 +35,7 @@ namespace TestAutoMapper.Identity
                     BuildingNo = oldElementAddress.BuildingNo
                 }).ToList().AsReadOnly(),
                 UnitId = oldElement.UnitId
-            }).ToList();
+            });
         }
     }
 

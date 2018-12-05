@@ -12,7 +12,7 @@ namespace TestAutoMapper.Identity
             return new UserDTO()
             {
                 Age = old.Age,
-                Debs = old.Debs.Select(oldDeb => oldDeb.Clone() as AccountDTO).ToList(),
+                Debs = old.Debs.ConvertAll(oldDeb => oldDeb.Clone() as AccountDTO),
                 Source = new UserSourceDTO(providerName: old.Source.ProviderName, providerAddress: old.Source.ProviderAddress),
                 Login = old.Login,
                 ImageData = old.ImageData.ToArray(),

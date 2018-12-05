@@ -1165,5 +1165,63 @@ namespace MappingGenerator.Test.MappingGenerator {
                 return ResourceManager.GetString("_020_MappingPropertiesInConstructorInheritedFromLibraryClass_FIXED", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO Map(string firstName, string lastName)
+        ///        {
+        ///            return new UserDTO
+        ///            {
+        ///               FirstName = firstName,
+        ///               LastName = lastName
+        ///            };
+        ///        }
+        ///    }
+        ///
+        ///    public class UserDTO
+        ///    {
+        ///        public string First [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _021_MultiParameterPureMappingMethod {
+            get {
+                return ResourceManager.GetString("_021_MultiParameterPureMappingMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO [|Map|](string firstName, string lastName)
+        ///        {
+        ///            throw new NotImplementedException();
+        ///        }
+        ///    }
+        ///
+        ///    public class UserDTO
+        ///    {
+        ///        public string FirstName { get;  }
+        ///        public string LastName { get; private set; }
+        ///        public [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _021_MultiParameterPureMappingMethod_FIxed {
+            get {
+                return ResourceManager.GetString("_021_MultiParameterPureMappingMethod_FIxed", resourceCulture);
+            }
+        }
     }
 }

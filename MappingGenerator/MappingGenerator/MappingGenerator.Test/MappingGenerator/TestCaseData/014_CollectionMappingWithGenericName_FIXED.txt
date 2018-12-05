@@ -21,11 +21,11 @@ namespace TestAutoMapper.Identity.X
 
         public static List<ZZ> MapNew(List<XX> dictionary)
         {
-            return dictionary.Select(item => new ZZ()
+            return dictionary.ConvertAll(item => new ZZ()
             {
                 Id = item.Id,
                 Name = item.Name
-            }).ToList();
+            });
         }
     }
 }

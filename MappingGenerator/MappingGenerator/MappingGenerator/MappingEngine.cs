@@ -268,16 +268,22 @@ namespace MappingGenerator
             var targetListElementType = MappingHelper.GetElementType(targetListType);
             if (ShouldCreateConversionBetweenTypes(targetListElementType, sourceListElementType))
             {
-                var selectAccess = syntaxGenerator.MemberAccessExpression(sourceAccess, "Select");
+                var useConvert = CanUseConvert(sourceListType);
+                var selectAccess = useConvert ?   syntaxGenerator.MemberAccessExpression(sourceAccess, "ConvertAll"): syntaxGenerator.MemberAccessExpression(sourceAccess, "Select");
                 var lambdaParameterName = NameHelper.CreateLambdaParameterName(sourceAccess);
                 var mappingLambda = CreateMappingLambda(lambdaParameterName, sourceListElementType, targetListElementType, mappingPath);
                 var selectInvocation = syntaxGenerator.InvocationExpression(selectAccess, mappingLambda);
-                var toList = AddMaterializeCollectionInvocation(syntaxGenerator, selectInvocation, targetListType);
+                var toList = useConvert? selectInvocation: AddMaterializeCollectionInvocation(syntaxGenerator, selectInvocation, targetListType);
                 return MappingHelper.WrapInReadonlyCollectionIfNecessary(toList, isReadonlyCollection, syntaxGenerator);
             }
 
             var toListInvocation = AddMaterializeCollectionInvocation(syntaxGenerator, sourceAccess, targetListType);
             return MappingHelper.WrapInReadonlyCollectionIfNecessary(toListInvocation, isReadonlyCollection, syntaxGenerator);
+        }
+
+        private bool CanUseConvert(ITypeSymbol sourceListType)
+        {
+            return sourceListType.Name == "List" && sourceListType.GetMembers("ConvertAll").Length != 0;
         }
 
 	    public SyntaxNode CreateMappingLambda(string lambdaParameterName, ITypeSymbol sourceListElementType, ITypeSymbol targetListElementType, MappingPath mappingPath)

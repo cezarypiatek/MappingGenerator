@@ -10,11 +10,11 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public static void Map(UserEntity src, UserDTO dst)
         {
             dst.Age = src.Age;
-            dst.Debs = src.Debs.Select(srcDeb => new AccountDTO()
+            dst.Debs = src.Debs.ConvertAll(srcDeb => new AccountDTO()
             {
                 BankName = srcDeb.BankName,
                 Number = srcDeb.Number
-            }).ToList();
+            });
             dst.Source = new UserSourceDTO(providerName: src.Source.ProviderName, providerAddress: src.Source.ProviderAddress);
             dst.ImageData = src.ImageData;
             dst.LuckyNumbers = src.LuckyNumbers;
@@ -27,14 +27,14 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                 FlatNo = src.MainAddress.FlatNo,
                 BuildingNo = src.MainAddress.BuildingNo
             };
-            dst.Addresses = src.Addresses.Select(srcAddress => new AddressDTO()
+            dst.Addresses = src.Addresses.ConvertAll(srcAddress => new AddressDTO()
             {
                 City = srcAddress.City,
                 ZipCode = srcAddress.ZipCode,
                 Street = srcAddress.Street,
                 FlatNo = srcAddress.FlatNo,
                 BuildingNo = srcAddress.BuildingNo
-            }).ToList().AsReadOnly();
+            }).AsReadOnly();
             dst.UnitId = src.Unit.Id;
         }
     }

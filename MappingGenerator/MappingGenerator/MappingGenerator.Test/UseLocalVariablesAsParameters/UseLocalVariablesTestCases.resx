@@ -119,21 +119,21 @@
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="_001_UserLocaVariablesToCompleteMethodInvocation" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\001_UserLocaVariablesToCompleteMethodInvocation.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\001_UserLocaVariablesToCompleteMethodInvocation.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_001_UserLocaVariablesToCompleteMethodInvocationWithNamedParameters_Fixed" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\001_UserLocaVariablesToCompleteMethodInvocationWithNamedParameters_Fixed.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\001_UserLocaVariablesToCompleteMethodInvocationWithNamedParameters_Fixed.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_001_UserLocaVariablesToCompleteMethodInvocation_Fixed" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\001_UserLocaVariablesToCompleteMethodInvocation_Fixed.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\001_UserLocaVariablesToCompleteMethodInvocation_Fixed.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_002_UserLocaVariablesToCompleteConstructorInvocation" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\002_UserLocaVariablesToCompleteConstructorInvocation.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\002_UserLocaVariablesToCompleteConstructorInvocation.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_002_UserLocaVariablesToCompleteConstructorInvocationWithNamedParameters_Fixed" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\002_UserLocaVariablesToCompleteConstructorInvocationWithNamedParameters_Fixed .cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\002_UserLocaVariablesToCompleteConstructorInvocationWithNamedParameters_Fixed .txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="_002_UserLocaVariablesToCompleteConstructorInvocation_Fixed" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>TestCaseData\002_UserLocaVariablesToCompleteConstructorInvocation_Fixed.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+    <value>TestCaseData\002_UserLocaVariablesToCompleteConstructorInvocation_Fixed.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
 </root>

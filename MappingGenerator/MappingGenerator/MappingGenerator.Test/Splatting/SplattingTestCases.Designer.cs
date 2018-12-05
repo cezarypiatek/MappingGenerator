@@ -72,7 +72,7 @@ namespace MappingGenerator.Test.Splatting {
         ///        public void DoSomething()
         ///        {
         ///            var user = new UserDTO();
-        ///            ProceessUser(user);
+        ///            ProceessUser([|user|]);
         ///        }
         ///
         ///        public void ProceessUser(string firstName, string lastName, int age)
@@ -85,7 +85,7 @@ namespace MappingGenerator.Test.Splatting {
         ///    public class UserDTO
         ///    {
         ///        public string FirstName { get; set; }
-        ///        public string LastNa [rest of string was truncated]&quot;;.
+        ///        public string La [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _001_SplattingInMethodInvocation {
             get {
@@ -302,7 +302,7 @@ namespace MappingGenerator.Test.Splatting {
         ///        public void DoSomething()
         ///        {
         ///            var user = new UserDTO();
-        ///            UserProcessor.ProceessUser(user);
+        ///            UserProcessor.ProceessUser(firstName: user.FirstName, lastName: user.LastName, age: user.Age);
         ///        }
         ///
         ///        public void ProceessUser(string firstName, string lastName, int age)
@@ -312,8 +312,7 @@ namespace MappingGenerator.Test.Splatting {
         ///    }
         ///
         ///    public class UserProcessor
-        ///    {
-        ///        public void ProceessUser(string firstName, string [rest of string was truncated]&quot;;.
+        ///    [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _003_SplattingWithBestOverloadMatch_FIXED {
             get {

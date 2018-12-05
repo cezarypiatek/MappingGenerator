@@ -4,7 +4,7 @@
    {
       public static AnotherClass DoSth()
       {
-          return new AnotherClass();
+          return new [|AnotherClass()|];
       }
 
 

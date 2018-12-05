@@ -37,7 +37,8 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                     FlatNo = entityAddress.FlatNo,
                     BuildingNo = entityAddress.BuildingNo
                 }).ToList().AsReadOnly(),
-                UnitId = entity.Unit.Id
+                UnitId = entity.Unit.Id,
+                ExtraSavings = entity.ExtraSavings.Value
             };
         }
     }
@@ -58,6 +59,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public AddressDTO MainAddress { get; set; }
         public ReadOnlyCollection<AddressDTO> Addresses { get; set; }
         public int UnitId { get; set; }
+        public decimal ExtraSavings { get; set; }
     }
 
     public class UserSourceDTO
@@ -111,6 +113,8 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         {
             throw new NotImplementedException();
         }
+
+        public decimal? ExtraSavings { get; set; }
     }
 
     public class AddressEntity

@@ -7,7 +7,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
 {
     public class TestMapper
     {
-        public static UserDTO [|Map|](UserEntity entity)
+        public static UserDTO [|Map|](string firstName, string lastName)
         {
             throw new NotImplementedException();
         }
@@ -15,8 +15,8 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
 
     public class UserDTO
     {
-        public string FirstName { get;  }
-        public string LastName { get; private set; }
+        public string FirstName { get;  set;}
+        public string LastName { get; set; }
         public int Age { get; set; }
         public int Cash { get;}
         public AccountDTO Account { get; private set; }
@@ -29,7 +29,6 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public AddressDTO MainAddress { get; set; }
         public ReadOnlyCollection<AddressDTO> Addresses { get; set; }
         public int UnitId { get; set; }
-        public decimal ExtraSavings { get; set; }
     }
 
     public class UserSourceDTO
@@ -83,8 +82,6 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         {
             throw new NotImplementedException();
         }
-
-        public decimal? ExtraSavings { get; set; }
     }
 
     public class AddressEntity

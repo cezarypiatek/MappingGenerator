@@ -12,11 +12,11 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
             return new TDto()
             {
                 Age = entity.Age,
-                Debs = entity.Debs.Select(entityDeb => new AccountDTO()
+                Debs = entity.Debs.ConvertAll(entityDeb => new AccountDTO()
                 {
                     BankName = entityDeb.BankName,
                     Number = entityDeb.Number
-                }).ToList(),
+                }),
                 Source = new UserSourceDTO(providerName: entity.Source.ProviderName, providerAddress: entity.Source.ProviderAddress),
                 ImageData = entity.ImageData,
                 LuckyNumbers = entity.LuckyNumbers,
@@ -104,7 +104,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public List<int> LuckyNumbers { get; set; }
         public AddressEntity MainAddress { get; set; }
         public string AddressCity { get; set; }
-        public List<AddressEntity> Addresses { get; set; }
+        public IList<AddressEntity> Addresses { get; set; }
         public UnitEntity Unit { get; set; }
 
         public int GetTotal()

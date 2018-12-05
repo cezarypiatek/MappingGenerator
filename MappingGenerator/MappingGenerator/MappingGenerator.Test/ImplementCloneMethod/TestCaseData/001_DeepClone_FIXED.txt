@@ -32,11 +32,11 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
             return new UserDTO()
             {
                 Age = Age,
-                Debs = Debs.Select(thisDeb => new AccountDTO()
+                Debs = Debs.ConvertAll(thisDeb => new AccountDTO()
                 {
                     BankName = thisDeb.BankName,
                     Number = thisDeb.Number
-                }).ToList(),
+                }),
                 Source = new UserSourceDTO(providerName: Source.ProviderName, providerAddress: Source.ProviderAddress),
                 Login = Login,
                 ImageData = ImageData.ToArray(),

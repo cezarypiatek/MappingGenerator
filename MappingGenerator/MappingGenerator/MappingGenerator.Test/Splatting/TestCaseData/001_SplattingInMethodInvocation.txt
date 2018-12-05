@@ -9,20 +9,7 @@ namespace MappingGenerator.Test.Splatting.TestCaseData
         public void DoSomething()
         {
             var user = new UserDTO();
-            UserProcessor.ProceessUser(user);
-        }
-
-        public void ProceessUser(string firstName, string lastName, int age)
-        {
-
-        }
-    }
-
-    public class UserProcessor
-    {
-        public void ProceessUser(string firstName, string lastName)
-        {
-
+            ProceessUser([|user|]);
         }
 
         public void ProceessUser(string firstName, string lastName, int age)

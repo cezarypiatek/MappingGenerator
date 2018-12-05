@@ -10,10 +10,13 @@ namespace MappingGenerator.Test.UseLocalVariablesAsParameters.TestCaseData
         {
             var age = 33;
             var weight = 80m;
-            DoSomethingElse();
+            new [|SampleClass()|];
         }
+    }
 
-        public void DoSomethingElse(string firstName, string lastName, int age, decimal weight)
+    public class SampleClass
+    {
+        public SampleClass(string firstName, string lastName, int age, decimal weight)
         {
 
         }

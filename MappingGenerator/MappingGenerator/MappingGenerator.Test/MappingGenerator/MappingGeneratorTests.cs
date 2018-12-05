@@ -134,6 +134,12 @@ namespace MappingGenerator.Test.Mapping
             TestCodeRefactoring(_020_MappingPropertiesInConstructorInheritedFromLibraryClass, _020_MappingPropertiesInConstructorInheritedFromLibraryClass_FIXED);
         }
 
+        [Test]
+        public void should_be_able_to_implement_multi_parameter_pure_method()
+        {
+            TestCodeRefactoring(_021_MultiParameterPureMappingMethod, _021_MultiParameterPureMappingMethod_FIxed);
+        }
+
         protected override string LanguageName => LanguageNames.CSharp;
 
         protected override CodeRefactoringProvider CreateProvider()

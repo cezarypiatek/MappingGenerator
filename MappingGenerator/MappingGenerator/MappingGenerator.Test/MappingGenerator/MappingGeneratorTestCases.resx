@@ -238,4 +238,10 @@
   <data name="_020_MappingPropertiesInConstructorInheritedFromLibraryClass_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>TestCaseData\020_MappingPropertiesInConstructorInheritedFromLibraryClass_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="_021_MultiParameterPureMappingMethod" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\021_MultiParameterPureMappingMethod.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_021_MultiParameterPureMappingMethod_FIxed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\021_MultiParameterPureMappingMethod_FIxed.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

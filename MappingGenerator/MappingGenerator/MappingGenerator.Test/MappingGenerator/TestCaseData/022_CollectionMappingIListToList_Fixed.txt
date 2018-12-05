@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace TestAutoMapper.Identity.X
@@ -11,7 +10,7 @@ namespace TestAutoMapper.Identity.X
         public string Name { get; set; }
     }
 
-    public class ZZ
+    public class YY
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -19,13 +18,13 @@ namespace TestAutoMapper.Identity.X
 
     public static class Mapper{
 
-        public static List<ZZ> MapNew(List<XX> usersList)
+        public static List<YY> Map(IList<XX> categories)
         {
-            return usersList.ConvertAll(user => new ZZ()
+            return categories.Select(category => new YY()
             {
-                Id = user.Id,
-                Name = user.Name
-            });
+                Id = category.Id,
+                Name = category.Name
+            }).ToList();
         }
     }
 }

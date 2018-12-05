@@ -13,12 +13,12 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
             return new Model1Vm()
             {
                 Id = src.Id,
-                Model2s = src.Model2s.Select(srcModel2 => new Model2Vm()
+                Model2s = src.Model2s.ConvertAll(srcModel2 => new Model2Vm()
                 {
                     Id = srcModel2.Id,
                     Model1 = srcModel2.Model1 /* Stop recursive mapping */,
                     Label = srcModel2.Label
-                }).ToList()
+                })
             };
         }
     }

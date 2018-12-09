@@ -103,10 +103,10 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///            return new UserDTO()
         ///            {
         ///                Age = entity.Age,
-        ///                Debs = entity.Debs.Select(entityDeb =&gt; new AccountDTO()
+        ///                Debs = entity.Debs.ConvertAll(entityDeb =&gt; new AccountDTO()
         ///                {
         ///                    BankName = entityDeb.BankName,
-        ///       [rest of string was truncated]&quot;;.
+        ///   [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _001_PureMappingMethod_FIXED {
             get {
@@ -156,8 +156,8 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///            return new TDto()
         ///            {
         ///                Age = entity.Age,
-        ///                Debs = entity.Debs.Select(entityDeb =&gt; new AccountDTO()
-        ///                {        /// [rest of string was truncated]&quot;;.
+        ///                Debs = entity.Debs.ConvertAll(entityDeb =&gt; new AccountDTO()
+        ///               [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _002_PureMappingMethodWithGenerics_FIXED {
             get {
@@ -206,12 +206,12 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///        public static void Map(UserEntity src, UserDTO dst)
         ///        {
         ///            dst.Age = src.Age;
-        ///            dst.Debs = src.Debs.Select(srcDeb =&gt; new AccountDTO()
+        ///            dst.Debs = src.Debs.ConvertAll(srcDeb =&gt; new AccountDTO()
         ///            {
         ///                BankName = srcDeb.BankName,
         ///                Number = srcDeb.Number
-        ///            }).ToList();
-        ///   [rest of string was truncated]&quot;;.
+        ///            });
+        ///        [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _003_MappingFromOneToAnotherParameter_FIXED {
             get {
@@ -439,10 +439,9 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///            return new Model1Vm()
         ///            {
         ///                Id = src.Id,
-        ///                Model2s = src.Model2s.Select(srcModel2 =&gt; new Model2Vm()
+        ///                Model2s = src.Model2s.ConvertAll(srcModel2 =&gt; new Model2Vm()
         ///                {
-        ///                    Id = srcModel2.Id,
-        ///    [rest of string was truncated]&quot;;.
+        ///                    Id = srcModel2.Id,        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _008_StopRecursingMapping_Fixed {
             get {
@@ -494,8 +493,8 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///            return new UserDTO()
         ///            {
         ///                Age = old.Age,
-        ///                Debs = old.Debs.Select(oldDeb =&gt; oldDeb.Clone() as AccountDTO).ToList(),
-        ///                Source = new UserSourceDTO(providerName: old.Source.ProviderName, providerAddress [rest of string was truncated]&quot;;.
+        ///                Debs = old.Debs.ConvertAll(oldDeb =&gt; oldDeb.Clone() as AccountDTO),
+        ///                Source = new UserSourceDTO(providerName: old.Source.ProviderName, providerAddress: old [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _009_IdentityFunctionMapping_FIXED {
             get {
@@ -590,11 +589,11 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///    {
         ///        public static List&lt;UserDTO&gt; Map(List&lt;UserDTO&gt; old)
         ///        {
-        ///            return old.Select(oldElement =&gt; new UserDTO()
+        ///            return old.ConvertAll(oldElement =&gt; new UserDTO()
         ///            {
         ///                Age = oldElement.Age,
-        ///                Debs = oldElement.Debs.Select(oldElementDeb =&gt; oldElementDeb.Clone() as AccountDTO).ToList(),
-        ///                Source = new Use [rest of string was truncated]&quot;;.
+        ///                Debs = oldElement.Debs.ConvertAll(oldElementDeb =&gt; oldElementDeb.Clone() as AccountDTO),
+        ///                Source = new User [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _011_IdentityFunctionMappingForCollection_FIXED {
             get {
@@ -658,8 +657,8 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public static List&lt;YY&gt; Map(List&lt;XX&gt; categories)
         ///        {
-        ///            return categories.Select(category =&gt; new YY()
-        ///       [rest of string was truncated]&quot;;.
+        ///            return categories.ConvertAll(category =&gt; new YY()
+        ///   [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _012_CollectionMappingWithSingularLambdaParameterName_FIXED {
             get {
@@ -919,9 +918,8 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public static List&lt;YY&gt; Map(List&lt;XX&gt; people)
         ///        {
-        ///            return people.Select(person =&gt; new YY()
-        ///            {
-        ///  [rest of string was truncated]&quot;;.
+        ///            return people.ConvertAll(person =&gt; new YY()
+        ///             [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _016_CollectionMappingWithIrregularSingularLambdaParameterName_FIXED {
             get {
@@ -985,7 +983,7 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public static List&lt;YY&gt; Map(List&lt;XX&gt; relatedPeople)
         ///        {
-        ///            return relatedPeople.Select(relatedPerson =&gt; new Y [rest of string was truncated]&quot;;.
+        ///            return relatedPeople.ConvertAll(relatedPerson =&gt; n [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _017_CollectionMappingWithIrregularCamelCaseSingularLambdaParameterName_FIXED {
             get {
@@ -1163,6 +1161,129 @@ namespace MappingGenerator.Test.MappingGenerator {
         internal static string _020_MappingPropertiesInConstructorInheritedFromLibraryClass_FIXED {
             get {
                 return ResourceManager.GetString("_020_MappingPropertiesInConstructorInheritedFromLibraryClass_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO [|Map|](string firstName, string lastName)
+        ///        {
+        ///            throw new NotImplementedException();
+        ///        }
+        ///    }
+        ///
+        ///    public class UserDTO
+        ///    {
+        ///        public string FirstName { get;  set;}
+        ///        public string LastName { get; set; }
+        ///        public int [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _021_MultiParameterPureMappingMethod {
+            get {
+                return ResourceManager.GetString("_021_MultiParameterPureMappingMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO Map(string firstName, string lastName)
+        ///        {
+        ///            return new UserDTO()
+        ///            {
+        ///                FirstName = firstName,
+        ///                LastName = lastName
+        ///            };
+        ///        }
+        ///    }
+        ///
+        ///    public class UserDTO
+        ///    {
+        ///        public string F [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _021_MultiParameterPureMappingMethod_FIxed {
+            get {
+                return ResourceManager.GetString("_021_MultiParameterPureMappingMethod_FIxed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Linq;
+        ///
+        ///namespace TestAutoMapper.Identity.X
+        ///{
+        ///    public class XX
+        ///    {
+        ///        public int Id { get; set; }
+        ///        public string Name { get; set; }
+        ///    }
+        ///
+        ///    public class YY
+        ///    {
+        ///        public int Id { get; set; }
+        ///        public string Name { get; set; }
+        ///    }
+        ///
+        ///    public static class Mapper{
+        ///
+        ///        public static List&lt;YY&gt; [|Map|](IList&lt;XX&gt; categories)
+        ///        {
+        ///            throw new NotImplementedException()
+        ///        }
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _022_CollectionMappingIListToList {
+            get {
+                return ResourceManager.GetString("_022_CollectionMappingIListToList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Linq;
+        ///
+        ///namespace TestAutoMapper.Identity.X
+        ///{
+        ///    public class XX
+        ///    {
+        ///        public int Id { get; set; }
+        ///        public string Name { get; set; }
+        ///    }
+        ///
+        ///    public class YY
+        ///    {
+        ///        public int Id { get; set; }
+        ///        public string Name { get; set; }
+        ///    }
+        ///
+        ///    public static class Mapper{
+        ///
+        ///        public static List&lt;YY&gt; Map(IList&lt;XX&gt; categories)
+        ///        {
+        ///            return categories.Select(category =&gt; new YY()
+        ///      [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _022_CollectionMappingIListToList_Fixed {
+            get {
+                return ResourceManager.GetString("_022_CollectionMappingIListToList_Fixed", resourceCulture);
             }
         }
     }

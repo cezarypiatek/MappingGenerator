@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections;
 using System.Collections.ObjectModel;
+using System;
 
 namespace TestAutoMapper
 {
@@ -31,7 +32,8 @@ namespace TestAutoMapper
         public ReadOnlyCollection<InnerDefaultObject> InnersReadonly { get; set; }
 
         public IList NonGenericInners { get; set; }
-        
+
+        public DateTime OccuredOn { get; set; }
     }
     
     class InnerDefaultObject
@@ -158,7 +160,8 @@ namespace TestAutoMapper
                 NonGenericInners = new ArrayList()
                 {
                     new object()
-                }
+                },
+                OccuredOn = DateTime.Now
             };
         }
     }

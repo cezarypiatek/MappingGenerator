@@ -44,10 +44,16 @@ namespace MappingGenerator
                 return syntaxGenerator.DefaultExpression(type)
                     .WithTrailingTrivia(SyntaxFactory.Comment(" /* Stop recursive mapping */"));
             }
-            
+
+            if (SymbolHelper.IsNullable(type, out var underlyingType))
+            {
+                type = underlyingType;
+            }
+
+
             if (type.TypeKind == TypeKind.Enum && type is INamedTypeSymbol namedTypeSymbol)
             {
-                var enumOptions = namedTypeSymbol.MemberNames.ToList();
+                var enumOptions = namedTypeSymbol.MemberNames.Where(x=>x!="value__" && x!=".ctor").ToList();
                 if (enumOptions.Count > 0)
                 {
                     return syntaxGenerator.MemberAccessExpression(syntaxGenerator.IdentifierName(namedTypeSymbol.Name), syntaxGenerator.IdentifierName(enumOptions[0]));
@@ -102,26 +108,56 @@ namespace MappingGenerator
                 {
                     var nt = type as INamedTypeSymbol;
 
+                    if (nt == null)
+                    {
+                        var genericTypeConstraints = type.UnwrapGeneric().ToList();
+                        if (genericTypeConstraints.Any() == false)
+                        {
+                            return GetDefaultForUnknown(type, SyntaxFactory.ParseTypeName("object"));
+                        }
+                        nt =  genericTypeConstraints.FirstOrDefault(x=>x.TypeKind == TypeKind.Class) as INamedTypeSymbol ??
+                              genericTypeConstraints.FirstOrDefault(x => x.TypeKind == TypeKind.Interface) as INamedTypeSymbol;
+                    }
+
+                    if (nt == null)
+                    {
+                        return GetDefaultForUnknownType(type);
+                    }
+
                     if (nt.TypeKind == TypeKind.Interface)
                     {
-                        var implementations =  SymbolFinder.FindImplementationsAsync(nt, this._document.Project.Solution).Result;
+                        var implementations =  SymbolFinder.FindImplementationsAsync(type, this._document.Project.Solution).Result;
                         var firstImplementation = implementations.FirstOrDefault();
                         if (firstImplementation is INamedTypeSymbol == false)
                         {
-                            return syntaxGenerator.DefaultExpression(nt)
-                                .WithTrailingTrivia(SyntaxFactory.Comment($" /* Cannot find any type implementing {nt.Name} */"));
+                            return GetDefaultForUnknownType(type);
                         }
 
                         nt = firstImplementation as INamedTypeSymbol;
-                        objectCreationExpression =
-                            (ObjectCreationExpressionSyntax) syntaxGenerator.ObjectCreationExpression(nt);
+                        objectCreationExpression = (ObjectCreationExpressionSyntax) syntaxGenerator.ObjectCreationExpression(nt);
 
+                    }else if (nt.TypeKind == TypeKind.Class && nt.IsAbstract)
+                    {
+                        var randomDerived = SymbolFinder.FindDerivedClassesAsync(nt, this._document.Project.Solution).Result
+                            .FirstOrDefault(x => x.IsAbstract == false);
+                        
+                        if (randomDerived != null)
+                        {
+                            nt = randomDerived;
+                            objectCreationExpression = (ObjectCreationExpressionSyntax)syntaxGenerator.ObjectCreationExpression(nt);
+                        }
                     }
 
-                    var hasDefaultConstructor = nt.Constructors.Any(x => x.Parameters.Length == 0);
-                    if (hasDefaultConstructor == false && nt.Constructors.Length >0)
+                    var publicConstructors = nt.Constructors.Where(x =>
+                        x.DeclaredAccessibility == Accessibility.Public ||
+                        (x.DeclaredAccessibility == Accessibility.Internal &&
+                         x.ContainingAssembly.IsSameAssemblyOrHasFriendAccessTo(_contextAssembly))).ToList();
+
+
+                    var hasDefaultConstructor = publicConstructors.Any(x => x.Parameters.Length == 0);
+                    if (hasDefaultConstructor == false && publicConstructors.Count > 0)
                     {
-                        var randomConstructor = nt.Constructors.First();
+                        var randomConstructor = publicConstructors.First();
                         var constructorArguments = randomConstructor.Parameters.Select(p => GetDefaultExpression(p.Type, mappingPath.Clone())).ToList();
                         objectCreationExpression = (ObjectCreationExpressionSyntax)syntaxGenerator.ObjectCreationExpression(nt, constructorArguments);
                     }
@@ -145,6 +181,11 @@ namespace MappingGenerator
             }
 
 
+            return GetDefaultForSpecialType(type);
+        }
+
+        private SyntaxNode GetDefaultForSpecialType(ITypeSymbol type)
+        {
             switch (type.SpecialType)
             {
                 case SpecialType.System_Boolean:
@@ -175,13 +216,27 @@ namespace MappingGenerator
                     return syntaxGenerator.LiteralExpression("lorem ipsum");
                 case SpecialType.System_Decimal:
                     return syntaxGenerator.LiteralExpression(2.0m);
+                case SpecialType.System_DateTime:
+                    return syntaxGenerator.MemberAccessExpression(SyntaxFactory.IdentifierName("DateTime"), "Now");
                 case SpecialType.System_Object:
-                    return SyntaxFactory.ObjectCreationExpression((TypeSyntax)syntaxGenerator.TypeExpression(type), SyntaxFactory.ArgumentList(),default(InitializerExpressionSyntax));
+                    return SyntaxFactory.ObjectCreationExpression((TypeSyntax) syntaxGenerator.TypeExpression(type),
+                        SyntaxFactory.ArgumentList(), default(InitializerExpressionSyntax));
                 default:
-                    return syntaxGenerator.LiteralExpression("ccc");
+                    return syntaxGenerator.LiteralExpression("/*TODO: provide value*/");
             }
         }
 
+        private SyntaxNode GetDefaultForUnknownType(ITypeSymbol type)
+        {
+            return syntaxGenerator.DefaultExpression(type)
+                .WithTrailingTrivia(SyntaxFactory.Comment($" /* Cannot find any type implementing {type.Name} */"));
+        }
+
+        private SyntaxNode GetDefaultForUnknown(ITypeSymbol type, TypeSyntax objectType)
+        {
+            return syntaxGenerator.DefaultExpression(objectType)
+                .WithTrailingTrivia(SyntaxFactory.Comment($" /* Cannot find any type implementing {type.Name} */"));
+        }
     }
 
     public static class TypeSyntaxFactory

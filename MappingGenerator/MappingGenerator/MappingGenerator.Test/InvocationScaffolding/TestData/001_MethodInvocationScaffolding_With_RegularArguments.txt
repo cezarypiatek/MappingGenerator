@@ -1,0 +1,15 @@
+﻿namespace Scaffolding
+{
+   public static class SampleClass
+   {
+      public static void DoSth()
+      {
+          [|DoSthElse()|];
+      }
+
+
+      public static void DoSthElse(string parameter1, int parameter2)
+      {
+      }
+   }
+}

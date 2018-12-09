@@ -153,15 +153,14 @@ namespace MappingGenerator.Test.UseLocalVariablesAsParameters {
         ///        {
         ///            var age = 33;
         ///            var weight = 80m;
-        ///            DoSomethingElse();
-        ///        }
-        ///
-        ///        public void DoSomethingElse(string firstName, string lastName, int age, decimal weight)
-        ///        {
-        ///
+        ///            new SampleClass();
         ///        }
         ///    }
-        ///}.
+        ///
+        ///    public class SampleClass
+        ///    {
+        ///        public SampleClass(string firstName, string lastName, int age, decimal weight)
+        ///        {        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _002_UserLocaVariablesToCompleteConstructorInvocation {
             get {
@@ -182,13 +181,13 @@ namespace MappingGenerator.Test.UseLocalVariablesAsParameters {
         ///        {
         ///            var age = 33;
         ///            var weight = 80m;
-        ///            DoSomethingElse(firstName, lastName, age, weight);
+        ///            new SampleClass(firstName, lastName, age, weight);
         ///        }
+        ///    }
         ///
-        ///        public void DoSomethingElse(string firstName, string lastName, int age, decimal weight)
-        ///        {
-        ///
-        /// [rest of string was truncated]&quot;;.
+        ///    public class SampleClass
+        ///    {
+        ///        public SampleClass(string firstName, string lastName, int  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _002_UserLocaVariablesToCompleteConstructorInvocation_Fixed {
             get {
@@ -209,10 +208,13 @@ namespace MappingGenerator.Test.UseLocalVariablesAsParameters {
         ///        {
         ///            var age = 33;
         ///            var weight = 80m;
-        ///            DoSomethingElse(firstName: firstName, lastName: lastName, age: age, weight: weight);
+        ///            new SampleClass(firstName: firstName, lastName: lastName, age: age, weight: weight);
         ///        }
+        ///    }
         ///
-        ///        public void DoSomethingElse(string firstName, string lastName, int a [rest of string was truncated]&quot;;.
+        ///    public class SampleClass
+        ///    {
+        ///        public SampleClass(strin [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _002_UserLocaVariablesToCompleteConstructorInvocationWithNamedParameters_Fixed {
             get {

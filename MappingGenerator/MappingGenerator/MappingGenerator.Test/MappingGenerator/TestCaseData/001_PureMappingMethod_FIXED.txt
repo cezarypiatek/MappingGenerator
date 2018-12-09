@@ -12,11 +12,11 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
             return new UserDTO()
             {
                 Age = entity.Age,
-                Debs = entity.Debs.Select(entityDeb => new AccountDTO()
+                Debs = entity.Debs.ConvertAll(entityDeb => new AccountDTO()
                 {
                     BankName = entityDeb.BankName,
                     Number = entityDeb.Number
-                }).ToList(),
+                }),
                 Source = new UserSourceDTO(providerName: entity.Source.ProviderName, providerAddress: entity.Source.ProviderAddress),
                 ImageData = entity.ImageData,
                 LuckyNumbers = entity.LuckyNumbers,
@@ -29,15 +29,16 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                     FlatNo = entity.MainAddress.FlatNo,
                     BuildingNo = entity.MainAddress.BuildingNo
                 },
-                Addresses = entity.Addresses.Select(entityAddress => new AddressDTO()
+                Addresses = entity.Addresses.ConvertAll(entityAddress => new AddressDTO()
                 {
                     City = entityAddress.City,
                     ZipCode = entityAddress.ZipCode,
                     Street = entityAddress.Street,
                     FlatNo = entityAddress.FlatNo,
                     BuildingNo = entityAddress.BuildingNo
-                }).ToList().AsReadOnly(),
-                UnitId = entity.Unit.Id
+                }).AsReadOnly(),
+                UnitId = entity.Unit.Id,
+                ExtraSavings = entity.ExtraSavings.Value
             };
         }
     }
@@ -58,6 +59,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public AddressDTO MainAddress { get; set; }
         public ReadOnlyCollection<AddressDTO> Addresses { get; set; }
         public int UnitId { get; set; }
+        public decimal ExtraSavings { get; set; }
     }
 
     public class UserSourceDTO
@@ -111,6 +113,8 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         {
             throw new NotImplementedException();
         }
+
+        public decimal? ExtraSavings { get; set; }
     }
 
     public class AddressEntity

@@ -18,6 +18,12 @@ namespace MappingGenerator
             this.localSymbols = semanticModel.LookupSymbols(nodeFromScope.GetLocation().SourceSpan.Start).Where(x=>x.Kind == SymbolKind.Local || x.Kind == SymbolKind.Parameter).ToList();
         }
 
+        public LocalScopeMappingSourceFinder(SemanticModel semanticModel, IMethodSymbol methodSymbol)
+        {
+            this.semanticModel = semanticModel;
+            this.localSymbols = methodSymbol.Parameters;
+        }
+
         public LocalScopeMappingSourceFinder(SemanticModel semanticModel, IReadOnlyList<ISymbol> localSymbols)
         {
             this.semanticModel = semanticModel;
@@ -35,11 +41,25 @@ namespace MappingGenerator
                     return new MappingElement()
                     {
                         ExpressionType = type,
-                        Expression = SyntaxFactory.IdentifierName(candidate.Name)
+                        Expression = CreateIdentifierName(candidate)
                     };
                 }
             }
             return null;
+        }
+
+        private static IdentifierNameSyntax CreateIdentifierName(ISymbol candidate)
+        {
+            var identifier = candidate.Name;
+            bool isAnyKeyword = SyntaxFacts.GetKeywordKind(identifier) != SyntaxKind.None
+                                || SyntaxFacts.GetContextualKeywordKind(identifier) != SyntaxKind.None;
+
+            if (isAnyKeyword)
+            {
+                return SyntaxFactory.IdentifierName("@"+identifier);
+            }
+
+            return SyntaxFactory.IdentifierName(identifier);
         }
 
         private ITypeSymbol GetType(ISymbol symbol)

@@ -164,5 +164,27 @@ namespace MappingGenerator
         {
             return x.IsKind(SyntaxKind.GetAccessorDeclaration) && x.Body ==null && x.ExpressionBody == null;
         }
+
+        public static bool IsNullable(ITypeSymbol type, out ITypeSymbol underlyingType)
+        {
+            if (type.TypeKind == TypeKind.Struct && type.Name == "Nullable")
+            {
+                underlyingType = GetUnderlyingNullableType(type);
+                return true;
+            }
+
+            underlyingType = null;
+            return false;
+        }
+
+        public static ITypeSymbol GetUnderlyingNullableType(ITypeSymbol type)
+        {
+            return ((INamedTypeSymbol) type).TypeArguments.First();
+        }
+
+        public static bool IsMultiParameterPureFunction(IMethodSymbol methodSymbol)
+        {
+            return methodSymbol.Parameters.Length > 1 && methodSymbol.ReturnsVoid == false;
+        }
     }
 }

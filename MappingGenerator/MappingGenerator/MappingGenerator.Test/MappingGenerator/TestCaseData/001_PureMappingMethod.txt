@@ -30,6 +30,8 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public ReadOnlyCollection<AddressDTO> Addresses { get; set; }
         public int UnitId { get; set; }
         public decimal ExtraSavings { get; set; }
+        public Nullable<decimal> Savings { get; set; }
+        public DateTime Birthday { get; set; }
     }
 
     public class UserSourceDTO
@@ -85,6 +87,8 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         }
 
         public decimal? ExtraSavings { get; set; }
+        public Nullable<decimal> Savings { get; set; }
+        public DateTime Birthday { get; set; }
     }
 
     public class AddressEntity

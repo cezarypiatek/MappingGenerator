@@ -204,7 +204,7 @@ namespace MappingGenerator
 
         private bool IsUnwrappingNeeded(ITypeSymbol targetType, MappingElement element)
         {
-            return targetType != element.ExpressionType && ObjectHelper.IsSimpleType(targetType);
+            return targetType.Equals(element.ExpressionType) == false && ObjectHelper.IsSimpleType(targetType);
         }
 
         private MappingElement TryToUnwrap(ITypeSymbol targetType, MappingElement element)

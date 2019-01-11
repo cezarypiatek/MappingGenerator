@@ -40,7 +40,8 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                 UnitId = entity.Unit.Id,
                 ExtraSavings = entity.ExtraSavings.Value,
                 Savings = entity.Savings,
-                Birthday = entity.Birthday
+                Birthday = entity.Birthday,
+                Authentication = entity.Authentication
             };
         }
     }
@@ -64,6 +65,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public decimal ExtraSavings { get; set; }
         public Nullable<decimal> Savings { get; set; }
         public DateTime Birthday { get; set; }
+        public AuthenticationKind Authentication { get; set;}
     }
 
     public class UserSourceDTO
@@ -121,6 +123,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public decimal? ExtraSavings { get; set; }
         public Nullable<decimal> Savings { get; set; }
         public DateTime Birthday { get; set; }
+        public AuthenticationKind Authentication { get; set;}
     }
 
     public class AddressEntity
@@ -148,5 +151,11 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
     {
         public string BankName { get; set; }
         public string Number { get; set; }
+    }
+
+    public enum AuthenticationKind
+    {
+        Password,
+        AD
     }
 }

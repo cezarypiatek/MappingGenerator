@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -105,6 +106,14 @@ namespace MappingGenerator
                 case SpecialType.System_Object:
                 case SpecialType.System_Decimal:
                 case SpecialType.System_DateTime:
+                case SpecialType.System_Enum:
+                    return true;
+            }
+
+
+            switch (type.TypeKind)
+            {
+                case TypeKind.Enum:
                     return true;
             }
 

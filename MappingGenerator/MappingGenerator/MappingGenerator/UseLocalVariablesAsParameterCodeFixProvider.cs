@@ -88,7 +88,7 @@ namespace MappingGenerator
                         var invocation = new MethodInvocation(invocationExpression);
                         if (invocationExpression.Expression is MemberAccessExpressionSyntax mae && mae.Name.ToFullString() == "Select")
                         {
-                            context.RegisterCodeFix(CodeAction.Create(title: titleWitSelect, createChangedDocument: c => CreateMappingLambda(context.Document, invocation,  c), equivalenceKey: titleWitSelect), diagnostic);
+                            context.RegisterCodeFix(CodeAction.Create(title: titleWitSelect, createChangedDocument: c => CreateMappingLambda(context.Document, invocationExpression,  c), equivalenceKey: titleWitSelect), diagnostic);
                         }
                         else
                         {
@@ -108,11 +108,11 @@ namespace MappingGenerator
             }
         }
 
-        private static async Task<Document> CreateMappingLambda(Document document, MethodInvocation invocation, CancellationToken cancellationToken)
+        private static async Task<Document> CreateMappingLambda(Document document, InvocationExpressionSyntax invocation, CancellationToken cancellationToken)
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
-            var methodInvocationSymbol = semanticModel.GetSymbolInfo(invocation.SourceNode);
+            var methodInvocationSymbol = semanticModel.GetSymbolInfo(invocation.Expression);
             var mappingOverload = methodInvocationSymbol.CandidateSymbols.OfType<IMethodSymbol>().FirstOrDefault(c => c.Parameters.Length == 1 && c.Parameters[0].Type.Name == "Func");
             if (mappingOverload == null)
             {
@@ -120,16 +120,16 @@ namespace MappingGenerator
             }
 
             var sourceElementType = ((INamedTypeSymbol)mappingOverload.Parameters[0].Type).TypeArguments[0];
-            var targetElementType = GetExpressionType(semanticModel, invocation.SourceNode);
+            var targetElementType = GetExpressionType(semanticModel, invocation);
             if (targetElementType == null)
             {
                 return document;
             }
 
-            var contextAssembly = semanticModel.FindContextAssembly(invocation.SourceNode);
+            var contextAssembly = semanticModel.FindContextAssembly(invocation);
             var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
             var mappingLambda = mappingEngine.CreateMappingLambda("x", sourceElementType, targetElementType, new MappingPath());
-            return await document.ReplaceNodes(invocation.SourceNode, invocation.WithArgumentList(SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument((ExpressionSyntax)mappingLambda))), cancellationToken);
+            return await document.ReplaceNodes(invocation, invocation.WithArgumentList(SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument((ExpressionSyntax)mappingLambda))), cancellationToken);
         }
 
         private static ITypeSymbol GetExpressionType(SemanticModel semanticModel, SyntaxNode sourceNodeParent)

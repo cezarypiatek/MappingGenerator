@@ -146,6 +146,18 @@ namespace MappingGenerator.Test.Mapping
             TestCodeRefactoring(_022_CollectionMappingIListToList, _022_CollectionMappingIListToList_Fixed);
         }
 
+        [Test]
+        public void should_be_able_to_replace_lambda_body_with_mapping_body()
+        {
+            TestCodeRefactoring(_023_PureLambdaMappingMethod, _023_PureLambdaMappingMethod_FIXED);
+        }
+
+        [Test]
+        public void should_be_able_to_replace_invalid_body_with_mapping_body()
+        {
+            TestCodeRefactoring(_024_InvalidSyntaxPureMappingMethod, _024_InvalidSyntaxPureMappingMethod_FIXED);
+        }
+
         protected override string LanguageName => LanguageNames.CSharp;
 
         protected override CodeRefactoringProvider CreateProvider()

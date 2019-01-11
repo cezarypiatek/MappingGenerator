@@ -1286,5 +1286,111 @@ namespace MappingGenerator.Test.MappingGenerator {
                 return ResourceManager.GetString("_022_CollectionMappingIListToList_Fixed", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO [|Map|](UserEntity entity)=&gt; null;
+        ///    }
+        ///
+        ///    public class UserDTO
+        ///    {
+        ///        public string FirstName { get;  }
+        ///        public string LastName { get; private set; }
+        ///        public int Age { get; set; }
+        ///        public int Cash { get;}
+        ///        public AccountD [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _023_PureLambdaMappingMethod {
+            get {
+                return ResourceManager.GetString("_023_PureLambdaMappingMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO Map(UserEntity entity)
+        ///        {
+        ///            return new UserDTO()
+        ///            {
+        ///                Age = entity.Age,
+        ///                Debs = entity.Debs.Select(entityDeb =&gt; new AccountDTO()
+        ///                {
+        ///                    BankName = entityDeb.BankName,
+        ///       [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _023_PureLambdaMappingMethod_FIXED {
+            get {
+                return ResourceManager.GetString("_023_PureLambdaMappingMethod_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO [|Map|](UserEntity entity)
+        ///    }
+        ///
+        ///    public class UserDTO
+        ///    {
+        ///        public string FirstName { get;  }
+        ///        public string LastName { get; private set; }
+        ///        public int Age { get; set; }
+        ///        public int Cash { get;}
+        ///        public AccountDTO Accou [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _024_InvalidSyntaxPureMappingMethod {
+            get {
+                return ResourceManager.GetString("_024_InvalidSyntaxPureMappingMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO Map(UserEntity entity)
+        ///        {
+        ///            return new UserDTO()
+        ///            {
+        ///                Age = entity.Age,
+        ///                Debs = entity.Debs.Select(entityDeb =&gt; new AccountDTO()
+        ///                {
+        ///                    BankName = entityDeb.BankName,
+        ///       [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _024_InvalidSyntaxPureMappingMethod_FIXED {
+            get {
+                return ResourceManager.GetString("_024_InvalidSyntaxPureMappingMethod_FIXED", resourceCulture);
+            }
+        }
     }
 }

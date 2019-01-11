@@ -1,8 +1,10 @@
+using System;
 using System.Composition;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MappingGenerator.MethodHelpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeRefactorings;
@@ -67,13 +69,22 @@ namespace MappingGenerator
             }
         }
 
-        private async Task<Document> GenerateMappingMethodBody(Document document, BaseMethodDeclarationSyntax methodSyntax, CancellationToken cancellationToken)
+        private async Task<Document> GenerateMappingMethodBody(Document document,
+            BaseMethodDeclarationSyntax methodSyntax, CancellationToken cancellationToken)
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var methodSymbol = semanticModel.GetDeclaredSymbol(methodSyntax);
             var generator = SyntaxGenerator.GetGenerator(document);
             var mappingExpressions = GenerateMappingCode(methodSymbol, generator, semanticModel);
-            return await document.ReplaceNodes(methodSyntax.Body, ((BaseMethodDeclarationSyntax)generator.MethodDeclaration(methodSymbol, mappingExpressions)).Body, cancellationToken);
+            var blockSyntax = SyntaxFactory.Block(mappingExpressions.Select(AsStatement)).WithAdditionalAnnotations(Formatter.Annotation);
+            return await document.ReplaceNodes(methodSyntax, methodSyntax.WithOnlyBody(blockSyntax), cancellationToken);
+        }
+
+        private StatementSyntax AsStatement(SyntaxNode node)
+        {
+            if (node is ExpressionSyntax expression)
+                return SyntaxFactory.ExpressionStatement(expression);
+            return (StatementSyntax)node;
         }
 
         private static IEnumerable<SyntaxNode> GenerateMappingCode(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)

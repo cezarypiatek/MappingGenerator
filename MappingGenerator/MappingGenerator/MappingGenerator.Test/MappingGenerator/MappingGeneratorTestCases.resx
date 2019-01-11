@@ -250,4 +250,16 @@
   <data name="_022_CollectionMappingIListToList_Fixed" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>TestCaseData\022_CollectionMappingIListToList_Fixed.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="_023_PureLambdaMappingMethod" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\023_PureLambdaMappingMethod.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_023_PureLambdaMappingMethod_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\023_PureLambdaMappingMethod_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_024_InvalidSyntaxPureMappingMethod" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\024_InvalidSyntaxPureMappingMethod.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_024_InvalidSyntaxPureMappingMethod_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\024_InvalidSyntaxPureMappingMethod_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

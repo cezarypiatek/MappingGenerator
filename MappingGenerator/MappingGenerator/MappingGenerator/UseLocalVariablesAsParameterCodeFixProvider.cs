@@ -86,9 +86,13 @@ namespace MappingGenerator
                     if (invocationExpression.ArgumentList.Arguments.Count == 0)
                     {
                         var invocation = new MethodInvocation(invocationExpression);
-                        if (invocationExpression.Expression is MemberAccessExpressionSyntax mae && mae.Name.ToFullString() == "Select")
+                        if (invocationExpression.Expression is MemberAccessExpressionSyntax mae)
                         {
-                            context.RegisterCodeFix(CodeAction.Create(title: titleWitSelect, createChangedDocument: c => CreateMappingLambda(context.Document, invocationExpression,  c), equivalenceKey: titleWitSelect), diagnostic);
+                            var methodName = mae.Name.ToFullString();
+                            if (methodName == "Select" || methodName == "ConvertAll")
+                            {
+                                context.RegisterCodeFix(CodeAction.Create(title: titleWitSelect, createChangedDocument: c => CreateMappingLambda(context.Document, invocationExpression,  c), equivalenceKey: titleWitSelect), diagnostic);
+                            }
                         }
                         else
                         {
@@ -113,7 +117,7 @@ namespace MappingGenerator
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
             var methodInvocationSymbol = semanticModel.GetSymbolInfo(invocation.Expression);
-            var mappingOverload = methodInvocationSymbol.CandidateSymbols.OfType<IMethodSymbol>().FirstOrDefault(c => c.Parameters.Length == 1 && c.Parameters[0].Type.Name == "Func");
+            var mappingOverload = methodInvocationSymbol.CandidateSymbols.OfType<IMethodSymbol>().FirstOrDefault(IsMappingMethod);
             if (mappingOverload == null)
             {
                 return document;
@@ -130,6 +134,21 @@ namespace MappingGenerator
             var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
             var mappingLambda = mappingEngine.CreateMappingLambda("x", sourceElementType, targetElementType, new MappingPath());
             return await document.ReplaceNodes(invocation, invocation.WithArgumentList(SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument((ExpressionSyntax)mappingLambda))), cancellationToken);
+        }
+
+        private static bool IsMappingMethod(IMethodSymbol c)
+        {
+            if (c.Parameters.Length == 1 && c.Parameters[0].Type.Name == "Func")
+            {
+                return true;
+            }
+
+            if (c.Parameters.Length == 1 && c.Parameters[0].Type.Name == "Converter")
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private static ITypeSymbol GetExpressionType(SemanticModel semanticModel, SyntaxNode sourceNodeParent)
@@ -156,7 +175,7 @@ namespace MappingGenerator
             }
 
             var typeInfo = semanticModel.GetTypeInfo(sourceNodeParent);
-            if (typeInfo.ConvertedType != null && typeInfo.ConvertedType.Kind != SymbolKind.ErrorType && typeInfo.ConvertedType is INamedTypeSymbol nt)
+            if (typeInfo.ConvertedType != null && typeInfo.ConvertedType.Kind != SymbolKind.ErrorType && typeInfo.ConvertedType is INamedTypeSymbol nt && nt.TypeArguments.Length >0 && nt.TypeArguments[0] is INamedTypeSymbol)
                 return nt.TypeArguments[0];
             return GetExpressionType(semanticModel, sourceNodeParent.Parent);
         }

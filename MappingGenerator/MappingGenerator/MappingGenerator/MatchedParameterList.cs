@@ -25,6 +25,11 @@ namespace MappingGenerator
 
         private List<MatchedParameter> Matches { get; } = new List<MatchedParameter>();
 
+        public IReadOnlyList<MappingElement> GetMatchedSources()
+        {
+            return Matches.Where(x => x.Source != null).Select(x => x.Source).ToList();
+        }
+
         public void AddMatch(IParameterSymbol parameter, MappingElement  mappingSrc=null)
         {
             Matches.Add(new MatchedParameter()

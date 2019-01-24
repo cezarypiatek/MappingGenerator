@@ -17,7 +17,10 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                     BankName = entityDeb.BankName,
                     Number = entityDeb.Number
                 }),
-                Source = new UserSourceDTO(providerName: entity.Source.ProviderName, providerAddress: entity.Source.ProviderAddress),
+                Source = new UserSourceDTO(providerName: entity.Source.ProviderName, providerAddress: entity.Source.ProviderAddress)
+                {
+                    IsActive = entity.Source.IsActive
+                },
                 ImageData = entity.ImageData,
                 LuckyNumbers = entity.LuckyNumbers,
                 Total = entity.GetTotal(),
@@ -72,6 +75,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
     {
         public string ProviderName { get; set; }
         public string ProviderAddress { get; set; }
+        public bool IsActive {get; set;}
 
         public UserSourceDTO(string providerName, string providerAddress)
         {
@@ -145,6 +149,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
     {
         public string ProviderName { get; set; }
         public string ProviderAddress { get; set; }
+        public bool IsActive {get; set;}
     }
 
     public class AccountEntity

@@ -39,6 +39,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
     {
         public string ProviderName { get; set; }
         public string ProviderAddress { get; set; }
+        public bool IsActive {get; set;}
 
         public UserSourceDTO(string providerName, string providerAddress)
         {
@@ -112,6 +113,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
     {
         public string ProviderName { get; set; }
         public string ProviderAddress { get; set; }
+        public bool IsActive {get; set;}
     }
 
     public class AccountEntity

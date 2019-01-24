@@ -135,11 +135,16 @@ namespace MappingGenerator
 
                 if (matchedOverload != null)
                 {
-                    var creationExpression = syntaxGenerator.ObjectCreationExpression(targetType, matchedOverload.ToArgumentListSyntax(this).Arguments);
+                    var creationExpression = ((ObjectCreationExpressionSyntax)syntaxGenerator.ObjectCreationExpression(targetType, matchedOverload.ToArgumentListSyntax(this).Arguments));
+                    var matchedSources = matchedOverload.GetMatchedSources();
+                    var restSourceFinder = new IgnorableMappingSourceFinder(subMappingSourceFinder,  foundElement =>
+                        {
+                            return matchedSources.Any(x => x.Expression.IsEquivalentTo(foundElement.Expression));
+                        });
                     return new MappingElement()
                     {
                         ExpressionType = targetType,
-                        Expression = (ExpressionSyntax) creationExpression
+                        Expression =   AddInitializerWithMapping(creationExpression, restSourceFinder, targetType, mappingPath)
                     };
                 }
             }
@@ -160,8 +165,11 @@ namespace MappingGenerator
             MappingPath mappingPath = null)
         {
             var propertiesToSet = ObjectHelper.GetFieldsThaCanBeSetPublicly(createdObjectTyp, contextAssembly);
-            var assignments = MapUsingSimpleAssignment(syntaxGenerator, propertiesToSet, mappingSourceFinder, mappingPath);
-
+            var assignments = MapUsingSimpleAssignment(syntaxGenerator, propertiesToSet, mappingSourceFinder, mappingPath).ToList();
+            if (assignments.Count == 0)
+            {
+                return objectCreationExpression;
+            }
             var initializerExpressionSyntax = SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression, new SeparatedSyntaxList<ExpressionSyntax>().AddRange(assignments)).FixInitializerExpressionFormatting(objectCreationExpression);
             return objectCreationExpression.WithInitializer(initializerExpressionSyntax);
         }

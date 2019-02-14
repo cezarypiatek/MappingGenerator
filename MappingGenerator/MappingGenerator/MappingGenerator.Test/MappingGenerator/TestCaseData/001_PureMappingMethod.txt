@@ -33,6 +33,8 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public Nullable<decimal> Savings { get; set; }
         public DateTime Birthday { get; set; }
         public AuthenticationKind Authentication { get; set;}
+        public string SecondAuthentication { get; set;}
+        public AuthenticationKind ThirdAuthentication { get; set;}
     }
 
     public class UserSourceDTO
@@ -92,6 +94,8 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public Nullable<decimal> Savings { get; set; }
         public DateTime Birthday { get; set; }
         public AuthenticationKind Authentication { get; set;}
+        public AuthenticationKind SecondAuthentication { get; set;}
+        public string ThirdAuthentication { get; set;}
     }
 
     public class AddressEntity

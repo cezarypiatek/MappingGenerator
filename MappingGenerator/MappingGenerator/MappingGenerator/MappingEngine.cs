@@ -229,7 +229,8 @@ namespace MappingGenerator
                         Expression = (ExpressionSyntax) syntaxGenerator.MemberAccessExpression(sourceAccess, wrapper.UnwrappingProperty.Name),
                         ExpressionType = wrapper.UnwrappingProperty.Type
                     };
-                }else if (wrapper.Type == WrapperInfoType.Method)
+                }
+                if (wrapper.Type == WrapperInfoType.Method)
                 {
                     var unwrappingMethodAccess = syntaxGenerator.MemberAccessExpression(sourceAccess, wrapper.UnwrappingMethod.Name);
                     
@@ -241,7 +242,33 @@ namespace MappingGenerator
                     };
                 }
 
-            }else if(conversion.IsExplicit)
+                if (targetType.SpecialType == SpecialType.System_String && element.ExpressionType.TypeKind == TypeKind.Enum)
+                {
+                    var toStringAccess = syntaxGenerator.MemberAccessExpression(element.Expression, "ToString");
+                    return new MappingElement()
+                    {
+                        Expression = (InvocationExpressionSyntax)syntaxGenerator.InvocationExpression(toStringAccess),
+                        ExpressionType = targetType
+                    };
+                }
+
+                if (element.ExpressionType.SpecialType == SpecialType.System_String && targetType.TypeKind  == TypeKind.Enum)
+                {
+                    var parseEnumAccess = syntaxGenerator.MemberAccessExpression(SyntaxFactory.ParseTypeName("Enum"), "Parse");
+                    return new MappingElement()
+                    {
+                        Expression = (InvocationExpressionSyntax)syntaxGenerator.InvocationExpression(parseEnumAccess, new[]
+                        {
+                            syntaxGenerator.TypeOfExpression(SyntaxFactory.ParseTypeName(targetType.Name)),
+                            element.Expression,
+                            syntaxGenerator.TrueLiteralExpression()
+                        }),
+                        ExpressionType = targetType
+                    };
+                }
+
+            }
+            else if(conversion.IsExplicit)
             {
                 return new MappingElement()
                 {

@@ -17,7 +17,7 @@ namespace MappingGenerator
         public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType)
         {
             var mapping = wrappedFinder.FindMappingSource(targetName, targetType);
-            return ignore(mapping) ? null : mapping;
+            return mapping == null || ignore(mapping) ? null : mapping;
         }
 
     }

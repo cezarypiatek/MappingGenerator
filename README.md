@@ -23,6 +23,12 @@ If you find this extension useful (you feel it helps you on the daily basis) you
 ### Contributing
 Before you start any contributig work, plase read the [contribution guidline](/docs/CONTRIBUTING.md)
 
+### Using along with Resharper
+
+If you are not able to open Roslyn refactoring menu (`ctr + .`) please verify your Resharper settings related to `Visual Studio Integration`. For more information please check [#50](https://github.com/cezarypiatek/MappingGenerator/issues/50)
+
+![resharper settings](doc/resharper_settings.jpg)
+
 ## Main features
 
 ### Generate mapping method body

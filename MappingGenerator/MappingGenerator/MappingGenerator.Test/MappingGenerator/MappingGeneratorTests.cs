@@ -158,6 +158,13 @@ namespace MappingGenerator.Test.Mapping
             TestCodeRefactoring(_024_InvalidSyntaxPureMappingMethod, _024_InvalidSyntaxPureMappingMethod_FIXED);
         }
 
+
+        [Test]
+        public void should_be_able_to_convert_this_object_to_other()
+        {
+            TestCodeRefactoring(_025_ThisObjectToOtherMapping, _025_ThisObjectToOtherMapping_FIXED);
+        }
+
         protected override string LanguageName => LanguageNames.CSharp;
 
         protected override CodeRefactoringProvider CreateProvider()

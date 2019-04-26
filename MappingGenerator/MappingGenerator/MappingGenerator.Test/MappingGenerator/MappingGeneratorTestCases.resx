@@ -262,4 +262,10 @@
   <data name="_024_InvalidSyntaxPureMappingMethod_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>TestCaseData\024_InvalidSyntaxPureMappingMethod_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="_025_ThisObjectToOtherMapping" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\025_ThisObjectToOtherMapping.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_025_ThisObjectToOtherMapping_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\025_ThisObjectToOtherMapping_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

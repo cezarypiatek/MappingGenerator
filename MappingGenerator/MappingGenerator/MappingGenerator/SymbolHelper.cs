@@ -186,5 +186,13 @@ namespace MappingGenerator
         {
             return methodSymbol.Parameters.Length > 1 && methodSymbol.ReturnsVoid == false;
         }
+
+        public static bool IsThisObjectToOtherConvert(IMethodSymbol methodSymbol)
+        {
+            return methodSymbol.IsStatic == false && 
+                   methodSymbol.Parameters.Length == 0 && 
+                   methodSymbol.ReturnsVoid == false && 
+                   ObjectHelper.IsSimpleType(methodSymbol.ReturnType) == false;
+        }
     }
 }

@@ -1,0 +1,44 @@
+﻿using System;
+
+namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+{
+    public struct Category { }
+    public struct Tag { }
+    public class CreateProductCommand
+    {
+        public string Name { get; set; }
+
+        public decimal Price { get; set; }
+
+        public Category Category { get; set; }
+
+        public Tag[] Tags { get; set; }
+
+        public Product [|ToProduct()|]
+        {
+           throw new NotImplementedException();
+        }
+    }
+
+    public class Product
+    {
+        public Product(string name, decimal price, Category category, Tag[] tags)
+        {
+            Id = new Guid();
+            Name = name;
+            Price = price;
+            Category = category;
+            Tags = tags;
+        }
+
+        public Guid Id { get; private set; }
+
+        public string Name { get; private set; }
+
+        public decimal Price { get; private set; }
+
+        public Category Category { get; private set; }
+
+        public Tag[] Tags { get; private set; }
+    }
+}

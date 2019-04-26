@@ -1,4 +1,3 @@
-using System;
 using System.Composition;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,19 +36,13 @@ namespace MappingGenerator
                     {
                         var semanticModel = await context.Document.GetSemanticModelAsync();
                         var methodSymbol = semanticModel.GetDeclaredSymbol(methodDeclaration);
-                        var allParameterHaveNames = methodSymbol.Parameters.All(x => string.IsNullOrWhiteSpace(x.Name) == false);
-                        if (allParameterHaveNames == false)
+
+                        if (IsCompleteMethodDeclarationSymbol(methodSymbol) == false)
                         {
                             return;
                         }
 
-                        if (SymbolHelper.IsPureMappingFunction(methodSymbol) ||
-                            SymbolHelper.IsMultiParameterPureFunction(methodSymbol) ||
-                            SymbolHelper.IsUpdateThisObjectFunction(methodSymbol) ||
-                            SymbolHelper.IsUpdateParameterFunction(methodSymbol) ||
-                            SymbolHelper.IsMultiParameterUpdateThisObjectFunction(methodSymbol) ||
-                            SymbolHelper.IsThisObjectToOtherConvert(methodSymbol)
-                        )
+                        if (IsMappingMethod(methodSymbol))
                         {
                             context.RegisterRefactoring(CodeAction.Create(title: title, createChangedDocument: c => GenerateMappingMethodBody(context.Document, methodDeclaration, c), equivalenceKey: title));
                            
@@ -57,7 +50,7 @@ namespace MappingGenerator
                     }
                     break;
                 case ConstructorDeclarationSyntax constructorDeclaration:
-                    if (constructorDeclaration.ParameterList.Parameters.Count >= 1)
+                    if (IsMappingConstructor(constructorDeclaration))
                     {
                         context.RegisterRefactoring(CodeAction.Create(title: title, createChangedDocument: c => GenerateMappingMethodBody(context.Document, constructorDeclaration, c), equivalenceKey: title));
                     }
@@ -70,8 +63,28 @@ namespace MappingGenerator
             }
         }
 
-        private async Task<Document> GenerateMappingMethodBody(Document document,
-            BaseMethodDeclarationSyntax methodSyntax, CancellationToken cancellationToken)
+        private static bool IsCompleteMethodDeclarationSymbol(IMethodSymbol methodSymbol)
+        {
+            var allParameterHaveNames = methodSymbol.Parameters.All(x => string.IsNullOrWhiteSpace(x.Name) == false);
+            return allParameterHaveNames;
+        }
+
+        private static bool IsMappingConstructor(ConstructorDeclarationSyntax constructorDeclaration)
+        {
+            return constructorDeclaration.ParameterList.Parameters.Count >= 1;
+        }
+
+        private static bool IsMappingMethod(IMethodSymbol methodSymbol)
+        {
+            return SymbolHelper.IsPureMappingFunction(methodSymbol) ||
+                   SymbolHelper.IsMultiParameterPureFunction(methodSymbol) ||
+                   SymbolHelper.IsUpdateThisObjectFunction(methodSymbol) ||
+                   SymbolHelper.IsUpdateParameterFunction(methodSymbol) ||
+                   SymbolHelper.IsMultiParameterUpdateThisObjectFunction(methodSymbol) ||
+                   SymbolHelper.IsThisObjectToOtherConvert(methodSymbol);
+        }
+
+        private async Task<Document> GenerateMappingMethodBody(Document document, BaseMethodDeclarationSyntax methodSyntax, CancellationToken cancellationToken)
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var methodSymbol = semanticModel.GetDeclaredSymbol(methodSyntax);
@@ -90,81 +103,135 @@ namespace MappingGenerator
 
         private static IEnumerable<SyntaxNode> GenerateMappingCode(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
         {
-
             if (SymbolHelper.IsIdentityMappingFunction(methodSymbol))
             {
-                var cloneMappingEngine = new CloneMappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
-                var source = methodSymbol.Parameters[0];
-                var targetType = methodSymbol.ReturnType;
-                var newExpression = cloneMappingEngine.MapExpression((ExpressionSyntax)generator.IdentifierName(source.Name), source.Type, targetType);
-                return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };
+                return GenerateIdentityMappingFunctionExpressions(methodSymbol, generator, semanticModel);
             }
-
-            var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
-
+            
             if (SymbolHelper.IsPureMappingFunction(methodSymbol))
             {
-                var source = methodSymbol.Parameters[0];
-                var targetType = methodSymbol.ReturnType;
-                var newExpression = mappingEngine.MapExpression((ExpressionSyntax)generator.IdentifierName(source.Name), source.Type, targetType);
-                return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };
+                return GenerateSingleParameterPureMappingFunctionExpressions(methodSymbol, generator, semanticModel);
             }
             
             if (SymbolHelper.IsMultiParameterPureFunction(methodSymbol))
             {
-                var targetType = methodSymbol.ReturnType;
-                var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol);
-                var newExpression = mappingEngine.AddInitializerWithMapping((ObjectCreationExpressionSyntax)generator.ObjectCreationExpression(targetType), sourceFinder, targetType);
-                return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };
+                return GenerateMultiParameterPureMappingFunctionExpressions(methodSymbol, generator, semanticModel);
             }
 
             if (SymbolHelper.IsUpdateParameterFunction(methodSymbol))
             {
-                var source = methodSymbol.Parameters[0];
-                var target = methodSymbol.Parameters[1];
-                var targets = ObjectHelper.GetFieldsThaCanBeSetPublicly(target.Type, methodSymbol.ContainingAssembly);
-                var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator);
-                return mappingEngine.MapUsingSimpleAssignment(generator, targets, sourceFinder, globalTargetAccessor: generator.IdentifierName(target.Name));
+                return GenerateUpdateSecondParameterFunctionExpressions(methodSymbol, generator, semanticModel);
             }
 
             if (SymbolHelper.IsUpdateThisObjectFunction(methodSymbol))
             {
-                var source = methodSymbol.Parameters[0];
-                var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator);
-                var targets = ObjectHelper.GetFieldsThaCanBeSetPrivately(methodSymbol.ContainingType);
-                return mappingEngine.MapUsingSimpleAssignment(generator, targets, sourceFinder);
+                return GenerateSingleParameterUpdateThisObjectFunctionExpressions(methodSymbol, generator, semanticModel);
             }
 
             if (SymbolHelper.IsMultiParameterUpdateThisObjectFunction(methodSymbol))
             {
-                var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters);
-                var targets = ObjectHelper.GetFieldsThaCanBeSetPrivately(methodSymbol.ContainingType);
-                return mappingEngine.MapUsingSimpleAssignment(generator, targets, sourceFinder);
+                return GenerateMultiParameterUpdateThisObjectFunctionExpressions(methodSymbol, generator, semanticModel);
             }
 
             if (SymbolHelper.IsMappingConstructor(methodSymbol))
             {
-                var source = methodSymbol.Parameters[0];
-                var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator);
-                var targets = ObjectHelper.GetFieldsThaCanBeSetFromConstructor(methodSymbol.ContainingType);
-                return mappingEngine.MapUsingSimpleAssignment(generator, targets, sourceFinder);
+                return GenerateSingleParameterMappingConstructor(methodSymbol, generator, semanticModel);
             }
 
             if (SymbolHelper.IsMultiParameterMappingConstructor(methodSymbol))
             {
-                var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters);
-                var targets = ObjectHelper.GetFieldsThaCanBeSetFromConstructor(methodSymbol.ContainingType);
-                return mappingEngine.MapUsingSimpleAssignment(generator, targets, sourceFinder);
+                return GenerateMultiParameterMappingConstructor(methodSymbol, generator, semanticModel);
             }
 
             if (SymbolHelper.IsThisObjectToOtherConvert(methodSymbol))
             {
-                var targetType = methodSymbol.ReturnType;
-                var newExpression = mappingEngine.MapExpression((ExpressionSyntax)generator.ThisExpression(), methodSymbol.ContainingType, targetType);
-                return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };
+                return GenerateThisObjectToOtherFunctionExpressions(methodSymbol, generator, semanticModel);
             }
 
             return Enumerable.Empty<SyntaxNode>();
+        }
+
+        private static IEnumerable<SyntaxNode> GenerateThisObjectToOtherFunctionExpressions(IMethodSymbol methodSymbol,
+            SyntaxGenerator generator, SemanticModel semanticModel)
+        {
+            var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
+            var targetType = methodSymbol.ReturnType;
+            var newExpression = mappingEngine.MapExpression((ExpressionSyntax) generator.ThisExpression(), methodSymbol.ContainingType, targetType);
+            return new[] {generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation)};
+        }
+
+        private static IEnumerable<SyntaxNode> GenerateMultiParameterMappingConstructor(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
+        {
+            var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
+            var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters);
+            var targets = ObjectHelper.GetFieldsThaCanBeSetFromConstructor(methodSymbol.ContainingType);
+            return mappingEngine.MapUsingSimpleAssignment(generator, targets, sourceFinder);
+        }
+
+        private static IEnumerable<SyntaxNode> GenerateSingleParameterMappingConstructor(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
+        {
+            var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
+            var source = methodSymbol.Parameters[0];
+            var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator);
+            var targets = ObjectHelper.GetFieldsThaCanBeSetFromConstructor(methodSymbol.ContainingType);
+            return mappingEngine.MapUsingSimpleAssignment(generator, targets, sourceFinder);
+        }
+
+        private static IEnumerable<SyntaxNode> GenerateMultiParameterUpdateThisObjectFunctionExpressions(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
+        {
+            var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
+            var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters);
+            var targets = ObjectHelper.GetFieldsThaCanBeSetPrivately(methodSymbol.ContainingType);
+            return mappingEngine.MapUsingSimpleAssignment(generator, targets, sourceFinder);
+        }
+
+        private static IEnumerable<SyntaxNode> GenerateSingleParameterUpdateThisObjectFunctionExpressions(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
+        {
+            var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
+            var source = methodSymbol.Parameters[0];
+            var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator);
+            var targets = ObjectHelper.GetFieldsThaCanBeSetPrivately(methodSymbol.ContainingType);
+            return mappingEngine.MapUsingSimpleAssignment(generator, targets, sourceFinder);
+        }
+
+        private static IEnumerable<SyntaxNode> GenerateUpdateSecondParameterFunctionExpressions(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
+        {
+            var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
+            var source = methodSymbol.Parameters[0];
+            var target = methodSymbol.Parameters[1];
+            var targets = ObjectHelper.GetFieldsThaCanBeSetPublicly(target.Type, methodSymbol.ContainingAssembly);
+            var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator);
+            return mappingEngine.MapUsingSimpleAssignment(generator, targets, sourceFinder, globalTargetAccessor: generator.IdentifierName(target.Name));
+        }
+
+        private static IEnumerable<SyntaxNode> GenerateMultiParameterPureMappingFunctionExpressions(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
+        {
+            var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
+            var targetType = methodSymbol.ReturnType;
+            var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol);
+            var newExpression = mappingEngine.AddInitializerWithMapping(
+                (ObjectCreationExpressionSyntax) generator.ObjectCreationExpression(targetType), sourceFinder, targetType);
+            return new[] {generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation)};
+        }
+
+        private static IEnumerable<SyntaxNode> GenerateSingleParameterPureMappingFunctionExpressions(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
+        {
+            var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
+            var source = methodSymbol.Parameters[0];
+            var targetType = methodSymbol.ReturnType;
+            var newExpression = mappingEngine.MapExpression((ExpressionSyntax) generator.IdentifierName(source.Name),
+                source.Type, targetType);
+            return new[] {generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation)};
+        }
+
+        private static IEnumerable<SyntaxNode> GenerateIdentityMappingFunctionExpressions(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
+        {
+            var cloneMappingEngine = new CloneMappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
+            var source = methodSymbol.Parameters[0];
+            var targetType = methodSymbol.ReturnType;
+            var newExpression = cloneMappingEngine.MapExpression((ExpressionSyntax) generator.IdentifierName(source.Name),
+                source.Type, targetType);
+            return new[] {generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation)};
         }
     }
 }

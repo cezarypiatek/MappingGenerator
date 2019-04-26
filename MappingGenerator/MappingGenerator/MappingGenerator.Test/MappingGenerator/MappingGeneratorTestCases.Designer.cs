@@ -19,7 +19,7 @@ namespace MappingGenerator.Test.MappingGenerator {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class MappingGeneratorTestCases {
@@ -1329,10 +1329,10 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///            return new UserDTO()
         ///            {
         ///                Age = entity.Age,
-        ///                Debs = entity.Debs.Select(entityDeb =&gt; new AccountDTO()
+        ///                Debs = entity.Debs.ConvertAll(entityDeb =&gt; new AccountDTO()
         ///                {
         ///                    BankName = entityDeb.BankName,
-        ///       [rest of string was truncated]&quot;;.
+        ///   [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _023_PureLambdaMappingMethod_FIXED {
             get {
@@ -1382,14 +1382,73 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///            return new UserDTO()
         ///            {
         ///                Age = entity.Age,
-        ///                Debs = entity.Debs.Select(entityDeb =&gt; new AccountDTO()
+        ///                Debs = entity.Debs.ConvertAll(entityDeb =&gt; new AccountDTO()
         ///                {
         ///                    BankName = entityDeb.BankName,
-        ///       [rest of string was truncated]&quot;;.
+        ///   [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _024_InvalidSyntaxPureMappingMethod_FIXED {
             get {
                 return ResourceManager.GetString("_024_InvalidSyntaxPureMappingMethod_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public struct Category { }
+        ///    public struct Tag { }
+        ///    public class CreateProductCommand
+        ///    {
+        ///        public string Name { get; set; }
+        ///
+        ///        public decimal Price { get; set; }
+        ///
+        ///        public Category Category { get; set; }
+        ///
+        ///        public Tag[] Tags { get; set; }
+        ///
+        ///        public Product [|ToProduct()|]
+        ///        {
+        ///           throw new NotImplementedException();
+        ///        }
+        ///    }
+        ///
+        ///    public class Prod [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _025_ThisObjectToOtherMapping {
+            get {
+                return ResourceManager.GetString("_025_ThisObjectToOtherMapping", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public struct Category { }
+        ///    public struct Tag { }
+        ///    public class CreateProductCommand
+        ///    {
+        ///        public string Name { get; set; }
+        ///
+        ///        public decimal Price { get; set; }
+        ///
+        ///        public Category Category { get; set; }
+        ///
+        ///        public Tag[] Tags { get; set; }
+        ///
+        ///        public Product [|ToProduct()|]
+        ///        {
+        ///           return new Product(name: Name, price: Price, category: Category, tags: Tags);
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _025_ThisObjectToOtherMapping_FIXED {
+            get {
+                return ResourceManager.GetString("_025_ThisObjectToOtherMapping_FIXED", resourceCulture);
             }
         }
     }

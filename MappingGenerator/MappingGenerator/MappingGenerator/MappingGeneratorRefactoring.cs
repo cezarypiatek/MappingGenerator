@@ -33,7 +33,7 @@ namespace MappingGenerator
             switch (node)
             {
                 case MethodDeclarationSyntax methodDeclaration:
-                    if (methodDeclaration.Parent.Kind() != SyntaxKind.InterfaceDeclaration && methodDeclaration.ParameterList.Parameters.Count > 0)
+                    if (methodDeclaration.Parent.Kind() != SyntaxKind.InterfaceDeclaration )
                     {
                         var semanticModel = await context.Document.GetSemanticModelAsync();
                         var methodSymbol = semanticModel.GetDeclaredSymbol(methodDeclaration);
@@ -47,7 +47,8 @@ namespace MappingGenerator
                             SymbolHelper.IsMultiParameterPureFunction(methodSymbol) ||
                             SymbolHelper.IsUpdateThisObjectFunction(methodSymbol) ||
                             SymbolHelper.IsUpdateParameterFunction(methodSymbol) ||
-                            SymbolHelper.IsMultiParameterUpdateThisObjectFunction(methodSymbol) 
+                            SymbolHelper.IsMultiParameterUpdateThisObjectFunction(methodSymbol) ||
+                            SymbolHelper.IsThisObjectToOtherConvert(methodSymbol)
                         )
                         {
                             context.RegisterRefactoring(CodeAction.Create(title: title, createChangedDocument: c => GenerateMappingMethodBody(context.Document, methodDeclaration, c), equivalenceKey: title));
@@ -155,6 +156,14 @@ namespace MappingGenerator
                 var targets = ObjectHelper.GetFieldsThaCanBeSetFromConstructor(methodSymbol.ContainingType);
                 return mappingEngine.MapUsingSimpleAssignment(generator, targets, sourceFinder);
             }
+
+            if (SymbolHelper.IsThisObjectToOtherConvert(methodSymbol))
+            {
+                var targetType = methodSymbol.ReturnType;
+                var newExpression = mappingEngine.MapExpression((ExpressionSyntax)generator.ThisExpression(), methodSymbol.ContainingType, targetType);
+                return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };
+            }
+
             return Enumerable.Empty<SyntaxNode>();
         }
     }

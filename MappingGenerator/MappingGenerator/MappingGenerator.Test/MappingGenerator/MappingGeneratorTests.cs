@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using MappingGenerator.Features.Refactorings.Mapping;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeRefactorings;

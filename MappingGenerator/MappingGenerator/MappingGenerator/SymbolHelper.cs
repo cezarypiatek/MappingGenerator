@@ -8,56 +8,9 @@ namespace MappingGenerator
 {
     internal static class SymbolHelper
     {
-        public static bool IsUpdateParameterFunction(IMethodSymbol methodSymbol)
-        {
-            if (IsConstructor(methodSymbol))
-            {
-                return false;
-            }
-            return methodSymbol.Parameters.Length == 2 && methodSymbol.ReturnsVoid;
-        }
-
-        private static bool IsConstructor(IMethodSymbol methodSymbol)
+        public static bool IsConstructor(IMethodSymbol methodSymbol)
         {
             return methodSymbol.MethodKind == MethodKind.Constructor;
-        }
-
-        public static bool IsUpdateThisObjectFunction(IMethodSymbol methodSymbol)
-        {
-            if (IsConstructor(methodSymbol))
-            {
-                return false;
-            }
-            return methodSymbol.Parameters.Length == 1 && methodSymbol.ReturnsVoid;
-        }
-        
-        public static bool IsMultiParameterUpdateThisObjectFunction(IMethodSymbol methodSymbol)
-        {
-            if (IsConstructor(methodSymbol))
-            {
-                return false;
-            }
-            return methodSymbol.Parameters.Length > 1 && methodSymbol.ReturnsVoid;
-        }
-
-        public static bool IsPureMappingFunction(IMethodSymbol methodSymbol)
-        {
-            return methodSymbol.Parameters.Length == 1 && methodSymbol.ReturnsVoid == false;
-        }
-
-        public static bool IsIdentityMappingFunction(IMethodSymbol methodSymbol)
-        {
-            return methodSymbol.Parameters.Length == 1 && methodSymbol.ReturnType.Equals(methodSymbol.Parameters[0].Type);
-        }
-
-        public static bool IsMappingConstructor(IMethodSymbol methodSymbol)
-        {
-            return methodSymbol.Parameters.Length == 1 && methodSymbol.MethodKind == MethodKind.Constructor;
-        }  
-        
-        public static bool IsMultiParameterMappingConstructor(IMethodSymbol methodSymbol)
-        {
-            return methodSymbol.Parameters.Length > 1 && methodSymbol.MethodKind == MethodKind.Constructor;
         }
 
         public static IEnumerable<ITypeSymbol> UnwrapGeneric(this ITypeSymbol typeSymbol)
@@ -180,19 +133,6 @@ namespace MappingGenerator
         public static ITypeSymbol GetUnderlyingNullableType(ITypeSymbol type)
         {
             return ((INamedTypeSymbol) type).TypeArguments.First();
-        }
-
-        public static bool IsMultiParameterPureFunction(IMethodSymbol methodSymbol)
-        {
-            return methodSymbol.Parameters.Length > 1 && methodSymbol.ReturnsVoid == false;
-        }
-
-        public static bool IsThisObjectToOtherConvert(IMethodSymbol methodSymbol)
-        {
-            return methodSymbol.IsStatic == false && 
-                   methodSymbol.Parameters.Length == 0 && 
-                   methodSymbol.ReturnsVoid == false && 
-                   ObjectHelper.IsSimpleType(methodSymbol.ReturnType) == false;
         }
     }
 }

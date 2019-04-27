@@ -1,4 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace MappingGenerator
 {
@@ -28,6 +30,13 @@ namespace MappingGenerator
             
 
             return tokenParent.Parent == null ? null : FindNearestContainer<T1, T2>(tokenParent.Parent);
+        }
+
+        public static StatementSyntax AsStatement(this SyntaxNode node)
+        {
+            if (node is ExpressionSyntax expression)
+                return SyntaxFactory.ExpressionStatement(expression);
+            return (StatementSyntax)node;
         }
     }
 }

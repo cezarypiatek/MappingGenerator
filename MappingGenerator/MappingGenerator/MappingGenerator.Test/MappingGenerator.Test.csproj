@@ -14,11 +14,11 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="NUnit" Version="3.10.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
+    <PackageReference Include="RoslynNUnitLight.NetStandard" Version="1.2.5" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MappingGenerator\MappingGenerator.csproj" />
-    <ProjectReference Include="..\RoslynNunitLight\RoslynNUnitLight.NetStandard\RoslynNUnitLight.NetStandard.csproj" />
   </ItemGroup>
 
   <ItemGroup>

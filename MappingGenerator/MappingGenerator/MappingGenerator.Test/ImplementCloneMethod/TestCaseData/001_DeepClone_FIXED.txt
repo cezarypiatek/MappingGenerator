@@ -26,6 +26,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public AddressDTO MainAddress { get; set; }
         public ReadOnlyCollection<AddressDTO> Addresses { get; set; }
         public int UnitId { get; set; }
+        public int? Rate { get; set; }
 
         public UserDTO Clone()
         {
@@ -59,6 +60,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                     BuildingNo = thisAddress.BuildingNo
                 }).ToList().AsReadOnly(),
                 UnitId = UnitId,
+                Rate = Rate,
                 Id = Id
             };
         }

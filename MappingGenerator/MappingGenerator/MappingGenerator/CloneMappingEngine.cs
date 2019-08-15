@@ -16,6 +16,11 @@ namespace MappingGenerator
 
         protected override bool ShouldCreateConversionBetweenTypes(ITypeSymbol targetType, ITypeSymbol sourceType)
         {
+            if (targetType.Equals(sourceType) && SymbolHelper.IsNullable(targetType, out _))
+            {
+                return false;
+            }
+
             return  ObjectHelper.IsSimpleType(targetType) == false && ObjectHelper.IsSimpleType(sourceType) == false;
         }
 

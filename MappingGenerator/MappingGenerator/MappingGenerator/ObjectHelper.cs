@@ -83,8 +83,6 @@ namespace MappingGenerator
             return current.Name == "ReadOnlyCollection";
         }
 
-        private static string[] SimpleTypes = new[] {"String", "Decimal"};
-
         public static bool IsSimpleType(ITypeSymbol type)
         {
 

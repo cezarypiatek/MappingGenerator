@@ -108,10 +108,10 @@ namespace MappingGenerator.Features.Refactorings.Mapping
             new IdentityMappingMethodImplementor(),
             new SingleParameterPureMappingMethodImplementor(),
             new MultiParameterPureMappingMethodImplementor(),
-            new UpdateSecondParameterMappingMethodImplementor(),
-            new UpdateThisObjectSingleParameterMappingMethodImplementor(),
+            new FallbackMappingImplementor(new UpdateSecondParameterMappingMethodImplementor(),new UpdateThisObjectMultiParameterMappingMethodImplementor()),
+            new FallbackMappingImplementor(new UpdateThisObjectSingleParameterMappingMethodImplementor(),  new UpdateThisObjectMultiParameterMappingMethodImplementor()),
             new UpdateThisObjectMultiParameterMappingMethodImplementor(),
-            new SingleParameterMappingConstructorImplementor(),
+            new FallbackMappingImplementor(new SingleParameterMappingConstructorImplementor(),new MultiParameterMappingConstructorImplementor()),
             new MultiParameterMappingConstructorImplementor(),
             new ThisObjectToOtherMappingMethodImplementor()
         };

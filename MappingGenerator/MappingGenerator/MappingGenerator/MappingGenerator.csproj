@@ -4,22 +4,24 @@
     <TargetFramework>netstandard1.3</TargetFramework>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   
   <PropertyGroup>
     <PackageId>MappingGenerator</PackageId>
-    <PackageVersion>1.0.0.0</PackageVersion>
-    <Authors>cepi</Authors>
+    <PackageVersion>2.0.0.0</PackageVersion>
+    <Authors>Cezary Piątek</Authors>
     <PackageLicenseUrl>https://github.com/cezarypiatek/MappingGenerator/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/cezarypiatek/MappingGenerator</PackageProjectUrl>
     <PackageIconUrl>https://github.com/cezarypiatek/MappingGenerator/raw/master/MappingGenerator/MappingGenerator/MappingGenerator.Vsix/icon.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/cezarypiatek/MappingGenerator</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Description>MappingGenerator</Description>
+    <Description>"AutoMapper" like, Roslyn based, code fix provider that allows to generate mapping code in design time.</Description>
     <PackageReleaseNotes></PackageReleaseNotes>
     <Copyright>Copyright</Copyright>
     <PackageTags>MappingGenerator, analyzers</PackageTags>
     <NoPackageAnalysis>true</NoPackageAnalysis>
+    <Version>2.0.0</Version>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -28,8 +30,8 @@
    
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="2.8.2" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Features" Version="2.0.0" />
-    <PackageReference Include="Pluralize.NET" Version="0.1.84" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Features" Version="2.0.0" PrivateAssets="all" />
+    <PackageReference Include="Pluralize.NET" Version="0.1.84" PrivateAssets="all" />
     <PackageReference Update="NETStandard.Library" PrivateAssets="all" />
   </ItemGroup>
 
@@ -40,6 +42,7 @@
   <ItemGroup>
     <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(OutputPath)\Pluralize.NET.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
 
 </Project>

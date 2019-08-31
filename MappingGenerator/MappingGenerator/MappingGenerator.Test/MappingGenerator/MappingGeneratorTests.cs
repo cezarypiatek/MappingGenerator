@@ -4,7 +4,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeRefactorings;
 using NUnit.Framework;
-using RoslynNUnitLight;
+using RoslynTestKit;
 using static MappingGenerator.Test.MappingGenerator.MappingGeneratorTestCases;
 
 namespace MappingGenerator.Test.Mapping

@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeRefactorings;
 using NUnit.Framework;
-using RoslynNUnitLight;
+using RoslynTestKit;
 
 namespace MappingGenerator.Test.ImplementCloneMethod
 {

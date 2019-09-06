@@ -1,8 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using NUnit.Framework;
-using RoslynNUnitLight;
-using TestHelper;
+using RoslynTestKit;
 using static MappingGenerator.Test.InvocationScaffolding.InvocationScaffoldingTestCases;
 
 namespace MappingGenerator.Test.InvocationScaffolding

@@ -83,8 +83,6 @@ namespace MappingGenerator
             return current.Name == "ReadOnlyCollection";
         }
 
-        private static string[] SimpleTypes = new[] {"String", "Decimal"};
-
         public static bool IsSimpleType(ITypeSymbol type)
         {
 
@@ -164,10 +162,5 @@ namespace MappingGenerator
             var symbol = semanticModel.GetDeclaredSymbol(type);
             return symbol.ContainingAssembly;
         }
-    }
-
-    struct SampleStruct
-    {
-        public int Test { get; set; }
     }
 }

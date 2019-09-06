@@ -1,9 +1,8 @@
 using Microsoft.CodeAnalysis.CodeFixes;
-using TestHelper;
 using MappingGenerator.Test.UseLocalVariablesAsParameters;
 using Microsoft.CodeAnalysis;
 using NUnit.Framework;
-using RoslynNUnitLight;
+using RoslynTestKit;
 
 namespace MappingGenerator.Test
 {

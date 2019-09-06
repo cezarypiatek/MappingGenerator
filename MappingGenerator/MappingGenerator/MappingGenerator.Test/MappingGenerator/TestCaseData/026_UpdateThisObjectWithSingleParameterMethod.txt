@@ -1,0 +1,14 @@
+﻿using System;
+
+namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+{
+    public class Person
+    {
+        public int Age { get; set; }
+        public string Name { get; set; }
+
+        public void [|Update|](int age)
+        {
+        }
+    }
+}

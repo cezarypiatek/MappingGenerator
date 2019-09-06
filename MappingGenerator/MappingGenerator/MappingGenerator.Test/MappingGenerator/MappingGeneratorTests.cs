@@ -4,7 +4,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeRefactorings;
 using NUnit.Framework;
-using RoslynNUnitLight;
+using RoslynTestKit;
 using static MappingGenerator.Test.MappingGenerator.MappingGeneratorTestCases;
 
 namespace MappingGenerator.Test.Mapping
@@ -30,22 +30,28 @@ namespace MappingGenerator.Test.Mapping
         }
 
         [Test]
-        public void should_be_able_to_generate_update_this_object_function_with_single_parameter()
+        public void should_be_able_to_generate_update_this_object_function_with_single_parameter_by_decomposition()
         {
-            TestCodeRefactoring(_004_UpdateThisObjectWithSingleParameter, _004_UpdateThisObjectWithSingleParameter_FIXED);
+            TestCodeRefactoring(_004_UpdateThisObjectWithSingleParameterDecomposition, _004_UpdateThisObjectWithSingleParameterDecomposition_FIXED);
         }
 
-        //TODO: Function not implemented yet
-        //[TestMethod]
-        //public void should_be_able_to_generate_update_this_object_function_with_multiple_parameters()
-        //{
-        //    VerifyMapper(_005_UpdateThisObjectWithMultipleParameters, _005_UpdateThisObjectWithMultipleParameters_FIXED, LocationFromTestFile(22, 13));
-        //}
+
+        [Test]
+        public void should_be_able_to_generate_update_this_object_function_with_multiple_parameters()
+        {
+            TestCodeRefactoring(_005_UpdateThisObjectWithMultipleParameters, _005_UpdateThisObjectWithMultipleParameters_FIXED);
+        }
+
+        [Test]
+        public void should_be_able_to_generate_update_this_object_function_with_two_parameters()
+        {
+            TestCodeRefactoring(_005_UpdateThisObjectWithTwoParameters, _005_UpdateThisObjectWithTwoParameters_FIXED);
+        }
 
         [Test]
         public void should_be_able_to_generate_mapping_constructor_with_single_parameter()
         {
-            TestCodeRefactoring(_006_ConstructorWithSingleParameter, _006_ConstructorWithSingleParameter_FIXED);
+            TestCodeRefactoring(_006_ConstructorWithSingleParameterDecomposition, _006_ConstructorWithSingleParameterDecomposition_FIXED);
         }
 
         [Test]
@@ -166,6 +172,17 @@ namespace MappingGenerator.Test.Mapping
             TestCodeRefactoring(_025_ThisObjectToOtherMapping, _025_ThisObjectToOtherMapping_FIXED);
         }
 
+        [Test]
+        public void should_be_able_to_generate_update_this_object_function_with_single_parameter_by_direct_mapping()
+        {
+            TestCodeRefactoring(_026_UpdateThisObjectWithSingleParameterMethod, _026_UpdateThisObjectWithSingleParameterMethod_FIXED);
+        }
+        [Test]
+        public void should_be_able_to_generate_constructor_mapping_with_single_parameter_by_direct_mapping()
+        {
+            TestCodeRefactoring(_027_ConstructorWithSingleParameter, _027_ConstructorWithSingleParameter_FIXED);
+        }
+
         protected override string LanguageName => LanguageNames.CSharp;
 
         protected override CodeRefactoringProvider CreateProvider()
@@ -179,3 +196,4 @@ namespace MappingGenerator.Test.Mapping
         }.ToImmutableList();}
     }
 }
+

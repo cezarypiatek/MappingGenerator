@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using MappingGenerator.Test.Splatting;
 using Microsoft.CodeAnalysis;
 using NUnit.Framework;
-using RoslynNUnitLight;
+using RoslynTestKit;
 
 namespace MappingGenerator.Test
 {

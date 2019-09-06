@@ -212,7 +212,7 @@ namespace MappingGenerator
 
         private bool IsUnwrappingNeeded(ITypeSymbol targetType, MappingElement element)
         {
-            return targetType.Equals(element.ExpressionType) == false && ObjectHelper.IsSimpleType(targetType);
+            return targetType.Equals(element.ExpressionType) == false && (ObjectHelper.IsSimpleType(targetType) || SymbolHelper.IsNullable(targetType, out _));
         }
 
         private MappingElement TryToUnwrap(ITypeSymbol targetType, MappingElement element)

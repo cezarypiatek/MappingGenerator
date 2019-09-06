@@ -1,7 +1,13 @@
 ﻿namespace MappingGenerator.Test.MappingGenerator.TestCaseData
 {
-    public class 005_UpdateThisObjectWithMultipleParameters
+    public class Person
     {
-        
+        public int Age { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+
+        public void [|Update|](int age, string firstName, string lastName)
+        {
+        }
     }
 }

@@ -237,9 +237,9 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///        public List&lt;AccountDTO&gt; Debs { get; set; }
         ///        public UserSourceD [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string _004_UpdateThisObjectWithSingleParameter {
+        internal static string _004_UpdateThisObjectWithSingleParameterDecomposition {
             get {
-                return ResourceManager.GetString("_004_UpdateThisObjectWithSingleParameter", resourceCulture);
+                return ResourceManager.GetString("_004_UpdateThisObjectWithSingleParameterDecomposition", resourceCulture);
             }
         }
         
@@ -261,18 +261,24 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///        public List&lt;AccountDTO&gt; Debs { get; set; }
         ///        public UserSourceD [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string _004_UpdateThisObjectWithSingleParameter_FIXED {
+        internal static string _004_UpdateThisObjectWithSingleParameterDecomposition_FIXED {
             get {
-                return ResourceManager.GetString("_004_UpdateThisObjectWithSingleParameter_FIXED", resourceCulture);
+                return ResourceManager.GetString("_004_UpdateThisObjectWithSingleParameterDecomposition_FIXED", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         ///{
-        ///    public class 005_UpdateThisObjectWithMultipleParameters
+        ///    public class Person
         ///    {
-        ///        
+        ///        public int Age { get; set; }
+        ///        public string FirstName { get; set; }
+        ///        public string LastName { get; set; }
+        ///
+        ///        public void [|Update|](int age, string firstName, string lastName)
+        ///        {
+        ///        }
         ///    }
         ///}.
         /// </summary>
@@ -285,9 +291,18 @@ namespace MappingGenerator.Test.MappingGenerator {
         /// <summary>
         ///   Looks up a localized string similar to namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         ///{
-        ///    public class 005_UpdateThisObjectWithMultipleParameters_FIXED
+        ///    public class Person
         ///    {
-        ///        
+        ///        public int Age { get; set; }
+        ///        public string FirstName { get; set; }
+        ///        public string LastName { get; set; }
+        ///
+        ///        public void Update(int age, string firstName, string lastName)
+        ///        {
+        ///            Age = age;
+        ///            FirstName = firstName;
+        ///            LastName = lastName;
+        ///        }
         ///    }
         ///}.
         /// </summary>
@@ -298,26 +313,47 @@ namespace MappingGenerator.Test.MappingGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to using System;
-        ///using System.Collections.Generic;
-        ///using System.Text;
-        ///using System.Collections.ObjectModel;
-        ///
-        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///   Looks up a localized string similar to namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         ///{
-        ///    public class UserDTO
+        ///    public class Person
         ///    {
-        ///        public string FirstName { get; }
-        ///        public string LastName { get; private set; }
         ///        public int Age { get; set; }
-        ///        public int Cash { get;}
-        ///        public AccountDTO Account { get; private set; }
-        ///        public List&lt;AccountDTO&gt; Debs { get; set; }
-        ///        public UserSourceD [rest of string was truncated]&quot;;.
+        ///        public string FirstName { get; set; }
+        ///        public string LastName { get; set; }
+        ///
+        ///        public void [|Update|](int age, string firstName, string lastName)
+        ///        {
+        ///        }
+        ///    }
+        ///}.
         /// </summary>
-        internal static string _006_ConstructorWithSingleParameter {
+        internal static string _005_UpdateThisObjectWithTwoParameters {
             get {
-                return ResourceManager.GetString("_006_ConstructorWithSingleParameter", resourceCulture);
+                return ResourceManager.GetString("_005_UpdateThisObjectWithTwoParameters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class Person
+        ///    {
+        ///        public int Age { get; set; }
+        ///        public string FirstName { get; set; }
+        ///        public string LastName { get; set; }
+        ///
+        ///        public void Update(int age, string firstName, string lastName)
+        ///        {
+        ///            Age = age;
+        ///            FirstName = firstName;
+        ///            LastName = lastName;
+        ///        }
+        ///    }
+        ///}.
+        /// </summary>
+        internal static string _005_UpdateThisObjectWithTwoParameters_FIXED {
+            get {
+                return ResourceManager.GetString("_005_UpdateThisObjectWithTwoParameters_FIXED", resourceCulture);
             }
         }
         
@@ -339,9 +375,33 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///        public List&lt;AccountDTO&gt; Debs { get; set; }
         ///        public UserSourceD [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string _006_ConstructorWithSingleParameter_FIXED {
+        internal static string _006_ConstructorWithSingleParameterDecomposition {
             get {
-                return ResourceManager.GetString("_006_ConstructorWithSingleParameter_FIXED", resourceCulture);
+                return ResourceManager.GetString("_006_ConstructorWithSingleParameterDecomposition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class UserDTO
+        ///    {
+        ///        public string FirstName { get; }
+        ///        public string LastName { get; private set; }
+        ///        public int Age { get; set; }
+        ///        public int Cash { get;}
+        ///        public AccountDTO Account { get; private set; }
+        ///        public List&lt;AccountDTO&gt; Debs { get; set; }
+        ///        public UserSourceD [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _006_ConstructorWithSingleParameterDecomposition_FIXED {
+            get {
+                return ResourceManager.GetString("_006_ConstructorWithSingleParameterDecomposition_FIXED", resourceCulture);
             }
         }
         
@@ -1441,14 +1501,108 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public Tag[] Tags { get; set; }
         ///
-        ///        public Product [|ToProduct()|]
+        ///        public Product ToProduct()
         ///        {
-        ///           return new Product(name: Name, price: Price, category: Category, tags: Tags);
-        /// [rest of string was truncated]&quot;;.
+        ///            return new Product(name: Name, price: Price, category: Category, tags: Tags);
+        ///    [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _025_ThisObjectToOtherMapping_FIXED {
             get {
                 return ResourceManager.GetString("_025_ThisObjectToOtherMapping_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class Person
+        ///    {
+        ///        public int Age { get; set; }
+        ///        public string Name { get; set; }
+        ///
+        ///        public void [|Update|](int age)
+        ///        {
+        ///        }
+        ///    }
+        ///}
+        ///.
+        /// </summary>
+        internal static string _026_UpdateThisObjectWithSingleParameterMethod {
+            get {
+                return ResourceManager.GetString("_026_UpdateThisObjectWithSingleParameterMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class Person
+        ///    {
+        ///        public int Age { get; set; }
+        ///        public string Name { get; set; }
+        ///
+        ///        public void Update(int age)
+        ///        {
+        ///            Age = age;
+        ///        }
+        ///    }
+        ///}
+        ///.
+        /// </summary>
+        internal static string _026_UpdateThisObjectWithSingleParameterMethod_FIXED {
+            get {
+                return ResourceManager.GetString("_026_UpdateThisObjectWithSingleParameterMethod_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class Person
+        ///    {
+        ///        public int Age { get; set; }
+        ///        public string Name { get; set; }
+        ///
+        ///        public [|Person|](int age)
+        ///        {
+        ///        }
+        ///    }
+        ///}
+        ///.
+        /// </summary>
+        internal static string _027_ConstructorWithSingleParameter {
+            get {
+                return ResourceManager.GetString("_027_ConstructorWithSingleParameter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class Person
+        ///    {
+        ///        public int Age { get; set; }
+        ///        public string Name { get; set; }
+        ///
+        ///        public Person(int age)
+        ///        {
+        ///            Age = age;
+        ///        }
+        ///    }
+        ///}
+        ///.
+        /// </summary>
+        internal static string _027_ConstructorWithSingleParameter_FIXED {
+            get {
+                return ResourceManager.GetString("_027_ConstructorWithSingleParameter_FIXED", resourceCulture);
             }
         }
     }

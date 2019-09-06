@@ -46,7 +46,9 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                 Birthday = entity.Birthday,
                 Authentication = entity.Authentication,
                 SecondAuthentication = entity.SecondAuthentication.ToString(),
-                ThirdAuthentication = Enum.Parse(typeof(AuthenticationKind), entity.ThirdAuthentication, true)
+                ThirdAuthentication = Enum.Parse(typeof(AuthenticationKind), entity.ThirdAuthentication, true),
+                FourthAuthentication = (int?)entity.FourthAuthentication,
+                FifthAuthentication = (AuthenticationKind?)entity.FifthAuthentication
             };
         }
     }
@@ -73,6 +75,8 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public AuthenticationKind Authentication { get; set;}
         public string SecondAuthentication { get; set;}
         public AuthenticationKind ThirdAuthentication { get; set;}
+        public int? FourthAuthentication { get; set;}
+        public AuthenticationKind? FifthAuthentication { get; set;}
     }
 
     public class UserSourceDTO
@@ -134,6 +138,8 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public AuthenticationKind Authentication { get; set;}
         public AuthenticationKind SecondAuthentication { get; set;}
         public string ThirdAuthentication { get; set;}
+        public AuthenticationKind? FourthAuthentication { get; set;}
+        public int? FifthAuthentication { get; set;}
     }
 
     public class AddressEntity

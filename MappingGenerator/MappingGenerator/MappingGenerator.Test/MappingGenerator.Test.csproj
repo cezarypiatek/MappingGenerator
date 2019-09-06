@@ -15,7 +15,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="NUnit" Version="3.10.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
-    <PackageReference Include="SmartAnalyzers.RoslynTestKit" Version="1.0.13" />
+    <PackageReference Include="SmartAnalyzers.RoslynTestKit" Version="1.0.20" />
   </ItemGroup>
 
   <ItemGroup>
@@ -47,6 +47,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>MappingGeneratorTestCases.resx</DependentUpon>
+    </Compile>
+    <Compile Update="MethodParameterSuggestion\MethodParameterSuggestionTestCases.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>MethodParameterSuggestionTestCases.resx</DependentUpon>
     </Compile>
     <Compile Update="Splatting\SplattingTestCases.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -80,6 +85,10 @@
     <EmbeddedResource Update="MappingGenerator\MappingGeneratorTestCases.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>MappingGeneratorTestCases.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="MethodParameterSuggestion\MethodParameterSuggestionTestCases.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>MethodParameterSuggestionTestCases.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="Splatting\SplattingTestCases.resx">
       <Generator>ResXFileCodeGenerator</Generator>

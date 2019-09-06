@@ -163,9 +163,4 @@ namespace MappingGenerator
             return symbol.ContainingAssembly;
         }
     }
-
-    struct SampleStruct
-    {
-        public int Test { get; set; }
-    }
 }

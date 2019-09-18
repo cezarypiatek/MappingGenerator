@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MappingGenerator.Test", "Ma
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MappingGenerator.Vsix", "MappingGenerator\MappingGenerator.Vsix\MappingGenerator.Vsix.csproj", "{D8BF5CFC-E3F0-4D2A-8131-508023BD0A30}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MappingGenerator.OnBuildGenerator", "OnBuildGenerator\MappingGenerator.OnBuildGenerator.csproj", "{D9DF08C9-15B7-4DE7-8D1E-BDB5C7CD883F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{D8BF5CFC-E3F0-4D2A-8131-508023BD0A30}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8BF5CFC-E3F0-4D2A-8131-508023BD0A30}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8BF5CFC-E3F0-4D2A-8131-508023BD0A30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9DF08C9-15B7-4DE7-8D1E-BDB5C7CD883F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9DF08C9-15B7-4DE7-8D1E-BDB5C7CD883F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9DF08C9-15B7-4DE7-8D1E-BDB5C7CD883F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9DF08C9-15B7-4DE7-8D1E-BDB5C7CD883F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

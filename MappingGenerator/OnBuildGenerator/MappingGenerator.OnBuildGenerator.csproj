@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <Version>2.0.0.0</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>MappingGenerator.OnBuildGenerator</PackageId>
+    <Authors>Cezary Piątek</Authors>
+    <Product>MappingGenerator.OnBuildGenerator</Product>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MappingGenerator\MappingGenerator\MappingGenerator.csproj">
+      <!--<IncludeAssets>compile</IncludeAssets>-->
+      <PrivateAssets>all</PrivateAssets>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="SmartCodeGenerator.Sdk" Version="1.2.0" />
+  </ItemGroup>
+</Project>

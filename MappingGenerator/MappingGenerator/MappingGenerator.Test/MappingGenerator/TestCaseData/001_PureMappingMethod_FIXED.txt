@@ -46,7 +46,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                 Birthday = entity.Birthday,
                 Authentication = entity.Authentication,
                 SecondAuthentication = entity.SecondAuthentication.ToString(),
-                ThirdAuthentication = Enum.Parse(typeof(AuthenticationKind), entity.ThirdAuthentication, true),
+                ThirdAuthentication = (AuthenticationKind)Enum.Parse(typeof(AuthenticationKind), entity.ThirdAuthentication, true),
                 FourthAuthentication = (int?)entity.FourthAuthentication,
                 FifthAuthentication = (AuthenticationKind?)entity.FifthAuthentication
             };

@@ -121,4 +121,19 @@
   <data name="_001_SuggestOuterMethodParameters" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>TestCaseData\001_SuggestOuterMethodParameters.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="_002_SuggestOuterMethodParametersAndLocal" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\002_SuggestOuterMethodParametersAndLocal.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_003_SuggestOuterMethodParametersAndMembers" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\003_SuggestOuterMethodParametersAndMembers.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_004_FallbackByTypeIfSingleCandidate" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\004_FallbackByTypeIfSingleCandidate.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_005_FallbackByTypeIfSingleCandidateInterface" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\005_FallbackByTypeIfSingleCandidateInterface.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_006_FallbackByTypeIfSingleCandidateBaseClass" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\006_FallbackByTypeIfSingleCandidateBaseClass.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

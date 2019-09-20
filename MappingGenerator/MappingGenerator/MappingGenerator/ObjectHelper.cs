@@ -60,7 +60,7 @@ namespace MappingGenerator
             return GetBaseTypesAndThis(source).SelectMany(x=> x.GetMembers()).Where(IsPublicGetMethod).OfType<IMethodSymbol>();
         }
 
-        private  static IEnumerable<ITypeSymbol> GetBaseTypesAndThis(ITypeSymbol type)
+        public static IEnumerable<ITypeSymbol> GetBaseTypesAndThis(this ITypeSymbol type)
         {
             foreach (var unwrapped in type.UnwrapGeneric())
             {

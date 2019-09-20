@@ -89,5 +89,142 @@ namespace MappingGenerator.Test.MethodParameterSuggestion {
                 return ResourceManager.GetString("_001_SuggestOuterMethodParameters", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO Map(string firstName, string lastName, int age)
+        ///        {
+        ///            var parent = new UserDTO();
+        ///            Map2([||]);
+        ///        }
+        ///
+        ///        public static UserDTO Map2(string firstName, string lastName, int age, UserDTO parent)
+        ///        {
+        ///            
+        ///        } [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _002_SuggestOuterMethodParametersAndLocal {
+            get {
+                return ResourceManager.GetString("_002_SuggestOuterMethodParametersAndLocal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        private readonly UserDTO parent = new UserDTO();
+        ///
+        ///        public static UserDTO Map(string firstName, string lastName, int age)
+        ///        {
+        ///            Map2([||]);
+        ///        }
+        ///
+        ///        public static UserDTO Map2(string firstName, string lastName, int age, UserDTO parent)
+        ///        {
+        ///     [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _003_SuggestOuterMethodParametersAndMembers {
+            get {
+                return ResourceManager.GetString("_003_SuggestOuterMethodParametersAndMembers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO Map(string firstName, string lastName, int age)
+        ///        {
+        ///            var firstParent = new UserDTO();
+        ///            Map2([||]);
+        ///        }
+        ///
+        ///        public static UserDTO Map2(string firstName, string lastName, int age, UserDTO parent)
+        ///        {
+        ///            
+        ///     [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _004_FallbackByTypeIfSingleCandidate {
+            get {
+                return ResourceManager.GetString("_004_FallbackByTypeIfSingleCandidate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        IUserDTO firstParent = new UserDTO();
+        ///
+        ///        public static UserDTO Map(string firstName, string lastName, int age)
+        ///        {
+        ///            Map2([||]);
+        ///        }
+        ///
+        ///        public static UserDTO Map2(string firstName, string lastName, int age, IUserDTO parent)
+        ///        {
+        ///            
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _005_FallbackByTypeIfSingleCandidateInterface {
+            get {
+                return ResourceManager.GetString("_005_FallbackByTypeIfSingleCandidateInterface", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        IUserDTO firstParent = new UserDTO();
+        ///
+        ///        public static UserDTO Map(string firstName, string lastName, int age)
+        ///        {
+        ///            Map2([||]);
+        ///        }
+        ///
+        ///        public static UserDTO Map2(string firstName, string lastName, int age, IUserDTO parent)
+        ///        {
+        ///            
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _006_FallbackByTypeIfSingleCandidateBaseClass {
+            get {
+                return ResourceManager.GetString("_006_FallbackByTypeIfSingleCandidateBaseClass", resourceCulture);
+            }
+        }
     }
 }

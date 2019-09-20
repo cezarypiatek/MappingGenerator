@@ -14,6 +14,14 @@ namespace MappingGenerator
     {
         private CompletionItemRules _preselectCompletionRules;
 
+        private static readonly SymbolKind[] AllowedSymbolsForCompletion = new[]
+        {
+            SymbolKind.Parameter,
+            SymbolKind.Local,
+            SymbolKind.Field,
+            SymbolKind.Property
+        };
+
         public MethodParametersSuggestionProvider()
         {
             _preselectCompletionRules = CompletionItemRules.Default.WithMatchPriority(MatchPriority.Preselect).WithSelectionBehavior(CompletionItemSelectionBehavior.SoftSelection);
@@ -71,8 +79,11 @@ namespace MappingGenerator
         }
 
         private string GetArgumentListWithLocalVariables(Document document, IInvocation invocation, bool generateNamedParameters, SemanticModel semanticModel)
-        { 
-            var mappingSourceFinder = new LocalScopeMappingSourceFinder(semanticModel, invocation.SourceNode);
+        {
+            var mappingSourceFinder = new LocalScopeMappingSourceFinder(semanticModel, invocation.SourceNode, AllowedSymbolsForCompletion)
+            {
+                AllowMatchOnlyByTypeWhenSingleCandidate =  true
+            };
             var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
             var overloadParameterSets = invocation.GetOverloadParameterSets(semanticModel);
             if (overloadParameterSets != null)

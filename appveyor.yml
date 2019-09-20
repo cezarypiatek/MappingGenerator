@@ -1,0 +1,48 @@
+version: 1.12.{build}
+image: Visual Studio 2017
+configuration: Release
+assembly_info:
+  patch: true
+  file: '**\AssemblyInfo.*'
+  assembly_version: '{version}'
+  assembly_file_version: '{version}'
+  assembly_informational_version: '{version}'
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '{version}'
+  package_version: '{version}'
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{version}'
+before_build:
+- ps: >-
+    function Set-VsixVersion {
+        param(
+           [Parameter(Mandatory=$true)]
+           [string]$manifestPath,
+           [Parameter(Mandatory=$true)]
+           [string]$Version
+        )
+        $manifestXml = [xml](Get-Content $manifestPath -Raw)
+        $manifestXml.PackageManifest.Metadata.Identity.Version = $Version
+        $manifestXml.save($manifestPath)
+    }
+
+    git submodule update --init --recursive
+
+    Set-VsixVersion -Version "$($env:APPVEYOR_BUILD_VERSION)" -manifestPath C:\projects\mappinggenerator\MappingGenerator\MappingGenerator\MappingGenerator.Vsix\source.extension.vsixmanifest
+
+    nuget restore MappingGenerator
+
+    dotnet restore MappingGenerator
+build:
+  project: MappingGenerator\MappingGenerator.sln
+  verbosity: minimal
+after_build:
+- ps: Get-ChildItem MappingGenerator\MappingGenerator\MappingGenerator.Vsix\ -Recurse
+artifacts:
+- path: MappingGenerator\MappingGenerator\MappingGenerator.Vsix\bin\Release\MappingGenerator.vsix
+  name: MappingGenerator.vsix
+- path: MappingGenerator\MappingGenerator\MappingGenerator\bin\Release\MappingGenerator.*.nupkg
+  name: MappingGenerator.nupkg

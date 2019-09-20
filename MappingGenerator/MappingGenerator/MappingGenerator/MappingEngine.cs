@@ -255,14 +255,17 @@ namespace MappingGenerator
                 if (element.ExpressionType.SpecialType == SpecialType.System_String && targetType.TypeKind  == TypeKind.Enum)
                 {
                     var parseEnumAccess = syntaxGenerator.MemberAccessExpression(SyntaxFactory.ParseTypeName("Enum"), "Parse");
+                    var enumType = SyntaxFactory.ParseTypeName(targetType.Name);
+                    var parseInvocation = (InvocationExpressionSyntax)syntaxGenerator.InvocationExpression(parseEnumAccess, new[]
+                    {
+                        syntaxGenerator.TypeOfExpression(enumType),
+                        element.Expression,
+                        syntaxGenerator.TrueLiteralExpression()
+                    });
+
                     return new MappingElement()
                     {
-                        Expression = (InvocationExpressionSyntax)syntaxGenerator.InvocationExpression(parseEnumAccess, new[]
-                        {
-                            syntaxGenerator.TypeOfExpression(SyntaxFactory.ParseTypeName(targetType.Name)),
-                            element.Expression,
-                            syntaxGenerator.TrueLiteralExpression()
-                        }),
+                        Expression = (ExpressionSyntax) syntaxGenerator.CastExpression(enumType, parseInvocation),
                         ExpressionType = targetType
                     };
                 }

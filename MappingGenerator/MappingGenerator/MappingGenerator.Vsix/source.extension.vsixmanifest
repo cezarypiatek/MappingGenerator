@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="MappingGenerator.de964118-68da-48b7-9b74-0bf8a2c5bfa3" Version="1.0" Language="en-US" Publisher="Cezary Piątek"/>
+        <Identity Id="MappingGenerator" Version="1.0" Language="en-US" Publisher="Cezary Piątek"/>
         <DisplayName>MappingGenerator</DisplayName>
         <Description xml:space="preserve">Roslyn based code fix provider that allows to generate mapping code in design time.</Description>
         <Icon>preview.png</Icon>

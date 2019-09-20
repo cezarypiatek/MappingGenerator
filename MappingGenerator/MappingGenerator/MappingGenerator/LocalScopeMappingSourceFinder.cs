@@ -12,10 +12,19 @@ namespace MappingGenerator
         private readonly SemanticModel semanticModel;
         private readonly IReadOnlyList<ISymbol> localSymbols;
 
-        public LocalScopeMappingSourceFinder(SemanticModel semanticModel, SyntaxNode nodeFromScope)
+        public bool AllowMatchOnlyByTypeWhenSingleCandidate { get; set; }
+
+        private readonly SymbolKind[] localSymbolKinds = new[]
         {
+            SymbolKind.Local,
+            SymbolKind.Parameter
+        };
+
+        public LocalScopeMappingSourceFinder(SemanticModel semanticModel, SyntaxNode nodeFromScope, params SymbolKind[] allowedSymbols)
+        {
+            var symbolsToSelect = new HashSet<SymbolKind>( allowedSymbols.Length >0 ? allowedSymbols : localSymbolKinds);
             this.semanticModel = semanticModel;
-            this.localSymbols = semanticModel.LookupSymbols(nodeFromScope.GetLocation().SourceSpan.Start).Where(x=>x.Kind == SymbolKind.Local || x.Kind == SymbolKind.Parameter).ToList();
+            this.localSymbols = semanticModel.LookupSymbols(nodeFromScope.GetLocation().SourceSpan.Start).Where(x=> symbolsToSelect.Contains(x.Kind)).ToList();
         }
 
         public LocalScopeMappingSourceFinder(SemanticModel semanticModel, IMethodSymbol methodSymbol)
@@ -45,8 +54,51 @@ namespace MappingGenerator
                     };
                 }
             }
+
+            if (AllowMatchOnlyByTypeWhenSingleCandidate)
+            {
+                var byTypeCandidates = localSymbols.Where(x => MatchType(x, targetType)).ToList();
+                if (byTypeCandidates.Count == 1)
+                {
+                    var byTypeCandidate = byTypeCandidates[0];
+                    var type = GetType(byTypeCandidate);
+                    if (type != null)
+                    {
+                        return new MappingElement()
+                        {
+                            ExpressionType = type,
+                            Expression = CreateIdentifierName(byTypeCandidate)
+                        };
+                    }
+                }
+            }
             return null;
         }
+
+        private bool MatchType(ISymbol source, ITypeSymbol targetType)
+        {
+            var sourceSymbolType = GetType(source);
+            if (sourceSymbolType == null)
+            {
+                return false;
+            }
+
+            if (sourceSymbolType.GetBaseTypesAndThis().Any(t => t.Equals(targetType)))
+            {
+                return true;
+            }
+
+            if (targetType.TypeKind == TypeKind.Interface)
+            {
+                if (sourceSymbolType.OriginalDefinition.AllInterfaces.Any(i => i.Equals(targetType)))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
 
         private static IdentifierNameSyntax CreateIdentifierName(ISymbol candidate)
         {

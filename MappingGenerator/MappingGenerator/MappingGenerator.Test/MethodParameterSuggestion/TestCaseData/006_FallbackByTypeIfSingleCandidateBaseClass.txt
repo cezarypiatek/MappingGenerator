@@ -1,0 +1,29 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Collections.ObjectModel;
+
+namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+{
+    public class TestMapper
+    {
+        EntityDTO firstParent = new UserDTO();
+
+        public static UserDTO Map(string firstName, string lastName, int age)
+        {
+            Map2([||]);
+        }
+
+        public static UserDTO Map2(string firstName, string lastName, int age, EntityDTO parent)
+        {
+            
+        }
+    }
+
+    public class EntityDTO {}
+
+    public class UserDTO:EntityDTO
+    {
+    
+    }
+}

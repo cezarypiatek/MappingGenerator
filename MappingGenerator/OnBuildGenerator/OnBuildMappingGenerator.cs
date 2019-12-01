@@ -46,6 +46,7 @@ namespace MappingGenerator.OnBuildGenerator
                             methodDeclaration.Identifier.Text,
                             parameters: methodDeclaration.ParameterList.Parameters,
                             accessibility: Accessibility.Public,
+                            modifiers: DeclarationModifiers.Virtual,
                             typeParameters: methodDeclaration.TypeParameterList?.Parameters.Select(xx => xx.Identifier.Text),
                             returnType: methodDeclaration.ReturnType
                         )).WithBody(SyntaxFactory.Block(statements));
@@ -60,6 +61,7 @@ namespace MappingGenerator.OnBuildGenerator
                 Members = SyntaxFactory.SingletonList(newRoot),
                 Usings = new SyntaxList<UsingDirectiveSyntax>(new[]
                 {
+                    SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("System")),
                     SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("System.Linq")),
                     SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(interfaceSymbol.ContainingNamespace.ToDisplayString())),
                 })

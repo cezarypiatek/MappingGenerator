@@ -46,7 +46,7 @@ namespace MappingGenerator
             var generator = SyntaxGenerator.GetGenerator(document);
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var mappingSourceFinder = new LocalScopeMappingSourceFinder(semanticModel, objectInitializer);
-            return await ReplaceEmptyInitializationBlock(document, objectInitializer, cancellationToken, semanticModel, mappingSourceFinder, generator);
+            return await ReplaceEmptyInitializationBlock(document, objectInitializer, semanticModel, mappingSourceFinder, cancellationToken);
         }
 
         private async Task<Document> InitializeWithLambdaParameter(Document document, LambdaExpressionSyntax lambdaSyntax, InitializerExpressionSyntax objectInitializer, CancellationToken cancellationToken)
@@ -57,7 +57,7 @@ namespace MappingGenerator
             var lambdaSymbol = semanticModel.GetSymbolInfo(lambdaSyntax).Symbol as IMethodSymbol;
             var firstArgument = lambdaSymbol.Parameters.First();
             var mappingSourceFinder = new ObjectMembersMappingSourceFinder(firstArgument.Type, generator.IdentifierName(firstArgument.Name), generator);
-            return await ReplaceEmptyInitializationBlock(document, objectInitializer, cancellationToken, semanticModel, mappingSourceFinder, generator);
+            return await ReplaceEmptyInitializationBlock(document, objectInitializer, semanticModel, mappingSourceFinder, cancellationToken);
         }
 
         private async Task<Document> InitializeWithDefaults(Document document, InitializerExpressionSyntax objectInitializer, CancellationToken cancellationToken)
@@ -65,14 +65,13 @@ namespace MappingGenerator
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
             var mappingSourceFinder = new ScaffoldingSourceFinder(syntaxGenerator, document, semanticModel.FindContextAssembly(objectInitializer));
-            return await ReplaceEmptyInitializationBlock(document, objectInitializer, cancellationToken, semanticModel, mappingSourceFinder, syntaxGenerator);
+            return await ReplaceEmptyInitializationBlock(document, objectInitializer, semanticModel, mappingSourceFinder, cancellationToken);
         }
 
         private static async Task<Document> ReplaceEmptyInitializationBlock(Document document,
-            InitializerExpressionSyntax objectInitializer, CancellationToken cancellationToken,
-            SemanticModel semanticModel, IMappingSourceFinder mappingSourceFinder, SyntaxGenerator syntaxGenerator)
+            InitializerExpressionSyntax objectInitializer, SemanticModel semanticModel,
+            IMappingSourceFinder mappingSourceFinder, CancellationToken cancellationToken)
         {
-            var contextAssembly = semanticModel.FindContextAssembly(objectInitializer);
             var oldObjCreation = objectInitializer.FindContainer<ObjectCreationExpressionSyntax>();
             var createdObjectType = ModelExtensions.GetTypeInfo(semanticModel, oldObjCreation).Type;
             var mappingEngine = await MappingEngine.Create(document, cancellationToken, semanticModel.FindContextAssembly(objectInitializer));

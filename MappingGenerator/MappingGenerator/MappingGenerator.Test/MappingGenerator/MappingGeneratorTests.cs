@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using MappingGenerator.Features.Refactorings.Mapping;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.CodeAnalysis;
@@ -190,10 +191,10 @@ namespace MappingGenerator.Test.Mapping
             return new MappingGeneratorRefactoring();
         }
 
-        protected override ImmutableList<MetadataReference> References { get => new MetadataReference[]
+        protected override IReadOnlyCollection<MetadataReference> References => new MetadataReference[]
         {
             MetadataReference.CreateFromFile(typeof(IdentityUser).Assembly.Location)
-        }.ToImmutableList();}
+        };
     }
 }
 

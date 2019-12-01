@@ -254,7 +254,7 @@ namespace MappingGenerator
 
                 if (element.ExpressionType.SpecialType == SpecialType.System_String && targetType.TypeKind  == TypeKind.Enum)
                 {
-                    var parseEnumAccess = syntaxGenerator.MemberAccessExpression(SyntaxFactory.ParseTypeName("Enum"), "Parse");
+                    var parseEnumAccess = syntaxGenerator.MemberAccessExpression(SyntaxFactory.ParseTypeName("System.Enum"), "Parse");
                     var enumType = SyntaxFactory.ParseTypeName(targetType.Name);
                     var parseInvocation = (InvocationExpressionSyntax)syntaxGenerator.InvocationExpression(parseEnumAccess, new[]
                     {

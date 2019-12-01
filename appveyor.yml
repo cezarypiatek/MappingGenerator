@@ -46,3 +46,5 @@ artifacts:
   name: MappingGenerator.vsix
 - path: MappingGenerator\MappingGenerator\MappingGenerator\bin\Release\MappingGenerator.*.nupkg
   name: MappingGenerator.nupkg
+- path: MappingGenerator\OnBuildGenerator\bin\Release\MappingGenerator.OnBuildGenerator.*.nupkg
+  name: MappingGenerator.OnBuildGenerator.nupkg

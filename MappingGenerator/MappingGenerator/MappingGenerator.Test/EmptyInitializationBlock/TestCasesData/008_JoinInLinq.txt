@@ -1,0 +1,109 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace ConsoleApp9
+{
+    public class Tenant
+    {
+        public string Key { get; set; }
+
+        public string Description { get; set; }
+    }
+
+    public class User
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public IList<UserRequest> Requests { get; } = new List<UserRequest>();
+
+        public string Tenant { get; set; }
+    }
+
+    public class Request
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public DateTime TimeStamp { get; set; }
+
+        public string Category { get; set; }
+
+        public IList<UserRequest> Users { get; } = new List<UserRequest>();
+    }
+
+    public class UserRequest
+    {
+        public User User { get; set; }
+
+        public int UserId { get; set; }
+
+        public Request Request { get; set; }
+
+        public int RequestId { get; set; }
+    }
+
+    public class UserView
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public int LastRequestId { get; set; }
+
+        public string LastRequestName { get; set; }
+
+        public DateTime LastRequestTimeStamp { get; set; }
+    }
+
+    public class TenantView
+    {
+        public string Key { get; set; }
+
+        public string Description { get; set; }
+
+        public int UserId { get; set; }
+
+        public string UserName { get; set; }
+    }
+
+    public class RequestsView
+    {
+        public int UserId { get; set; }
+
+        public string UserName { get; set; }
+
+        public int Year { get; set; }
+
+        public int Month { get; set; }
+
+        public int Count { get; set; }
+    }
+
+    public class RequestView
+    {
+        public int UserId { get; set; }
+
+        public string UserName { get; set; }
+
+        public int RequestId { get; set; }
+
+        public string RequestName { get; set; }
+    }
+
+    public static class Examples
+    {
+        public static IEnumerable<TenantView> JoinStatement(IEnumerable<Tenant> tenants, IEnumerable<User> users)
+        {
+            return from t in tenants
+                    join user in users on t.Key equals user.Tenant
+                    select new TenantView
+                    {
+                        [||]
+                    };
+        }
+    }
+}

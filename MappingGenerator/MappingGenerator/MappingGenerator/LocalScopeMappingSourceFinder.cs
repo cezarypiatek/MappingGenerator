@@ -11,21 +11,12 @@ namespace MappingGenerator
     {
         private readonly SemanticModel semanticModel;
         private readonly IReadOnlyList<ISymbol> localSymbols;
-
         public bool AllowMatchOnlyByTypeWhenSingleCandidate { get; set; }
 
-        private readonly HashSet<SymbolKind> localSymbolKinds = new HashSet<SymbolKind>
+        public static LocalScopeMappingSourceFinder FromScope(SemanticModel semanticModel, SyntaxNode nodeFromScope, HashSet<SymbolKind> allowedSymbols = null)
         {
-            SymbolKind.Local,
-            SymbolKind.Parameter,
-            SymbolKind.RangeVariable
-        };
-
-        public LocalScopeMappingSourceFinder(SemanticModel semanticModel, SyntaxNode nodeFromScope, HashSet<SymbolKind> allowedSymbols = null)
-        {
-            var symbolsToSelect = allowedSymbols ?? localSymbolKinds;
-            this.semanticModel = semanticModel;
-            this.localSymbols = semanticModel.LookupSymbols(nodeFromScope.GetLocation().SourceSpan.Start).Where(x=> symbolsToSelect.Contains(x.Kind)).ToList();
+            var symbols = semanticModel.GetLocalSymbols(nodeFromScope, allowedSymbols);
+            return new LocalScopeMappingSourceFinder(semanticModel, symbols);
         }
 
         public LocalScopeMappingSourceFinder(SemanticModel semanticModel, IMethodSymbol methodSymbol)
@@ -45,7 +36,7 @@ namespace MappingGenerator
             var candidate= localSymbols.FirstOrDefault(x => x.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase));
             if (candidate != null)
             {
-                var type = GetType(candidate);
+                var type = semanticModel.GetTypeForSymbol(candidate);
                 if (type != null)
                 {
                     return new MappingElement()
@@ -62,7 +53,7 @@ namespace MappingGenerator
                 if (byTypeCandidates.Count == 1)
                 {
                     var byTypeCandidate = byTypeCandidates[0];
-                    var type = GetType(byTypeCandidate);
+                    var type = semanticModel.GetTypeForSymbol(byTypeCandidate);
                     if (type != null)
                     {
                         return new MappingElement()
@@ -78,7 +69,7 @@ namespace MappingGenerator
 
         private bool MatchType(ISymbol source, ITypeSymbol targetType)
         {
-            var sourceSymbolType = GetType(source);
+            var sourceSymbolType = semanticModel.GetTypeForSymbol(source);
             if (sourceSymbolType == null)
             {
                 return false;
@@ -115,29 +106,5 @@ namespace MappingGenerator
             return SyntaxFactory.IdentifierName(identifier);
         }
 
-        private ITypeSymbol GetType(ISymbol symbol)
-        {
-            var syntaxType = GetSyntaxType(symbol);
-            if (syntaxType == null)
-            {
-                return null;
-            }
-            return semanticModel.GetTypeInfo(syntaxType).Type;
-        }
-
-        private TypeSyntax GetSyntaxType(ISymbol candidate)
-        {
-            var candidateSyntax = candidate.DeclaringSyntaxReferences.Select(x => x.GetSyntax()).FirstOrDefault();
-            if (candidateSyntax is VariableDeclaratorSyntax variableDeclarator)
-            {
-                var variableDeclaration = variableDeclarator.FindContainer<VariableDeclarationSyntax>();
-                return variableDeclaration.Type;
-            }
-            if (candidateSyntax is ParameterSyntax parameter)
-            {
-                return parameter.Type;
-            }
-            return null;
-        }
     }
 }

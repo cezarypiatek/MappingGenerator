@@ -81,10 +81,9 @@ namespace MappingGenerator
 
         private string GetArgumentListWithLocalVariables(Document document, IInvocation invocation, bool generateNamedParameters, SemanticModel semanticModel)
         {
-            var mappingSourceFinder = new LocalScopeMappingSourceFinder(semanticModel, invocation.SourceNode, AllowedSymbolsForCompletion)
-            {
-                AllowMatchOnlyByTypeWhenSingleCandidate =  true
-            };
+            var mappingSourceFinder = LocalScopeMappingSourceFinder.FromScope(semanticModel, invocation.SourceNode, AllowedSymbolsForCompletion);
+            mappingSourceFinder.AllowMatchOnlyByTypeWhenSingleCandidate = true;
+
             var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
             var overloadParameterSets = invocation.GetOverloadParameterSets(semanticModel);
             if (overloadParameterSets != null)

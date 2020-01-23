@@ -19,7 +19,7 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class EmptyInitializationBlockTestCases {
@@ -292,7 +292,12 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to namespace TestAutoMapper
+        ///   Looks up a localized string similar to using System.Collections.Generic;
+        ///using System.Collections;
+        ///using System.Collections.ObjectModel;
+        ///using System;
+        ///
+        ///namespace TestAutoMapper
         ///{
         ///    class DefaultObject
         ///    {
@@ -308,11 +313,7 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
         ///
         ///        public byte MyProperty5 { get; set; }
         ///
-        ///        public char MyProperty6 { get; set; }
-        ///
-        ///        public CustomEnum MyProperty7 { get; set; }
-        ///
-        ///        public decimal DecimalProperty { get; set;  [rest of string was truncated]&quot;;.
+        ///        public char MyProperty6 { get [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _005_CompleteInitializationBlockWithSampleDatComplexType {
             get {
@@ -321,7 +322,12 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to namespace TestAutoMapper
+        ///   Looks up a localized string similar to using System.Collections.Generic;
+        ///using System.Collections;
+        ///using System.Collections.ObjectModel;
+        ///using System;
+        ///
+        ///namespace TestAutoMapper
         ///{
         ///    class DefaultObject
         ///    {
@@ -337,15 +343,287 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
         ///
         ///        public byte MyProperty5 { get; set; }
         ///
-        ///        public char MyProperty6 { get; set; }
-        ///
-        ///        public CustomEnum MyProperty7 { get; set; }
-        ///
-        ///        public decimal DecimalProperty { get; set;  [rest of string was truncated]&quot;;.
+        ///        public char MyProperty6 { get [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _005_CompleteInitializationBlockWithSampleDatComplexType_FIXED {
             get {
                 return ResourceManager.GetString("_005_CompleteInitializationBlockWithSampleDatComplexType_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Linq;
+        ///
+        ///namespace ConsoleApp9
+        ///{
+        ///    class Program
+        ///    {
+        ///        static void Main(string[] args)
+        ///        {
+        ///            var users = new List&lt;User&gt;();
+        ///            var query = from p in users
+        ///                where p.FirstName !=&quot;&quot;
+        ///                select new UserDTO()
+        ///                {
+        ///                    [||]
+        ///                };
+        ///        }
+        ///    }
+        ///
+        ///
+        ///    class User
+        ///    {
+        ///        public string FirstName { get; set; }
+        ///        public st [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _006_SelectInSimpleLinq {
+            get {
+                return ResourceManager.GetString("_006_SelectInSimpleLinq", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Linq;
+        ///
+        ///namespace ConsoleApp9
+        ///{
+        ///    class Program
+        ///    {
+        ///        static void Main(string[] args)
+        ///        {
+        ///            var users = new List&lt;User&gt;();
+        ///            var query = from p in users
+        ///                where p.FirstName !=&quot;&quot;
+        ///                select new UserDTO()
+        ///                {
+        ///                    FirstName = p.FirstName,
+        ///                    LastName = p.LastName
+        ///                };
+        ///        }
+        ///    }
+        ///
+        ///
+        ///    class User
+        ///    {
+        ///  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _006_SelectInSimpleLinqFixed {
+            get {
+                return ResourceManager.GetString("_006_SelectInSimpleLinqFixed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Linq;
+        ///
+        ///namespace ConsoleApp9
+        ///{
+        ///    public class Tenant
+        ///    {
+        ///        public string Key { get; set; }
+        ///
+        ///        public string Description { get; set; }
+        ///    }
+        ///
+        ///    public class User
+        ///    {
+        ///        public int Id { get; set; }
+        ///
+        ///        public string Name { get; set; }
+        ///
+        ///        public IList&lt;UserRequest&gt; Requests { get; } = new List&lt;UserRequest&gt;();
+        ///
+        ///        public string Tenant { get; set; }
+        ///    }
+        ///
+        ///    public class Request
+        ///    {
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _007_SelectWithLetInLinq {
+            get {
+                return ResourceManager.GetString("_007_SelectWithLetInLinq", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Linq;
+        ///
+        ///namespace ConsoleApp9
+        ///{
+        ///    public class Tenant
+        ///    {
+        ///        public string Key { get; set; }
+        ///
+        ///        public string Description { get; set; }
+        ///    }
+        ///
+        ///    public class User
+        ///    {
+        ///        public int Id { get; set; }
+        ///
+        ///        public string Name { get; set; }
+        ///
+        ///        public IList&lt;UserRequest&gt; Requests { get; } = new List&lt;UserRequest&gt;();
+        ///
+        ///        public string Tenant { get; set; }
+        ///    }
+        ///
+        ///    public class Request
+        ///    {
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _007_SelectWithLetInLinq_FiIXED {
+            get {
+                return ResourceManager.GetString("_007_SelectWithLetInLinq_FiIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Linq;
+        ///
+        ///namespace ConsoleApp9
+        ///{
+        ///    public class Tenant
+        ///    {
+        ///        public string Key { get; set; }
+        ///
+        ///        public string Description { get; set; }
+        ///    }
+        ///
+        ///    public class User
+        ///    {
+        ///        public int Id { get; set; }
+        ///
+        ///        public string Name { get; set; }
+        ///
+        ///        public IList&lt;UserRequest&gt; Requests { get; } = new List&lt;UserRequest&gt;();
+        ///
+        ///        public string Tenant { get; set; }
+        ///    }
+        ///
+        ///    public class Request
+        ///    {
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _008_JoinInLinq {
+            get {
+                return ResourceManager.GetString("_008_JoinInLinq", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Linq;
+        ///
+        ///namespace ConsoleApp9
+        ///{
+        ///    public class Tenant
+        ///    {
+        ///        public string Key { get; set; }
+        ///
+        ///        public string Description { get; set; }
+        ///    }
+        ///
+        ///    public class User
+        ///    {
+        ///        public int Id { get; set; }
+        ///
+        ///        public string Name { get; set; }
+        ///
+        ///        public IList&lt;UserRequest&gt; Requests { get; } = new List&lt;UserRequest&gt;();
+        ///
+        ///        public string Tenant { get; set; }
+        ///    }
+        ///
+        ///    public class Request
+        ///    {
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _008_JoinInLinq_FiIXED {
+            get {
+                return ResourceManager.GetString("_008_JoinInLinq_FiIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Linq;
+        ///
+        ///namespace ConsoleApp9
+        ///{
+        ///    public class Tenant
+        ///    {
+        ///        public string Key { get; set; }
+        ///
+        ///        public string Description { get; set; }
+        ///    }
+        ///
+        ///    public class User
+        ///    {
+        ///        public int Id { get; set; }
+        ///
+        ///        public string Name { get; set; }
+        ///
+        ///        public IList&lt;UserRequest&gt; Requests { get; } = new List&lt;UserRequest&gt;();
+        ///
+        ///        public string Tenant { get; set; }
+        ///    }
+        ///
+        ///    public class Request
+        ///    {
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _009_QueryContinuationInLinq {
+            get {
+                return ResourceManager.GetString("_009_QueryContinuationInLinq", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Linq;
+        ///
+        ///namespace ConsoleApp9
+        ///{
+        ///    public class Tenant
+        ///    {
+        ///        public string Key { get; set; }
+        ///
+        ///        public string Description { get; set; }
+        ///    }
+        ///
+        ///    public class User
+        ///    {
+        ///        public int Id { get; set; }
+        ///
+        ///        public string Name { get; set; }
+        ///
+        ///        public IList&lt;UserRequest&gt; Requests { get; } = new List&lt;UserRequest&gt;();
+        ///
+        ///        public string Tenant { get; set; }
+        ///    }
+        ///
+        ///    public class Request
+        ///    {
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _009_QueryContinuationInLinq_FIXED {
+            get {
+                return ResourceManager.GetString("_009_QueryContinuationInLinq_FIXED", resourceCulture);
             }
         }
     }

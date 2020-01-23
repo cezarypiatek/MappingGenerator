@@ -165,7 +165,7 @@ namespace MappingGenerator
             MappingPath mappingPath = null)
         {
             var propertiesToSet = ObjectHelper.GetFieldsThaCanBeSetPublicly(createdObjectTyp, contextAssembly);
-            var assignments = MapUsingSimpleAssignment(syntaxGenerator, propertiesToSet, mappingSourceFinder, mappingPath).ToList();
+            var assignments = MapUsingSimpleAssignment(propertiesToSet, mappingSourceFinder, mappingPath).ToList();
             if (assignments.Count == 0)
             {
                 return objectCreationExpression;
@@ -174,8 +174,7 @@ namespace MappingGenerator
             return objectCreationExpression.WithInitializer(initializerExpressionSyntax);
         }
 
-        public IEnumerable<ExpressionSyntax> MapUsingSimpleAssignment(SyntaxGenerator generator,
-            IEnumerable<IPropertySymbol> targets, IMappingSourceFinder sourceFinder,
+        public IEnumerable<ExpressionSyntax> MapUsingSimpleAssignment(IEnumerable<IPropertySymbol> targets, IMappingSourceFinder sourceFinder,
             MappingPath mappingPath = null, SyntaxNode globalTargetAccessor = null)
         {
             if (mappingPath == null)
@@ -186,18 +185,23 @@ namespace MappingGenerator
             return targets.Select(property => new
                 {
                     source = sourceFinder.FindMappingSource(property.Name, property.Type),
-                    target = new MappingElement()
-                    {
-                        Expression = (ExpressionSyntax)CreateAccessPropertyExpression(globalTargetAccessor, property, generator),
-                        ExpressionType = property.Type
-                    }
+                    target = CreateTargetElement(globalTargetAccessor, property)
                 })
                 .Where(x => x.source != null)
                 .Select(pair =>
                 {
                     var sourceExpression = this.MapExpression(pair.source, pair.target.ExpressionType, mappingPath.Clone()).Expression;
-                    return (ExpressionSyntax)generator.AssignmentStatement(pair.target.Expression, sourceExpression);
+                    return (ExpressionSyntax)syntaxGenerator.AssignmentStatement(pair.target.Expression, sourceExpression);
                 }).ToList();
+        }
+
+        private MappingElement CreateTargetElement(SyntaxNode globalTargetAccessor, IPropertySymbol property)
+        {
+            return new MappingElement()
+            {
+                Expression = (ExpressionSyntax)CreateAccessPropertyExpression(globalTargetAccessor, property, syntaxGenerator),
+                ExpressionType = property.Type
+            };
         }
 
         private static SyntaxNode CreateAccessPropertyExpression(SyntaxNode globalTargetAccessor, IPropertySymbol property, SyntaxGenerator generator)

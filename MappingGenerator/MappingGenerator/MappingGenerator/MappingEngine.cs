@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MappingGenerator.MappingMatchers;
 using MappingGenerator.MethodHelpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -141,31 +142,33 @@ namespace MappingGenerator
                         {
                             return matchedSources.Any(x => x.Expression.IsEquivalentTo(foundElement.Expression));
                         });
+                    var mappingMatcher = new SingleSourceMatcher(restSourceFinder);
                     return new MappingElement()
                     {
                         ExpressionType = targetType,
-                        Expression =   AddInitializerWithMapping(creationExpression, restSourceFinder, targetType, mappingPath)
+                        Expression =   AddInitializerWithMapping(creationExpression, mappingMatcher, targetType, mappingPath)
                     };
                 }
             }
 
 
             var objectCreationExpressionSyntax = ((ObjectCreationExpressionSyntax) syntaxGenerator.ObjectCreationExpression(targetType));
+            var subMappingMatcher = new SingleSourceMatcher(subMappingSourceFinder);
             return new MappingElement()
             {
                 ExpressionType = targetType,
-                Expression = AddInitializerWithMapping(objectCreationExpressionSyntax, subMappingSourceFinder, targetType, mappingPath)
+                Expression = AddInitializerWithMapping(objectCreationExpressionSyntax, subMappingMatcher, targetType, mappingPath)
             };
         }
 
 
         public ObjectCreationExpressionSyntax AddInitializerWithMapping(
-            ObjectCreationExpressionSyntax objectCreationExpression, IMappingSourceFinder mappingSourceFinder,
+            ObjectCreationExpressionSyntax objectCreationExpression, IMappingMatcher mappingMatcher,
             ITypeSymbol createdObjectTyp,
             MappingPath mappingPath = null)
         {
             var propertiesToSet = ObjectHelper.GetFieldsThaCanBeSetPublicly(createdObjectTyp, contextAssembly);
-            var assignments = MapUsingSimpleAssignment(propertiesToSet, mappingSourceFinder, mappingPath).ToList();
+            var assignments = MapUsingSimpleAssignment(propertiesToSet, mappingMatcher, mappingPath).ToList();
             if (assignments.Count == 0)
             {
                 return objectCreationExpression;
@@ -174,7 +177,7 @@ namespace MappingGenerator
             return objectCreationExpression.WithInitializer(initializerExpressionSyntax);
         }
 
-        public IEnumerable<ExpressionSyntax> MapUsingSimpleAssignment(IEnumerable<IPropertySymbol> targets, IMappingSourceFinder sourceFinder,
+        public IEnumerable<ExpressionSyntax> MapUsingSimpleAssignment(IEnumerable<IPropertySymbol> targets, IMappingMatcher mappingMatcher,
             MappingPath mappingPath = null, SyntaxNode globalTargetAccessor = null)
         {
             if (mappingPath == null)
@@ -182,37 +185,13 @@ namespace MappingGenerator
                 mappingPath = new MappingPath();
             }
           
-            return targets.Select(property => new
+            return mappingMatcher.MatchAll(targets, syntaxGenerator, globalTargetAccessor)
+                .Select(match =>
                 {
-                    source = sourceFinder.FindMappingSource(property.Name, property.Type),
-                    target = CreateTargetElement(globalTargetAccessor, property)
-                })
-                .Where(x => x.source != null)
-                .Select(pair =>
-                {
-                    var sourceExpression = this.MapExpression(pair.source, pair.target.ExpressionType, mappingPath.Clone()).Expression;
-                    return (ExpressionSyntax)syntaxGenerator.AssignmentStatement(pair.target.Expression, sourceExpression);
+                    var sourceExpression = this.MapExpression(match.Source, match.Target.ExpressionType, mappingPath.Clone()).Expression;
+                    return (ExpressionSyntax)syntaxGenerator.AssignmentStatement(match.Target.Expression, sourceExpression);
                 }).ToList();
         }
-
-        private MappingElement CreateTargetElement(SyntaxNode globalTargetAccessor, IPropertySymbol property)
-        {
-            return new MappingElement()
-            {
-                Expression = (ExpressionSyntax)CreateAccessPropertyExpression(globalTargetAccessor, property, syntaxGenerator),
-                ExpressionType = property.Type
-            };
-        }
-
-        private static SyntaxNode CreateAccessPropertyExpression(SyntaxNode globalTargetAccessor, IPropertySymbol property, SyntaxGenerator generator)
-        {
-            if (globalTargetAccessor == null)
-            {
-                return SyntaxFactory.IdentifierName(property.Name);
-            }
-            return generator.MemberAccessExpression(globalTargetAccessor, property.Name);
-        }
-
 
         private bool IsUnwrappingNeeded(ITypeSymbol targetType, MappingElement element)
         {

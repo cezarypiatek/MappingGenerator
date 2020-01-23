@@ -14,15 +14,16 @@ namespace MappingGenerator
 
         public bool AllowMatchOnlyByTypeWhenSingleCandidate { get; set; }
 
-        private readonly SymbolKind[] localSymbolKinds = new[]
+        private readonly HashSet<SymbolKind> localSymbolKinds = new HashSet<SymbolKind>
         {
             SymbolKind.Local,
-            SymbolKind.Parameter
+            SymbolKind.Parameter,
+            SymbolKind.RangeVariable
         };
 
-        public LocalScopeMappingSourceFinder(SemanticModel semanticModel, SyntaxNode nodeFromScope, params SymbolKind[] allowedSymbols)
+        public LocalScopeMappingSourceFinder(SemanticModel semanticModel, SyntaxNode nodeFromScope, HashSet<SymbolKind> allowedSymbols = null)
         {
-            var symbolsToSelect = new HashSet<SymbolKind>( allowedSymbols.Length >0 ? allowedSymbols : localSymbolKinds);
+            var symbolsToSelect = allowedSymbols ?? localSymbolKinds;
             this.semanticModel = semanticModel;
             this.localSymbols = semanticModel.LookupSymbols(nodeFromScope.GetLocation().SourceSpan.Start).Where(x=> symbolsToSelect.Contains(x.Kind)).ToList();
         }

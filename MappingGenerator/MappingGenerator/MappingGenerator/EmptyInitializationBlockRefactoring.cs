@@ -43,7 +43,6 @@ namespace MappingGenerator
 
         private async Task<Document> InitializeWithLocals(Document document, InitializerExpressionSyntax objectInitializer, CancellationToken cancellationToken)
         {
-            var generator = SyntaxGenerator.GetGenerator(document);
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var mappingSourceFinder = new LocalScopeMappingSourceFinder(semanticModel, objectInitializer);
             return await ReplaceEmptyInitializationBlock(document, objectInitializer, semanticModel, mappingSourceFinder, cancellationToken);

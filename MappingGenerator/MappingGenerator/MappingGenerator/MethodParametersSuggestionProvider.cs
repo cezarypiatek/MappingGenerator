@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MappingGenerator.MethodHelpers;
 using Microsoft.CodeAnalysis;
@@ -12,9 +13,9 @@ namespace MappingGenerator
     [ExportCompletionProvider(nameof(MethodParametersSuggestionProvider), LanguageNames.CSharp)]
     public class MethodParametersSuggestionProvider : CompletionProvider
     {
-        private CompletionItemRules _preselectCompletionRules;
+        private readonly CompletionItemRules preselectCompletionRules;
 
-        private static readonly SymbolKind[] AllowedSymbolsForCompletion = new[]
+        private static readonly HashSet<SymbolKind> AllowedSymbolsForCompletion = new HashSet<SymbolKind>
         {
             SymbolKind.Parameter,
             SymbolKind.Local,
@@ -24,7 +25,7 @@ namespace MappingGenerator
 
         public MethodParametersSuggestionProvider()
         {
-            _preselectCompletionRules = CompletionItemRules.Default.WithMatchPriority(MatchPriority.Preselect).WithSelectionBehavior(CompletionItemSelectionBehavior.SoftSelection);
+            preselectCompletionRules = CompletionItemRules.Default.WithMatchPriority(MatchPriority.Preselect).WithSelectionBehavior(CompletionItemSelectionBehavior.SoftSelection);
         }
 
         public override async Task ProvideCompletionsAsync(CompletionContext context)
@@ -68,13 +69,13 @@ namespace MappingGenerator
             var argumentList = GetArgumentListWithLocalVariables(context.Document, invocation, false, semanticModel);
             if (argumentList != null)
             {
-                context.AddItem(CompletionItem.Create(argumentList, rules: _preselectCompletionRules));
+                context.AddItem(CompletionItem.Create(argumentList, rules: preselectCompletionRules));
             }
 
             var argumentListWithParameterNames = GetArgumentListWithLocalVariables(context.Document, invocation, true, semanticModel);
             if (argumentListWithParameterNames != null)
             {
-                context.AddItem(CompletionItem.Create(argumentListWithParameterNames, rules: _preselectCompletionRules));
+                context.AddItem(CompletionItem.Create(argumentListWithParameterNames, rules: preselectCompletionRules));
             }
         }
 

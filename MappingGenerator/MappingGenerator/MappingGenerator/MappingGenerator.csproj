@@ -22,11 +22,9 @@
     <PackageTags>MappingGenerator, analyzers</PackageTags>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <Version>2.0.0</Version>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <LangVersion>7.2</LangVersion>
-  </PropertyGroup>
    
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="2.8.2" PrivateAssets="all" />

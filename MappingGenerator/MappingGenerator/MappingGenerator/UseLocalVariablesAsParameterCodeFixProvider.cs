@@ -183,7 +183,7 @@ namespace MappingGenerator
         private async Task<Document> UseLocalVariablesAsParameters(Document document, IInvocation invocation, bool generateNamedParameters, CancellationToken cancellationToken)
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var mappingSourceFinder = new LocalScopeMappingSourceFinder(semanticModel, invocation.SourceNode);
+            var mappingSourceFinder =  LocalScopeMappingSourceFinder.FromScope(semanticModel, invocation.SourceNode);
             return await CodeFixHelper.FixInvocationWithParameters(document, invocation, generateNamedParameters, semanticModel, mappingSourceFinder, cancellationToken);
         }
     }

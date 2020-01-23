@@ -148,4 +148,28 @@
   <data name="_005_CompleteInitializationBlockWithSampleDatComplexType_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>TestCasesData\005_CompleteInitializationBlockWithSampleDatComplexType_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="_006_SelectInSimpleLinq" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCasesData\006_SelectInSimpleLinq.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_006_SelectInSimpleLinqFixed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCasesData\006_SelectInSimpleLinqFixed.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_007_SelectWithLetInLinq" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCasesData\007_SelectWithLetInLinq.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_007_SelectWithLetInLinq_FiIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCasesData\007_SelectWithLetInLinq_FiIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_008_JoinInLinq" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCasesData\008_JoinInLinq.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_008_JoinInLinq_FiIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCasesData\008_JoinInLinq_FiIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_009_QueryContinuationInLinq" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCasesData\009_QueryContinuationInLinq.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_009_QueryContinuationInLinq_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCasesData\009_QueryContinuationInLinq_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

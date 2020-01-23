@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Runtime.Versioning;
 using MappingGenerator.Test.EmptyInitializationBlock;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeRefactorings;
@@ -9,6 +11,13 @@ namespace MappingGenerator.Test
 {
     public class EmptyInitializationBlockTests : CodeRefactoringTestFixture
     {
+        protected override IReadOnlyCollection<MetadataReference> References =>
+            new []
+            {
+                ReferenceSource.FromType(typeof(IEnumerable<>)),
+                ReferenceSource.FromType(typeof(ISet<>))
+            };
+
         [Test]
         public void should_be_able_to_generate_initialization_block_with_local_variables()
         {
@@ -47,6 +56,39 @@ namespace MappingGenerator.Test
             var test = EmptyInitializationBlockTestCases._005_CompleteInitializationBlockWithSampleDatComplexType;
             var fixedCode = EmptyInitializationBlockTestCases._005_CompleteInitializationBlockWithSampleDatComplexType_FIXED;
             TestCodeRefactoring(test, fixedCode, 1);
+        } 
+        
+        [Test]
+        public void should_be_able_to_generate_initialization_block_in_select_for_simple_ling()
+        {
+            var test = EmptyInitializationBlockTestCases._006_SelectInSimpleLinq;
+            var fixedCode = EmptyInitializationBlockTestCases._006_SelectInSimpleLinqFixed;
+            TestCodeRefactoring(test, fixedCode, 0);
+        }
+        
+        [Test]
+        public void should_be_able_to_generate_initialization_block_in_select_with_let()
+        {
+            var test = EmptyInitializationBlockTestCases._007_SelectWithLetInLinq;
+            var fixedCode = EmptyInitializationBlockTestCases._007_SelectWithLetInLinq_FiIXED;
+            TestCodeRefactoring(test, fixedCode, 0);
+        } 
+        
+        [Test]
+        public void should_be_able_to_generate_initialization_block_in_select_with_join()
+        {
+            var test = EmptyInitializationBlockTestCases._008_JoinInLinq;
+            var fixedCode = EmptyInitializationBlockTestCases._008_JoinInLinq_FiIXED;
+            TestCodeRefactoring(test, fixedCode, 0);
+        } 
+        
+        
+        [Test]
+        public void should_be_able_to_generate_initialization_block_in_select_with_query_continuation()
+        {
+            var test = EmptyInitializationBlockTestCases._009_QueryContinuationInLinq;
+            var fixedCode = EmptyInitializationBlockTestCases._009_QueryContinuationInLinq_FIXED;
+            TestCodeRefactoring(test, fixedCode, 0);
         }
       
         protected override string LanguageName => LanguageNames.CSharp;

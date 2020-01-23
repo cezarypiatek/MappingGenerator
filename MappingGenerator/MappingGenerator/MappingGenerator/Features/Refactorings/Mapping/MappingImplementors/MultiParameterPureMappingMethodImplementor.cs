@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using MappingGenerator.MappingMatchers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
@@ -19,7 +20,7 @@ namespace MappingGenerator.Features.Refactorings.Mapping.MappingImplementors
             var targetType = methodSymbol.ReturnType;
             var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol);
             var newExpression = mappingEngine.AddInitializerWithMapping(
-                (ObjectCreationExpressionSyntax)generator.ObjectCreationExpression(targetType), sourceFinder, targetType);
+                (ObjectCreationExpressionSyntax)generator.ObjectCreationExpression(targetType), new SingleSourceMatcher(sourceFinder), targetType);
             return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };
         }
     }

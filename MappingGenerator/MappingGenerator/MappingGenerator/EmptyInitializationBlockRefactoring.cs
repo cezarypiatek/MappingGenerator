@@ -3,6 +3,7 @@ using System.Composition;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MappingGenerator.MappingMatchers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeRefactorings;
@@ -73,7 +74,7 @@ namespace MappingGenerator
             var oldObjCreation = objectInitializer.FindContainer<ObjectCreationExpressionSyntax>();
             var createdObjectType = ModelExtensions.GetTypeInfo(semanticModel, oldObjCreation).Type;
             var mappingEngine = await MappingEngine.Create(document, cancellationToken, semanticModel.FindContextAssembly(objectInitializer));
-            var newObjectCreation = mappingEngine.AddInitializerWithMapping(oldObjCreation, mappingSourceFinder, createdObjectType);
+            var newObjectCreation = mappingEngine.AddInitializerWithMapping(oldObjCreation, new SingleSourceMatcher(mappingSourceFinder), createdObjectType);
             return await document.ReplaceNodes(oldObjCreation, newObjectCreation, cancellationToken);
         }
     }

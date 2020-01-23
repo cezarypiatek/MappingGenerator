@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using MappingGenerator.MappingMatchers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Editing;
 
@@ -22,7 +23,7 @@ namespace MappingGenerator.Features.Refactorings.Mapping.MappingImplementors
             var target = methodSymbol.Parameters[1];
             var targets = ObjectHelper.GetFieldsThaCanBeSetPublicly(target.Type, methodSymbol.ContainingAssembly);
             var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator);
-            return mappingEngine.MapUsingSimpleAssignment(targets, sourceFinder, globalTargetAccessor: generator.IdentifierName(target.Name));
+            return mappingEngine.MapUsingSimpleAssignment(targets, new SingleSourceMatcher(sourceFinder), globalTargetAccessor: generator.IdentifierName(target.Name));
         }
     }
 }

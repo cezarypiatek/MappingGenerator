@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
@@ -71,7 +72,25 @@ namespace MappingGenerator
                 };
             }
 
+            // HIGHLY SPECULATIVE: Expanding acronyms: UserName = u.Name
+            if (string.IsNullOrWhiteSpace(potentialPrefix) == false && potentialPrefix == potentialPrefix.ToLowerInvariant() && targetName != potentialPrefix)
+            {
+                var acronym = GetAcronym(targetName).ToLowerInvariant();
+                if (acronym.StartsWith(potentialPrefix))
+                {
+                    var rest = Regex.Split(targetName, @"(?<!^)(?=[A-Z])").Skip(potentialPrefix.Length);
+                    var newTarget = $"{potentialPrefix}{string.Join("", rest)}";
+                    return FindSource(newTarget);
+                }
+            }
+
             return null;
+        }
+
+        private string GetAcronym(string targetName)
+        {
+            var capitalLetters = targetName.Where(char.IsUpper).ToArray();
+            return new string(capitalLetters);
         }
 
         private MappingElement FindSubPropertySource(string targetName, ITypeSymbol containingType, IEnumerable<IPropertySymbol> properties, SyntaxNode currentAccessor, string prefix=null)

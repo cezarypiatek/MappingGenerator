@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 using MappingGenerator.Features.Refactorings.Mapping;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.CodeAnalysis;
@@ -161,13 +160,6 @@ namespace MappingGenerator.Test.Mapping
         }
 
         [Test]
-        public void should_be_able_to_replace_invalid_body_with_mapping_body()
-        {
-            TestCodeRefactoring(_024_InvalidSyntaxPureMappingMethod, _024_InvalidSyntaxPureMappingMethod_FIXED);
-        }
-
-
-        [Test]
         public void should_be_able_to_convert_this_object_to_other()
         {
             TestCodeRefactoring(_025_ThisObjectToOtherMapping, _025_ThisObjectToOtherMapping_FIXED);
@@ -178,6 +170,7 @@ namespace MappingGenerator.Test.Mapping
         {
             TestCodeRefactoring(_026_UpdateThisObjectWithSingleParameterMethod, _026_UpdateThisObjectWithSingleParameterMethod_FIXED);
         }
+
         [Test]
         public void should_be_able_to_generate_constructor_mapping_with_single_parameter_by_direct_mapping()
         {

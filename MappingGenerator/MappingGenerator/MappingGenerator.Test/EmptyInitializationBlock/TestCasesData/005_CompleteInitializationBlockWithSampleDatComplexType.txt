@@ -79,7 +79,7 @@ namespace TestAutoMapper
         Opt2
     }
 
-    public static class Factory
+    static class Factory
     {
         public static DefaultObject New()
         {

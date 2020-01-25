@@ -175,4 +175,10 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         Password,
         AD
     }
+
+    public enum CustomerKind
+    {
+        Regular,
+        Special
+    }
 }

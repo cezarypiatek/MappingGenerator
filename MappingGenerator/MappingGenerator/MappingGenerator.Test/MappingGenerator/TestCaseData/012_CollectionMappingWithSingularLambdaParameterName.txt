@@ -20,6 +20,7 @@ namespace TestAutoMapper.Identity.X
 
         public static List<YY> [|Map|](List<XX> categories)
         {
+            throw new NotImplementedException();
         }
     }
 }

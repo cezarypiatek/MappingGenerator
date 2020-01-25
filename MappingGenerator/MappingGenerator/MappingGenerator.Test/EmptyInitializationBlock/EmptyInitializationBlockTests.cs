@@ -12,7 +12,7 @@ namespace MappingGenerator.Test
     public class EmptyInitializationBlockTests : CodeRefactoringTestFixture
     {
         protected override IReadOnlyCollection<MetadataReference> References =>
-            new []
+            new[]
             {
                 ReferenceSource.FromType(typeof(IEnumerable<>)),
                 ReferenceSource.FromType(typeof(ISet<>))

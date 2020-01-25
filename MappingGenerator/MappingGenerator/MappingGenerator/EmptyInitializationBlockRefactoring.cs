@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Composition;
 using System.Linq;
@@ -58,27 +57,10 @@ namespace MappingGenerator
             var queryExpression = objectInitializer.FindContainer<QueryExpressionSyntax>();
             if (queryExpression != null)
             {
-                var queryLocation = queryExpression.GetLocation().SourceSpan;
-
-                var queryVariablesSourceFinders = localSymbols.Where(s => s is IRangeVariableSymbol).Where(s =>
-                {
-                    var symbolLocation = s.Locations.First().SourceSpan;
-                    return symbolLocation.Start >= queryLocation.Start && symbolLocation.End <= queryLocation.End;
-                }).Select(s =>
-                {
-                    var type = semanticModel.GetTypeForSymbol(s);
-                    if (ObjectHelper.IsSimpleType(type))
-                    {
-                        return null;
-                    }
-                    return new ObjectMembersMappingSourceFinder(type, syntaxGenerator.IdentifierName(s.Name), syntaxGenerator);
-                }).Where(x=> x != null).ToList();
-
-                yield return new OrderedSourceFinder(queryVariablesSourceFinders);
+                yield return GetMappingSourceFindersForQueryExpression(semanticModel, syntaxGenerator, queryExpression, localSymbols);
                 yield break;
             }
 
-           
             yield return new LocalScopeMappingSourceFinder(semanticModel, localSymbols);
 
             foreach (var localSymbol in localSymbols)
@@ -89,6 +71,42 @@ namespace MappingGenerator
                     yield return new ObjectMembersMappingSourceFinder(symbolType, SyntaxFactory.IdentifierName(localSymbol.Name), syntaxGenerator);
                 }
             }
+        }
+
+        private static IMappingSourceFinder GetMappingSourceFindersForQueryExpression(SemanticModel semanticModel, SyntaxGenerator syntaxGenerator, QueryExpressionSyntax queryExpression, IReadOnlyList<ISymbol> localSymbols)
+        {
+            var queryLocation = queryExpression.GetLocation().SourceSpan;
+
+            var queryVariablesSourceFinders = localSymbols.Where(s => s is IRangeVariableSymbol).Where(s =>
+            {
+                var symbolLocation = s.Locations.First().SourceSpan;
+                return symbolLocation.Start >= queryLocation.Start && symbolLocation.End <= queryLocation.End;
+            }).Select(s =>
+            {
+                var type = semanticModel.GetTypeForSymbol(s);
+                if (ObjectHelper.IsSimpleType(type))
+                {
+                    return null;
+                }
+
+                if (type is INamedTypeSymbol namedType && type.ToDisplayString().StartsWith("System.Linq.IGrouping<"))
+                {
+                    var keyType = namedType.TypeArguments[0];
+                    if (ObjectHelper.IsSimpleType(keyType) == false)
+                    {
+                        var accessor = syntaxGenerator.MemberAccessExpression(syntaxGenerator.IdentifierName(s.Name), syntaxGenerator.IdentifierName("Key"));
+                        return (IMappingSourceFinder)new OrderedSourceFinder(new []
+                        {
+                            new ObjectMembersMappingSourceFinder(type, syntaxGenerator.IdentifierName(s.Name), syntaxGenerator),
+                            new ObjectMembersMappingSourceFinder(keyType, accessor, syntaxGenerator)
+                        });
+                    }
+                }
+
+                return new ObjectMembersMappingSourceFinder(type, syntaxGenerator.IdentifierName(s.Name), syntaxGenerator);
+            }).Where(x => x != null).ToList();
+
+            return new OrderedSourceFinder(queryVariablesSourceFinders);
         }
 
         private async Task<Document> InitializeWithLambdaParameter(Document document, LambdaExpressionSyntax lambdaSyntax, InitializerExpressionSyntax objectInitializer, CancellationToken cancellationToken)

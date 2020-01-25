@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Runtime.Versioning;
 using MappingGenerator.Test.EmptyInitializationBlock;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeRefactorings;
@@ -11,13 +9,6 @@ namespace MappingGenerator.Test
 {
     public class EmptyInitializationBlockTests : CodeRefactoringTestFixture
     {
-        protected override IReadOnlyCollection<MetadataReference> References =>
-            new[]
-            {
-                ReferenceSource.FromType(typeof(IEnumerable<>)),
-                ReferenceSource.FromType(typeof(ISet<>))
-            };
-
         [Test]
         public void should_be_able_to_generate_initialization_block_with_local_variables()
         {
@@ -88,6 +79,14 @@ namespace MappingGenerator.Test
         {
             var test = EmptyInitializationBlockTestCases._009_QueryContinuationInLinq;
             var fixedCode = EmptyInitializationBlockTestCases._009_QueryContinuationInLinq_FIXED;
+            TestCodeRefactoring(test, fixedCode, 0);
+        }        
+        
+        [Test]
+        public void should_be_able_to_generate_initialization_block_in_select_with_group_by()
+        {
+            var test = EmptyInitializationBlockTestCases._010_GroupByInLinq;
+            var fixedCode = EmptyInitializationBlockTestCases._010_GroupByInLinq_txt_FIXED;
             TestCodeRefactoring(test, fixedCode, 0);
         }
       

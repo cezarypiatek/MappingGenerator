@@ -21,6 +21,8 @@ namespace MappingGenerator
         private readonly Lazy<IReadOnlyList<IPropertySymbol>> sourceProperties;
         private readonly Lazy<IReadOnlyList<IMethodSymbol>> sourceMethods;
         private readonly string potentialPrefix;
+        private readonly Lazy<bool> isSourceTypeEnumerable;
+
 
         public ObjectMembersMappingSourceFinder(ITypeSymbol sourceType, SyntaxNode sourceGlobalAccessor, SyntaxGenerator generator)
         {
@@ -31,16 +33,46 @@ namespace MappingGenerator
             this.sourceProperties = new Lazy<IReadOnlyList<IPropertySymbol>>(() => ObjectHelper.GetPublicPropertySymbols(sourceType)
                 .Where(property => property.GetMethod!=null)
                 .ToList());
-            this.sourceMethods = new Lazy<IReadOnlyList<IMethodSymbol>>(()=>  ObjectHelper.GetPublicGetMethods(sourceType).ToList());
+            this.sourceMethods = new Lazy<IReadOnlyList<IMethodSymbol>>(()=> ObjectHelper.GetPublicGetMethods(sourceType).ToList());
+            this.isSourceTypeEnumerable = new Lazy<bool>(() => sourceType.Interfaces.Any(x => x.ToDisplayString().StartsWith("System.Collections.Generic.IEnumerable<")));
         }
 
         public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType)
         {
-            var mappingSource = FindSource(targetName);
-            return mappingSource;
-        } 
+            return TryFindSource(targetName) ?? TryFindSourceForEnumerable(targetName, targetType);
+        }
 
-        private MappingElement FindSource(string targetName)
+
+        //TODO: Acquire semantic model and try to search through extensions methods with no arguments
+        private MappingElement TryFindSourceForEnumerable(string targetName, ITypeSymbol targetType)
+        {
+            if (isSourceTypeEnumerable.Value)
+            {
+                if (targetName == "Any" && targetType.Name == "Boolean")
+                {
+                    return CreateMappingElementFromExtensionMethod(targetType, "Any");
+                }
+
+                if (targetName == "Count" && targetType.Name == "Int32")
+                {
+                    return CreateMappingElementFromExtensionMethod(targetType, "Count");
+                }
+            }
+
+            return null;
+        }
+
+        private MappingElement CreateMappingElementFromExtensionMethod(ITypeSymbol targetType, string methodName)
+        {
+            var sourceMethodAccessor = generator.MemberAccessExpression(sourceGlobalAccessor, methodName);
+            return new MappingElement()
+            {
+                Expression = (ExpressionSyntax) generator.InvocationExpression(sourceMethodAccessor),
+                ExpressionType = targetType
+            };
+        }
+
+        private MappingElement TryFindSource(string targetName)
         {
             //Direct 1-1 mapping
             var matchedSourceProperty = sourceProperties.Value.FirstOrDefault(x => x.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase) || $"{potentialPrefix}{x.Name}".Equals(targetName, StringComparison.OrdinalIgnoreCase));
@@ -80,10 +112,9 @@ namespace MappingGenerator
                 {
                     var rest = Regex.Split(targetName, @"(?<!^)(?=[A-Z])").Skip(potentialPrefix.Length);
                     var newTarget = $"{potentialPrefix}{string.Join("", rest)}";
-                    return FindSource(newTarget);
+                    return TryFindSource(newTarget);
                 }
             }
-
             return null;
         }
 

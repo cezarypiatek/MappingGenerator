@@ -1,3 +1,4 @@
+using MappingGenerator.Features.Refactorings;
 using MappingGenerator.Test.EmptyInitializationBlock;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeRefactorings;

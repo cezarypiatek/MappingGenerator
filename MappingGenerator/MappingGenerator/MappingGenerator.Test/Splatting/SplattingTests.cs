@@ -1,3 +1,4 @@
+using MappingGenerator.Features.CodeFixes;
 using Microsoft.CodeAnalysis.CodeFixes;
 using MappingGenerator.Test.Splatting;
 using Microsoft.CodeAnalysis;

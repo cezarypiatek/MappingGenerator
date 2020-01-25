@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using MappingGenerator.Features.Suggestions;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Completion;
 using NUnit.Framework;
 using RoslynTestKit;

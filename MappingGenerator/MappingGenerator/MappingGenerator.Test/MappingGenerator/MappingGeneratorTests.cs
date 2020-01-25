@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using MappingGenerator.Features.Refactorings.Mapping;
+using MappingGenerator.Features.Refactorings;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeRefactorings;

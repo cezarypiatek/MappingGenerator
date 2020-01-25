@@ -1,4 +1,4 @@
-﻿using MappingGenerator.Features.Refactorings.Mapping;
+﻿using MappingGenerator.Features.Refactorings;
 using MappingGenerator.Test.MappingGenerator;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeRefactorings;

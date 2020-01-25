@@ -172,4 +172,10 @@
   <data name="_009_QueryContinuationInLinq_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>TestCasesData\009_QueryContinuationInLinq_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="_010_GroupByInLinq" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCasesData\010_GroupByInLinq.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_010_GroupByInLinq_txt_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCasesData\010_GroupByInLinq.txt_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

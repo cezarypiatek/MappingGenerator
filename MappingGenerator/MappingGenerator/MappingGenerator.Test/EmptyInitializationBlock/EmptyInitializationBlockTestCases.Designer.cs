@@ -626,5 +626,75 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
                 return ResourceManager.GetString("_009_QueryContinuationInLinq_FIXED", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Linq;
+        ///
+        ///namespace ConsoleApp9
+        ///{
+        ///    public class Tenant
+        ///    {
+        ///        public string Key { get; set; }
+        ///
+        ///        public string Description { get; set; }
+        ///    }
+        ///
+        ///    public class User
+        ///    {
+        ///        public int Id { get; set; }
+        ///
+        ///        public string Name { get; set; }
+        ///
+        ///        public IList&lt;UserRequest&gt; Requests { get; } = new List&lt;UserRequest&gt;();
+        ///
+        ///        public string Tenant { get; set; }
+        ///    }
+        ///
+        ///    public class Request
+        ///    {
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _010_GroupByInLinq {
+            get {
+                return ResourceManager.GetString("_010_GroupByInLinq", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Linq;
+        ///
+        ///namespace ConsoleApp9
+        ///{
+        ///    public class Tenant
+        ///    {
+        ///        public string Key { get; set; }
+        ///
+        ///        public string Description { get; set; }
+        ///    }
+        ///
+        ///    public class User
+        ///    {
+        ///        public int Id { get; set; }
+        ///
+        ///        public string Name { get; set; }
+        ///
+        ///        public IList&lt;UserRequest&gt; Requests { get; } = new List&lt;UserRequest&gt;();
+        ///
+        ///        public string Tenant { get; set; }
+        ///    }
+        ///
+        ///    public class Request
+        ///    {
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _010_GroupByInLinq_txt_FIXED {
+            get {
+                return ResourceManager.GetString("_010_GroupByInLinq_txt_FIXED", resourceCulture);
+            }
+        }
     }
 }

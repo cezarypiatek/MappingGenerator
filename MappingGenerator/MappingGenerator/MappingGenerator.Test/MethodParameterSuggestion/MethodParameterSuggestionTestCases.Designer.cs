@@ -209,7 +209,34 @@ namespace MappingGenerator.Test.MethodParameterSuggestion {
         ///{
         ///    public class TestMapper
         ///    {
-        ///        IUserDTO firstParent = new UserDTO();
+        ///        EntityDTO firstParent = new UserDTO();
+        ///
+        ///        public static UserDTO Map(string firstName, string lastName, int age)
+        ///        {
+        ///            Map2([||]);
+        ///        }
+        ///
+        ///        public static UserDTO Map2(string firstName, string lastName, int age, EntityDTO parent)
+        ///        {
+        ///             [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _006_FallbackByTypeIfSingleCandidateBaseClass {
+            get {
+                return ResourceManager.GetString("_006_FallbackByTypeIfSingleCandidateBaseClass", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        UserDTO firstParent = new UserDTO();
         ///
         ///        public static UserDTO Map(string firstName, string lastName, int age)
         ///        {
@@ -219,11 +246,39 @@ namespace MappingGenerator.Test.MethodParameterSuggestion {
         ///        public static UserDTO Map2(string firstName, string lastName, int age, IUserDTO parent)
         ///        {
         ///            
+        ///  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _007_FallbackByTypeIfSingleCandidateInterfaceInheritance {
+            get {
+                return ResourceManager.GetString("_007_FallbackByTypeIfSingleCandidateInterfaceInheritance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        UserDTO firstParent = new UserDTO();
+        ///
+        ///        public static UserDTO Map(string firstName, string lastName, int age)
+        ///        {
+        ///            Map2([||]);
+        ///        }
+        ///
+        ///        public static UserDTO Map2(string firstName, string lastName, int age, EntityDTO parent)
+        ///        {
+        ///            
         /// [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string _006_FallbackByTypeIfSingleCandidateBaseClass {
+        internal static string _008_FallbackByTypeIfSingleCandidateBaseClassInheritance {
             get {
-                return ResourceManager.GetString("_006_FallbackByTypeIfSingleCandidateBaseClass", resourceCulture);
+                return ResourceManager.GetString("_008_FallbackByTypeIfSingleCandidateBaseClassInheritance", resourceCulture);
             }
         }
     }

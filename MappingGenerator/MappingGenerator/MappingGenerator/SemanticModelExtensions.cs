@@ -104,5 +104,34 @@ namespace MappingGenerator
            
             return null;
         }
+
+        public static bool MatchType(this SemanticModel semanticModel, ISymbol source, ITypeSymbol targetType)
+        {
+            var sourceSymbolType = semanticModel.GetTypeForSymbol(source);
+            if (sourceSymbolType == null)
+            {
+                return false;
+            }
+
+            return sourceSymbolType.CanBeAssignedTo(targetType);
+        }
+
+        public static bool CanBeAssignedTo(this ITypeSymbol sourceSymbolType, ITypeSymbol targetType)
+        {
+            if (sourceSymbolType.GetBaseTypesAndThis().Any(t => t.Equals(targetType)))
+            {
+                return true;
+            }
+
+            if (targetType.TypeKind == TypeKind.Interface)
+            {
+                if (sourceSymbolType.OriginalDefinition.AllInterfaces.Any(i => i.Equals(targetType)))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }

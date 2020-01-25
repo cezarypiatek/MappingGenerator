@@ -141,4 +141,10 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public string BankName { get; set; }
         public string Number { get; set; }
     }
+
+    public enum CustomerKind
+    {
+        Regular,
+        Special
+    }
 }

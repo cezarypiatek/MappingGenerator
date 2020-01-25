@@ -21,6 +21,7 @@ namespace TestAutoMapper.Identity.X
 
         public static List<ZZ> [|MapNew|](List<XX> categories)
         {
+            throw new NotImplementedException();
         }
     }
 }

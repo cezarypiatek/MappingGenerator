@@ -86,6 +86,17 @@ namespace MappingGenerator.Test.MethodParameterSuggestion
                 "firstName:firstName, lastName:lastName, age:age, parent:firstParent"
             });
         }
+        
+        
+        [Test]
+        public void should_be_able_to_get_completion_with_variables_for_extension_method()
+        {
+            TestCompletion(MethodParameterSuggestionTestCases._009_SuggestParamsForExtensionMethod, new[]
+            {
+                "firstName, lastName, age",
+                "firstName:firstName, lastName:lastName, age:age"
+            });
+        }
 
 
         protected override string LanguageName => LanguageNames.CSharp;

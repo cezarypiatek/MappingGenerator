@@ -1,0 +1,31 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Collections.ObjectModel;
+
+namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+{
+    public class TestMapper
+    {
+
+        public static UserDTO Map(string firstName, string lastName, int age)
+        {
+            var user = new UserDTO();
+            user.Update([||]);
+            return user;
+        }
+    }
+
+    public class UserDTO
+    {
+    
+    }
+
+    public static class UserDTOExtensions
+    {
+        public static void Update(this UserDTO user, string firstName, string lastName, int age)
+        {
+            
+        }
+    }
+}

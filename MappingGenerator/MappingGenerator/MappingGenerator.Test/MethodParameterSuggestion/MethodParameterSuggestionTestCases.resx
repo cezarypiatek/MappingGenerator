@@ -142,4 +142,7 @@
   <data name="_008_FallbackByTypeIfSingleCandidateBaseClassInheritance" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>TestCaseData\008_FallbackByTypeIfSingleCandidateBaseClassInheritance.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="_009_SuggestParamsForExtensionMethod" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\009_SuggestParamsForExtensionMethod.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

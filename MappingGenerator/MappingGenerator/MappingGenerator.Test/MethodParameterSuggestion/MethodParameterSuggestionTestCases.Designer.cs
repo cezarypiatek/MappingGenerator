@@ -281,5 +281,37 @@ namespace MappingGenerator.Test.MethodParameterSuggestion {
                 return ResourceManager.GetString("_008_FallbackByTypeIfSingleCandidateBaseClassInheritance", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///
+        ///        public static UserDTO Map(string firstName, string lastName, int age)
+        ///        {
+        ///            var user = new UserDTO();
+        ///            user.Update([||]);
+        ///            return user;
+        ///        }
+        ///    }
+        ///
+        ///    public class UserDTO
+        ///    {
+        ///    
+        ///    }
+        ///
+        ///    public static class UserDTOExtensions        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _009_SuggestParamsForExtensionMethod {
+            get {
+                return ResourceManager.GetString("_009_SuggestParamsForExtensionMethod", resourceCulture);
+            }
+        }
     }
 }

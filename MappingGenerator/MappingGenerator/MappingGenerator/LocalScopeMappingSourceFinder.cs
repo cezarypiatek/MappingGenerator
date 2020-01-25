@@ -49,7 +49,7 @@ namespace MappingGenerator
 
             if (AllowMatchOnlyByTypeWhenSingleCandidate)
             {
-                var byTypeCandidates = localSymbols.Where(x => MatchType(x, targetType)).ToList();
+                var byTypeCandidates = localSymbols.Where(x => semanticModel. MatchType(x, targetType)).ToList();
                 if (byTypeCandidates.Count == 1)
                 {
                     var byTypeCandidate = byTypeCandidates[0];
@@ -66,31 +66,6 @@ namespace MappingGenerator
             }
             return null;
         }
-
-        private bool MatchType(ISymbol source, ITypeSymbol targetType)
-        {
-            var sourceSymbolType = semanticModel.GetTypeForSymbol(source);
-            if (sourceSymbolType == null)
-            {
-                return false;
-            }
-
-            if (sourceSymbolType.GetBaseTypesAndThis().Any(t => t.Equals(targetType)))
-            {
-                return true;
-            }
-
-            if (targetType.TypeKind == TypeKind.Interface)
-            {
-                if (sourceSymbolType.OriginalDefinition.AllInterfaces.Any(i => i.Equals(targetType)))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
 
         private static IdentifierNameSyntax CreateIdentifierName(ISymbol candidate)
         {

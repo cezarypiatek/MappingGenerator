@@ -136,4 +136,10 @@
   <data name="_006_FallbackByTypeIfSingleCandidateBaseClass" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>TestCaseData\006_FallbackByTypeIfSingleCandidateBaseClass.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="_007_FallbackByTypeIfSingleCandidateInterfaceInheritance" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\007_FallbackByTypeIfSingleCandidateInterfaceInheritance.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_008_FallbackByTypeIfSingleCandidateBaseClassInheritance" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\008_FallbackByTypeIfSingleCandidateBaseClassInheritance.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

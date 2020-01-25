@@ -67,6 +67,26 @@ namespace MappingGenerator.Test.MethodParameterSuggestion
             });
         }
 
+        [Test]
+        public void should_be_able_to_get_completion_with_variables_that_match_only_type_when_single_candidate_by_interface_inheritance()
+        {
+            TestCompletion(MethodParameterSuggestionTestCases._007_FallbackByTypeIfSingleCandidateInterfaceInheritance, new[]
+            {
+                "firstName, lastName, age, firstParent",
+                "firstName:firstName, lastName:lastName, age:age, parent:firstParent"
+            });
+        }
+
+        [Test]
+        public void should_be_able_to_get_completion_with_variables_that_match_only_type_when_single_candidate_by_base_class_inheritance()
+        {
+            TestCompletion(MethodParameterSuggestionTestCases._008_FallbackByTypeIfSingleCandidateBaseClassInheritance, new[]
+            {
+                "firstName, lastName, age, firstParent",
+                "firstName:firstName, lastName:lastName, age:age, parent:firstParent"
+            });
+        }
+
 
         protected override string LanguageName => LanguageNames.CSharp;
         protected override CompletionProvider CreateProvider()

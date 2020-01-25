@@ -94,7 +94,7 @@ namespace MappingGenerator
 
         protected virtual bool ShouldCreateConversionBetweenTypes(ITypeSymbol targetType, ITypeSymbol sourceType)
         {
-            return (sourceType.Equals(targetType) == false) && ObjectHelper.IsSimpleType(targetType)==false && ObjectHelper.IsSimpleType(sourceType)==false;
+            return sourceType.CanBeAssignedTo(targetType) == false && ObjectHelper.IsSimpleType(targetType)==false && ObjectHelper.IsSimpleType(sourceType)==false;
         }
 
         protected virtual MappingElement TryToCreateMappingExpression(MappingElement source, ITypeSymbol targetType, MappingPath mappingPath)

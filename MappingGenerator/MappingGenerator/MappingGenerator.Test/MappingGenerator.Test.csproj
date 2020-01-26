@@ -58,6 +58,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>SplattingTestCases.resx</DependentUpon>
     </Compile>
+    <Compile Update="UpdateLambdaParameter\UpdateLambdaParameterRefactoringTestCases.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>UpdateLambdaParameterRefactoringTestCases.resx</DependentUpon>
+    </Compile>
     <Compile Update="UseLocalVariablesAsParameters\UseLocalVariablesTestCases.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -93,6 +98,10 @@
     <EmbeddedResource Update="Splatting\SplattingTestCases.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>SplattingTestCases.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="UpdateLambdaParameter\UpdateLambdaParameterRefactoringTestCases.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>UpdateLambdaParameterRefactoringTestCases.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="UseLocalVariablesAsParameters\UseLocalVariablesTestCases.resx">
       <Generator>ResXFileCodeGenerator</Generator>

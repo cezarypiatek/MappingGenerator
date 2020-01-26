@@ -1,0 +1,34 @@
+﻿using System;
+
+namespace ConsoleApp9
+{
+    public class User
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public string Tenant { get; set; }
+    }
+
+    public class UserView
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public string Tenant { get; set; }
+    }
+
+    public static class Examples
+    {
+        public static void Process(User user)
+        {
+            Update(userView => {[||]});
+        }
+
+        private static void Update(Action<UserView> updateAction)
+        {
+        }
+    }
+}

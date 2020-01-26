@@ -69,7 +69,7 @@ namespace MappingGenerator.Features.Refactorings
             var createdObjectType = methodSymbol.Parameters.First().Type;
             var contextAssembly = semanticModel.FindContextAssembly(lambda);
             var mappingEngine = await MappingEngine.Create(document, cancellationToken, contextAssembly);
-            var propertiesToSet = ObjectHelper.GetFieldsThaCanBeSetPublicly(createdObjectType, contextAssembly);
+            var propertiesToSet = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(createdObjectType, contextAssembly);
             var mappingContext = new MappingContext(lambda, semanticModel);
             var statements = mappingEngine.MapUsingSimpleAssignment(propertiesToSet, mappingMatcher, mappingContext, globalTargetAccessor: SyntaxFactory.IdentifierName(GetParameterIdentifier(lambda)))
                 .Select(x=>x.AsStatement().WithTrailingTrivia(SyntaxFactory.EndOfLine("\r\n")));

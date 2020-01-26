@@ -182,7 +182,7 @@ namespace MappingGenerator.Mappings
             MappingContext mappingContext,
             MappingPath mappingPath = null)
         {
-            var propertiesToSet = ObjectHelper.GetFieldsThaCanBeSetPublicly(createdObjectTyp, contextAssembly);
+            var propertiesToSet = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(createdObjectTyp, contextAssembly);
             var assignments = MapUsingSimpleAssignment(propertiesToSet, mappingMatcher, mappingContext, mappingPath).ToList();
             if (assignments.Count == 0)
             {
@@ -192,7 +192,7 @@ namespace MappingGenerator.Mappings
             return objectCreationExpression.WithInitializer(initializerExpressionSyntax);
         }
 
-        public IEnumerable<ExpressionSyntax> MapUsingSimpleAssignment(IEnumerable<IPropertySymbol> targets,
+        public IEnumerable<ExpressionSyntax> MapUsingSimpleAssignment(IEnumerable<IObjectField> targets,
             IMappingMatcher mappingMatcher,
             MappingContext mappingContext,
             MappingPath mappingPath = null, SyntaxNode globalTargetAccessor = null)
@@ -295,7 +295,7 @@ namespace MappingGenerator.Mappings
 
         private static WrapperInfo GetWrappingInfo(ITypeSymbol wrapperType, ITypeSymbol wrappedType)
         {
-            var unwrappingProperties = ObjectHelper.GetUnwrappingProperties(wrapperType, wrappedType).ToList();
+            var unwrappingProperties = GetUnwrappingProperties(wrapperType, wrappedType).ToList();
             var unwrappingMethods = ObjectHelper.GetUnwrappingMethods(wrapperType, wrappedType).ToList();
             if (unwrappingMethods.Count + unwrappingProperties.Count == 1)
             {
@@ -309,6 +309,24 @@ namespace MappingGenerator.Mappings
             return new WrapperInfo();
         }
 
+        private static IEnumerable<IPropertySymbol> GetUnwrappingProperties(ITypeSymbol wrapperType, ITypeSymbol wrappedType)
+        {
+            return GetPublicPropertySymbols(wrapperType).Where(x => x.GetMethod.DeclaredAccessibility == Accessibility.Public && x.Type == wrappedType);
+        }
+
+        private static IEnumerable<IPropertySymbol> GetPublicPropertySymbols(ITypeSymbol source)
+        {
+            return source.GetBaseTypesAndThis().SelectMany(x => x.GetMembers()).OfType<IPropertySymbol>().Where(IsPublicPropertySymbol);
+        }
+
+        private static bool IsPublicPropertySymbol(IPropertySymbol x)
+        {
+            if (x.IsStatic || x.IsIndexer || x.DeclaredAccessibility != Accessibility.Public)
+            {
+                return false;
+            }
+            return true;
+        }
 
         private SyntaxNode MapCollections(SyntaxNode sourceAccess, ITypeSymbol sourceListType,
             ITypeSymbol targetListType, MappingPath mappingPath, MappingContext mappingContext)
@@ -387,6 +405,8 @@ namespace MappingGenerator.Mappings
         {
             return (ExpressionSyntax) syntaxGenerator.DefaultExpression(typeSymbol);
         }
+
+
     }
 
     public class MappingPath

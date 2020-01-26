@@ -121,17 +121,18 @@ namespace MappingGenerator.RoslynHelpers
             return xt.OriginalDefinition.AllInterfaces.Any(x => x.ToDisplayString() == interfaceName);
         }
 
-        public static IEnumerable<IPropertySymbol> GetFieldsThaCanBeSetFromConstructor(ITypeSymbol type)
+        public static IEnumerable<IObjectField> GetFieldsThaCanBeSetFromConstructor(ITypeSymbol type)
         {
             return ObjectHelper.GetPublicPropertySymbols(type)
-                .Where(property => property.SetMethod != null || property.CanBeSetOnlyFromConstructor());
+                .Where(property => property.SetMethod != null || property.CanBeSetOnlyFromConstructor())
+                .Select(x=> new ObjectProperty(x));
         }
         
-        public static IEnumerable<IPropertySymbol> GetFieldsThaCanBeSetPublicly(ITypeSymbol type,
-            IAssemblySymbol contextAssembly)
+        public static IEnumerable<IObjectField> GetFieldsThaCanBeSetPublicly(ITypeSymbol type, IAssemblySymbol contextAssembly)
         {
             var canSetInternalFields =contextAssembly.IsSameAssemblyOrHasFriendAccessTo(type.ContainingAssembly);
-            return GetPublicPropertySymbols(type).Where(property => property.SetMethod != null && property.CanBeSetPublicly(canSetInternalFields));
+            return GetPublicPropertySymbols(type).Where(property => property.SetMethod != null && property.CanBeSetPublicly(canSetInternalFields))
+                .Select(x=> new ObjectProperty(x));
         }
 
         public static bool IsSameAssemblyOrHasFriendAccessTo(this IAssemblySymbol assembly, IAssemblySymbol toAssembly)
@@ -148,10 +149,11 @@ namespace MappingGenerator.RoslynHelpers
                 toAssembly.GivesAccessTo(assembly);
         }
 
-        public static IEnumerable<IPropertySymbol> GetFieldsThaCanBeSetPrivately(ITypeSymbol type)
+        public static IEnumerable<IObjectField> GetFieldsThaCanBeSetPrivately(ITypeSymbol type)
         {
             return ObjectHelper.GetPublicPropertySymbols(type)
-                .Where(property => property.SetMethod != null && property.CanBeSetPrivately());
+                .Where(property => property.SetMethod != null && property.CanBeSetPrivately())
+                .Select(x=> new ObjectProperty(x));
         }
 
         public static IAssemblySymbol FindContextAssembly(this SemanticModel semanticModel, SyntaxNode node )
@@ -160,5 +162,44 @@ namespace MappingGenerator.RoslynHelpers
             var symbol = semanticModel.GetDeclaredSymbol(type);
             return symbol.ContainingAssembly;
         }
+    }
+
+    public interface IObjectField
+    {
+        string Name { get; }
+        ITypeSymbol Type { get; }
+        ISymbol UnderlyingSymbol { get; }
+    }
+
+    public class ObjectField : IObjectField
+    {
+        private readonly IFieldSymbol fieldSymbol;
+
+        public ObjectField(IFieldSymbol fieldSymbol)
+        {
+            this.fieldSymbol = fieldSymbol;
+        }
+
+        public string Name => fieldSymbol.Name;
+
+        public ITypeSymbol Type => fieldSymbol.Type;
+
+        public ISymbol UnderlyingSymbol => fieldSymbol;
+    }
+
+    public class ObjectProperty : IObjectField
+    {
+        private readonly IPropertySymbol propertySymbol;
+
+        public ObjectProperty(IPropertySymbol propertySymbol)
+        {
+            this.propertySymbol = propertySymbol;
+        }
+
+        public string Name => propertySymbol.Name;
+
+        public ITypeSymbol Type => propertySymbol.Type;
+
+        public ISymbol UnderlyingSymbol => propertySymbol;
     }
 }

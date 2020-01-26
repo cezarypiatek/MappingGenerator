@@ -179,7 +179,7 @@ namespace MappingGenerator.Mappings
             return objectCreationExpression.WithInitializer(initializerExpressionSyntax);
         }
 
-        public IEnumerable<ExpressionSyntax> MapUsingSimpleAssignment(IEnumerable<IPropertySymbol> targets, IMappingMatcher mappingMatcher,
+        public IEnumerable<ExpressionSyntax> MapUsingSimpleAssignment(IEnumerable<IObjectField> targets, IMappingMatcher mappingMatcher,
             MappingPath mappingPath = null, SyntaxNode globalTargetAccessor = null)
         {
             if (mappingPath == null)

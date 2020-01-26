@@ -177,17 +177,35 @@ namespace MappingGenerator.Test.Mapping
         {
             TestCodeRefactoring(_027_ConstructorWithSingleParameter, _027_ConstructorWithSingleParameter_FIXED);
         }
+        
+        [Test]
+        public void should_be_able_to_update_using_private_method()
+        {
+            TestCodeRefactoring(_028_PrivateUpdateFieldAccessibility, _028_PrivateUpdateFieldAccessibility_FIXEDy);
+        } 
+        
+        [Test]
+        public void should_be_able_to_update_using_constructor()
+        {
+            TestCodeRefactoring(_030_ConstructorUpdateFieldAccessibility, _030_ConstructorUpdateFieldAccessibility_FIXED);
+        } 
+        
+        [Test]
+        public void should_be_able_to_update_public_fields()
+        {
+            TestCodeRefactoring(_032_PubliclyUpdateFieldAccessibility, _032_PubliclyUpdateFieldAccessibility_FIXED);
+        }
 
         [Test]
         public void should_be_able_to_generate_mapping_using_custom_conversions()
         {
-            TestCodeRefactoring(_028_PureMappingMethodWithCustomConversions, _028_PureMappingMethodWithCustomConversions_FIXED, 1);
+            TestCodeRefactoring(_029_PureMappingMethodWithCustomConversions, _029_PureMappingMethodWithCustomConversions_FIXED, 1);
         }
         
         [Test]
         public void should_be_able_to_generate_mapping_using_inherited_custom_conversions()
         {
-            TestCodeRefactoring(_029_PureMappingMethodWithInheritedCustomConversions, _029_PureMappingMethodWithInheritedCustomConversions_FIXED, 1);
+            TestCodeRefactoring(_031_PureMappingMethodWithInheritedCustomConversions, _031_PureMappingMethodWithInheritedCustomConversions_FIXED, 1);
         }
 
         protected override string LanguageName => LanguageNames.CSharp;

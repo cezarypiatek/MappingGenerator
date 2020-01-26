@@ -118,7 +118,7 @@ namespace MappingGenerator.Test.OnBuildGenerator {
         ///
         ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         ///{
-        ///    [MappingInterface(TypeMappers = new []{typeof(CustomMappers)})]
+        ///    [MappingInterface(CustomStaticMappers = new []{typeof(CustomMappers)})]
         ///    public interface ISampleMapper
         ///    {
         ///        UserDTO Map(UserEntity entity);
@@ -127,8 +127,7 @@ namespace MappingGenerator.Test.OnBuildGenerator {
         ///    public class UserDTO
         ///    {
         ///        public string FirstName { get;  }
-        ///        public string LastName { get; private set; }
-        ///  [rest of string was truncated]&quot;;.
+        ///        public string LastName { get; private s [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _003_ExternalTypeMappers {
             get {

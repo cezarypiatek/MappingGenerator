@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using MappingGenerator.Mappings.SourceFinders;
+using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -17,7 +18,7 @@ namespace MappingGenerator.Mappings.MappingMatchers
             this.sourceFinder = sourceFinder;
         }
 
-        public IReadOnlyList<MappingMatch> MatchAll(IEnumerable<IPropertySymbol> targets,
+        public IReadOnlyList<MappingMatch> MatchAll(IEnumerable<IObjectField> targets,
             SyntaxGenerator syntaxGenerator, MappingContext mappingContext, SyntaxNode globalTargetAccessor = null)
         {
             return targets.Select(property => new MappingMatch
@@ -28,7 +29,7 @@ namespace MappingGenerator.Mappings.MappingMatchers
                 .Where(x => x.Source != null).ToList();
         }
 
-        private MappingElement CreateTargetElement(SyntaxNode globalTargetAccessor, IPropertySymbol property,
+        private MappingElement CreateTargetElement(SyntaxNode globalTargetAccessor, IObjectField property,
             SyntaxGenerator syntaxGenerator)
         {
             return new MappingElement()
@@ -38,7 +39,7 @@ namespace MappingGenerator.Mappings.MappingMatchers
             };
         }
 
-        private static SyntaxNode CreateAccessPropertyExpression(SyntaxNode globalTargetAccessor, IPropertySymbol property, SyntaxGenerator generator)
+        private static SyntaxNode CreateAccessPropertyExpression(SyntaxNode globalTargetAccessor, IObjectField property, SyntaxGenerator generator)
         {
             if (globalTargetAccessor == null)
             {

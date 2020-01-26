@@ -161,7 +161,7 @@ namespace MappingGenerator.Mappings.SourceFinders
                         objectCreationExpression = (ObjectCreationExpressionSyntax)syntaxGenerator.ObjectCreationExpression(nt, constructorArguments);
                     }
 
-                    var fields = ObjectHelper.GetFieldsThaCanBeSetPublicly(nt, _contextAssembly);
+                    var fields = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(nt, _contextAssembly);
                     var assignments = fields.Select(x =>
                     {
                         var identifier = (ExpressionSyntax)(SyntaxFactory.IdentifierName(x.Name));

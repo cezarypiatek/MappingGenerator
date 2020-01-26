@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using MappingGenerator.Mappings.SourceFinders;
+using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Editing;
 
@@ -16,7 +17,7 @@ namespace MappingGenerator.Mappings.MappingMatchers
             matchers = sourceFinders.Select(x => new SingleSourceMatcher(x)).ToList();
         }
 
-        public IReadOnlyList<MappingMatch> MatchAll(IEnumerable<IPropertySymbol> targets,
+        public IReadOnlyList<MappingMatch> MatchAll(IEnumerable<IObjectField> targets,
             SyntaxGenerator syntaxGenerator, MappingContext mappingContext, SyntaxNode globalTargetAccessor = null)
         {
             return matchers.Select(x => x.MatchAll(targets, syntaxGenerator, mappingContext, globalTargetAccessor))

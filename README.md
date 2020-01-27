@@ -20,6 +20,8 @@ If you find this extension useful (you feel it helps you on the daily basis) you
 
 [![](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/tmAJLYvWy)
 
+![support guide](/doc/support_anim.gif)
+
 ### Contributing
 Before you start any contributig work, plase read the [contribution guidline](/docs/CONTRIBUTING.md)
 

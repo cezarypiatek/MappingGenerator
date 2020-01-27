@@ -21,7 +21,7 @@ namespace MappingGenerator.RoslynHelpers
             throw new System.NotImplementedException();
         }
 
-        public bool CanBeSetPrivately()
+        public bool CanBeSetPrivately(ITypeSymbol fromType)
         {
             throw new System.NotImplementedException();
         }

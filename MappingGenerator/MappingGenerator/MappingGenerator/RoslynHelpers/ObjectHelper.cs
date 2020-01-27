@@ -138,7 +138,7 @@ namespace MappingGenerator.RoslynHelpers
         ISymbol UnderlyingSymbol { get; }
 
         bool CanBeSetPublicly(IAssemblySymbol contextAssembly);
-        bool CanBeSetPrivately();
+        bool CanBeSetPrivately(ITypeSymbol fromType);
         bool CanBeSetInConstructor();
     }
 }

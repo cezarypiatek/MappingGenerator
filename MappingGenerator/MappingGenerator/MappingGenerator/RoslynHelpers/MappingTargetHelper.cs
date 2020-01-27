@@ -25,7 +25,7 @@ namespace MappingGenerator.RoslynHelpers
         {
             return GetRegularPropertySymbols(type)
                 .Select(x => new ObjectProperty(x))
-                .Where(x => x.CanBeSetPrivately());
+                .Where(x => x.CanBeSetPrivately(type));
         }
 
         private static IEnumerable<IPropertySymbol> GetRegularPropertySymbols(ITypeSymbol source)

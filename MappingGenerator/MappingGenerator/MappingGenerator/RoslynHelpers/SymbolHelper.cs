@@ -22,24 +22,6 @@ namespace MappingGenerator.RoslynHelpers
             return new []{typeSymbol};
         }
 
-        public static bool CanBeSetPublicly(this IPropertySymbol property, bool isInternalAccessible)
-        {
-            if (IsDeclaredOutsideTheSourcecode(property))
-            {
-                return property.IsReadOnly == false && 
-                       property.SetMethod != null &&
-                       property.SetMethod.DeclaredAccessibility == Accessibility.Public;
-            }
-
-            var propertyDeclaration = property.DeclaringSyntaxReferences.Select(x => x.GetSyntax()).OfType<PropertyDeclarationSyntax>().FirstOrDefault();
-            if (propertyDeclaration?.AccessorList == null)
-            {
-                return false;
-            }
-
-            return HasPublicSetter(propertyDeclaration, isInternalAccessible);
-        }
-
         public static bool IsDeclaredOutsideTheSourcecode(IPropertySymbol property)
         {
             return property.DeclaringSyntaxReferences.Length == 0;

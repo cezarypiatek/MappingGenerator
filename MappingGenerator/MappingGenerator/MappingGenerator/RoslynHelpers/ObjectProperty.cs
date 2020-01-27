@@ -21,6 +21,11 @@ namespace MappingGenerator.RoslynHelpers
         public ISymbol UnderlyingSymbol => property;
         public bool CanBeSetPublicly(IAssemblySymbol contextAssembly)
         {
+            if(property.SetMethod == null)
+            {
+                return false;
+            }
+
             var canSetInternalFields = contextAssembly.IsSameAssemblyOrHasFriendAccessTo(property.ContainingAssembly);
             if(property.DeclaredAccessibility != Accessibility.Public)
             {
@@ -29,38 +34,48 @@ namespace MappingGenerator.RoslynHelpers
                     return false;
                 }
             }
-            return property.SetMethod != null && property.CanBeSetPublicly(canSetInternalFields);
+
+            if (property.SetMethod.DeclaredAccessibility != Accessibility.Public)
+            {
+                if (property.SetMethod.DeclaredAccessibility != Accessibility.Internal || canSetInternalFields == false)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
-        public bool CanBeSetPrivately()
+        public bool CanBeSetPrivately(ITypeSymbol fromType)
         {
             if (property.SetMethod == null)
             {
                 return false;
             }
 
-            var propertyDeclaration = property.DeclaringSyntaxReferences.Select(x => x.GetSyntax()).OfType<PropertyDeclarationSyntax>().FirstOrDefault();
-            if (propertyDeclaration?.AccessorList == null)
-            {
-                return false;
-            }
-
-            return SymbolHelper.HasPrivateSetter(propertyDeclaration) || SymbolHelper.HasPublicSetter(propertyDeclaration, isInternalAccessible:true);
-        }
-
-        public bool CanBeSetInConstructor()
-        {
-            if(property.SetMethod != null)
+            if (this.CanBeSetPublicly(fromType.ContainingAssembly))
             {
                 return true;
             }
 
+            if (property.SetMethod.DeclaredAccessibility == Accessibility.Protected)
+            {
+                return true;
+            }
+
+            return property.SetMethod.DeclaredAccessibility == Accessibility.Private && property.ContainingType.Equals(fromType);
+        }
+
+        public bool CanBeSetInConstructor()
+        {
             if (SymbolHelper.IsDeclaredOutsideTheSourcecode(property))
             {
-                return  property.IsReadOnly ||
-                      (property.SetMethod != null &&
-                       new[] {Accessibility.Public, Accessibility.Protected}.Contains(property.SetMethod.DeclaredAccessibility)
-                      );
+                return  property.IsReadOnly ||  (property.SetMethod != null && new[] {Accessibility.Public, Accessibility.Protected}.Contains(property.SetMethod.DeclaredAccessibility));
+            }
+
+            if (property.SetMethod != null)
+            {
+                return true;
             }
 
             var propertyDeclaration = property.DeclaringSyntaxReferences.Select(x => x.GetSyntax()).OfType<PropertyDeclarationSyntax>().FirstOrDefault();

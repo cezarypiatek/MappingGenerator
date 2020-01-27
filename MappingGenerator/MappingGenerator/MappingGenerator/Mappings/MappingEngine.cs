@@ -169,7 +169,7 @@ namespace MappingGenerator.Mappings
             ITypeSymbol createdObjectTyp,
             MappingPath mappingPath = null)
         {
-            var propertiesToSet = ObjectHelper.GetFieldsThaCanBeSetPublicly(createdObjectTyp, contextAssembly);
+            var propertiesToSet = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(createdObjectTyp, contextAssembly);
             var assignments = MapUsingSimpleAssignment(propertiesToSet, mappingMatcher, mappingPath).ToList();
             if (assignments.Count == 0)
             {

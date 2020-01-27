@@ -22,7 +22,7 @@ namespace MappingGenerator.Mappings.MappingImplementors
         {
             var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
             var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters);
-            var targets = ObjectHelper.GetFieldsThaCanBeSetPrivately(methodSymbol.ContainingType);
+            var targets = MappingTargetHelper.GetFieldsThaCanBeSetPrivately(methodSymbol.ContainingType);
             return mappingEngine.MapUsingSimpleAssignment(targets, new SingleSourceMatcher(sourceFinder));
         }
     }

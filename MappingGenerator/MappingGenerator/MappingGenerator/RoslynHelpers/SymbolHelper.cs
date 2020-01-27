@@ -22,16 +22,6 @@ namespace MappingGenerator.RoslynHelpers
             return new []{typeSymbol};
         }
 
-        public static bool CanBeSetPrivately(this IPropertySymbol property)
-        {
-            var propertyDeclaration = property.DeclaringSyntaxReferences.Select(x => x.GetSyntax()).OfType<PropertyDeclarationSyntax>().FirstOrDefault();
-            if (propertyDeclaration?.AccessorList == null)
-            {
-                return false;
-            }
-            return HasPrivateSetter(propertyDeclaration) || HasPublicSetter(propertyDeclaration, isInternalAccessible:true);
-        } 
-        
         public static bool CanBeSetPublicly(this IPropertySymbol property, bool isInternalAccessible)
         {
             if (IsDeclaredOutsideTheSourcecode(property))
@@ -50,42 +40,17 @@ namespace MappingGenerator.RoslynHelpers
             return HasPublicSetter(propertyDeclaration, isInternalAccessible);
         }
 
-        public static bool CanBeSetOnlyFromConstructor(this IPropertySymbol property)
-        {
-            if (IsDeclaredOutsideTheSourcecode(property))
-            {
-                return property.IsReadOnly ||
-                       (property.SetMethod != null &&
-                       new[] {Accessibility.Public, Accessibility.Protected}.Contains(property.SetMethod.DeclaredAccessibility)
-                       );
-            }
-
-
-            var propertyDeclaration = property.DeclaringSyntaxReferences.Select(x => x.GetSyntax()).OfType<PropertyDeclarationSyntax>().FirstOrDefault();
-            if (propertyDeclaration?.AccessorList == null)
-            {
-                return false;
-            }
-
-            if (HasPrivateSetter(propertyDeclaration))
-            {
-                return false;
-            }
-
-            return propertyDeclaration.AccessorList.Accessors.Count == 1 && propertyDeclaration.AccessorList.Accessors.SingleOrDefault(IsAutoGetter) != null;
-        }
-
-        private static bool IsDeclaredOutsideTheSourcecode(IPropertySymbol property)
+        public static bool IsDeclaredOutsideTheSourcecode(IPropertySymbol property)
         {
             return property.DeclaringSyntaxReferences.Length == 0;
         }
 
-        private static bool HasPrivateSetter(PropertyDeclarationSyntax propertyDeclaration)
+        public static bool HasPrivateSetter(PropertyDeclarationSyntax propertyDeclaration)
         {
             return propertyDeclaration.AccessorList.Accessors.Any(x =>x.Keyword.Kind() == SyntaxKind.SetKeyword && x.Modifiers.Any(m => m.Kind() == SyntaxKind.PrivateKeyword));
         } 
         
-        private static bool HasPublicSetter(PropertyDeclarationSyntax propertyDeclaration, bool isInternalAccessible)
+        public static bool HasPublicSetter(PropertyDeclarationSyntax propertyDeclaration, bool isInternalAccessible)
         {
             return propertyDeclaration.AccessorList.Accessors.Any(x =>
             {
@@ -111,11 +76,6 @@ namespace MappingGenerator.RoslynHelpers
                 default:
                     return false;
             }
-        }
-
-        private static bool IsAutoGetter(AccessorDeclarationSyntax x)
-        {
-            return x.IsKind(SyntaxKind.GetAccessorDeclaration) && x.Body ==null && x.ExpressionBody == null;
         }
 
         public static bool IsNullable(ITypeSymbol type, out ITypeSymbol underlyingType)

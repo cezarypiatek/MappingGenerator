@@ -18,24 +18,13 @@ namespace MappingGenerator.RoslynHelpers
                 ;
         }
 
-        private static bool IsPublicPropertySymbol(ISymbol x)
+        private static bool IsPublicPropertySymbol(IPropertySymbol x)
         {
-            if (x.Kind != SymbolKind.Property)
+            if (x.IsStatic || x.IsIndexer || x.DeclaredAccessibility != Accessibility.Public)
             {
                 return false;
             }
-
-            if (x is IPropertySymbol mSymbol)
-            {
-                if (mSymbol.IsStatic || mSymbol.IsIndexer || mSymbol.DeclaredAccessibility != Accessibility.Public)
-                {
-                    return false;
-                }
-
-                return true;
-            }
-
-            return false;
+            return true;
         }
 
         public static IEnumerable<IPropertySymbol> GetUnwrappingProperties(ITypeSymbol wrapperType, ITypeSymbol wrappedType)
@@ -50,9 +39,8 @@ namespace MappingGenerator.RoslynHelpers
 
         public static IEnumerable<IPropertySymbol> GetPublicPropertySymbols(ITypeSymbol source)
         {
-            return GetBaseTypesAndThis(source).SelectMany(x=> x.GetMembers()).Where(IsPublicPropertySymbol).OfType<IPropertySymbol>();
+            return GetBaseTypesAndThis(source).SelectMany(x=> x.GetMembers()).OfType<IPropertySymbol>().Where(IsPublicPropertySymbol);
         }
-
         public static IEnumerable<IMethodSymbol> GetPublicGetMethods(ITypeSymbol source)
         {
             return GetBaseTypesAndThis(source).SelectMany(x=> x.GetMembers()).Where(IsPublicGetMethod).OfType<IMethodSymbol>();
@@ -121,20 +109,6 @@ namespace MappingGenerator.RoslynHelpers
             return xt.OriginalDefinition.AllInterfaces.Any(x => x.ToDisplayString() == interfaceName);
         }
 
-        public static IEnumerable<IObjectField> GetFieldsThaCanBeSetFromConstructor(ITypeSymbol type)
-        {
-            return ObjectHelper.GetPublicPropertySymbols(type)
-                .Where(property => property.SetMethod != null || property.CanBeSetOnlyFromConstructor())
-                .Select(x=> new ObjectProperty(x));
-        }
-        
-        public static IEnumerable<IObjectField> GetFieldsThaCanBeSetPublicly(ITypeSymbol type, IAssemblySymbol contextAssembly)
-        {
-            var canSetInternalFields =contextAssembly.IsSameAssemblyOrHasFriendAccessTo(type.ContainingAssembly);
-            return GetPublicPropertySymbols(type).Where(property => property.SetMethod != null && property.CanBeSetPublicly(canSetInternalFields))
-                .Select(x=> new ObjectProperty(x));
-        }
-
         public static bool IsSameAssemblyOrHasFriendAccessTo(this IAssemblySymbol assembly, IAssemblySymbol toAssembly)
         {
             var areEquals = assembly.Equals(toAssembly);
@@ -147,13 +121,6 @@ namespace MappingGenerator.RoslynHelpers
                 areEquals ||
                 (assembly.IsInteractive && toAssembly.IsInteractive) ||
                 toAssembly.GivesAccessTo(assembly);
-        }
-
-        public static IEnumerable<IObjectField> GetFieldsThaCanBeSetPrivately(ITypeSymbol type)
-        {
-            return ObjectHelper.GetPublicPropertySymbols(type)
-                .Where(property => property.SetMethod != null && property.CanBeSetPrivately())
-                .Select(x=> new ObjectProperty(x));
         }
 
         public static IAssemblySymbol FindContextAssembly(this SemanticModel semanticModel, SyntaxNode node )
@@ -169,37 +136,9 @@ namespace MappingGenerator.RoslynHelpers
         string Name { get; }
         ITypeSymbol Type { get; }
         ISymbol UnderlyingSymbol { get; }
-    }
 
-    public class ObjectField : IObjectField
-    {
-        private readonly IFieldSymbol fieldSymbol;
-
-        public ObjectField(IFieldSymbol fieldSymbol)
-        {
-            this.fieldSymbol = fieldSymbol;
-        }
-
-        public string Name => fieldSymbol.Name;
-
-        public ITypeSymbol Type => fieldSymbol.Type;
-
-        public ISymbol UnderlyingSymbol => fieldSymbol;
-    }
-
-    public class ObjectProperty : IObjectField
-    {
-        private readonly IPropertySymbol propertySymbol;
-
-        public ObjectProperty(IPropertySymbol propertySymbol)
-        {
-            this.propertySymbol = propertySymbol;
-        }
-
-        public string Name => propertySymbol.Name;
-
-        public ITypeSymbol Type => propertySymbol.Type;
-
-        public ISymbol UnderlyingSymbol => propertySymbol;
+        bool CanBeSetPublicly(IAssemblySymbol contextAssembly);
+        bool CanBeSetPrivately();
+        bool CanBeSetInConstructor();
     }
 }

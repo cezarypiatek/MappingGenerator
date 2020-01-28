@@ -66,30 +66,40 @@ namespace MappingGenerator.RoslynHelpers
             return property.SetMethod.DeclaredAccessibility == Accessibility.Private && property.ContainingType.Equals(fromType);
         }
 
-        public bool CanBeSetInConstructor()
+        public bool CanBeSetInConstructor(ITypeSymbol fromType)
         {
-            if (SymbolHelper.IsDeclaredOutsideTheSourcecode(property))
-            {
-                return  property.IsReadOnly ||  (property.SetMethod != null && new[] {Accessibility.Public, Accessibility.Protected}.Contains(property.SetMethod.DeclaredAccessibility));
-            }
-
-            if (property.SetMethod != null)
+            if (CanBeSetPrivately(fromType))
             {
                 return true;
             }
 
+            if (SymbolHelper.IsDeclaredOutsideTheSourcecode(property))
+            {
+                return  property.IsReadOnly ||  (property.SetMethod != null && new[] {Accessibility.Public, Accessibility.Protected}.Contains(property.SetMethod.DeclaredAccessibility));
+            }
+            
             var propertyDeclaration = property.DeclaringSyntaxReferences.Select(x => x.GetSyntax()).OfType<PropertyDeclarationSyntax>().FirstOrDefault();
             if (propertyDeclaration?.AccessorList == null)
             {
                 return false;
             }
 
-            if (SymbolHelper.HasPrivateSetter(propertyDeclaration))
+            if (HasPrivateSetter(propertyDeclaration))
             {
-                return false;
+                if (property.ContainingType.Equals(fromType) == false)
+                {
+                    return false;
+                }
+
+                return true;
             }
 
             return propertyDeclaration.AccessorList.Accessors.Count == 1 && propertyDeclaration.AccessorList.Accessors.SingleOrDefault(IsAutoGetter) != null;
+        }
+
+        private static bool HasPrivateSetter(PropertyDeclarationSyntax propertyDeclaration)
+        {
+            return propertyDeclaration.AccessorList.Accessors.Any(x => x.Keyword.Kind() == SyntaxKind.SetKeyword && x.Modifiers.Any(m => m.Kind() == SyntaxKind.PrivateKeyword));
         }
 
         private static bool IsAutoGetter(AccessorDeclarationSyntax x)

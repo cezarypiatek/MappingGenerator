@@ -286,4 +286,22 @@
   <data name="_027_ConstructorWithSingleParameter_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>TestCaseData\027_ConstructorWithSingleParameter_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="_028_PrivateUpdateFieldAccessibility" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\028_PrivateUpdateFieldAccessibility.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_028_PrivateUpdateFieldAccessibility_FIXEDy" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\028_PrivateUpdateFieldAccessibility_FIXEDy.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_029_ConstructorUpdateFieldAccessibility" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\029_ConstructorUpdateFieldAccessibility.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_029_ConstructorUpdateFieldAccessibility_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\029_ConstructorUpdateFieldAccessibility_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_030_PubliclyUpdateFieldAccessibility" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\030_PubliclyUpdateFieldAccessibility.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_030_PubliclyUpdateFieldAccessibility_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\030_PubliclyUpdateFieldAccessibility_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

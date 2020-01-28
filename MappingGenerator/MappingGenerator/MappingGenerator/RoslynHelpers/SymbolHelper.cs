@@ -27,39 +27,6 @@ namespace MappingGenerator.RoslynHelpers
             return property.DeclaringSyntaxReferences.Length == 0;
         }
 
-        public static bool HasPrivateSetter(PropertyDeclarationSyntax propertyDeclaration)
-        {
-            return propertyDeclaration.AccessorList.Accessors.Any(x =>x.Keyword.Kind() == SyntaxKind.SetKeyword && x.Modifiers.Any(m => m.Kind() == SyntaxKind.PrivateKeyword));
-        } 
-        
-        public static bool HasPublicSetter(PropertyDeclarationSyntax propertyDeclaration, bool isInternalAccessible)
-        {
-            return propertyDeclaration.AccessorList.Accessors.Any(x =>
-            {
-                if (x.Keyword.Kind() == SyntaxKind.SetKeyword)
-                {
-                    return x.Modifiers.Count == 0 || x.Modifiers.Any(m => AllowsForPublic(m, isInternalAccessible));
-                }
-                return false;
-            });
-        }
-
-        private static bool AllowsForPublic(SyntaxToken accessor, bool isInternalAccessible)
-        {
-            switch (accessor.Kind())
-            {
-                case SyntaxKind.PrivateKeyword:
-                case SyntaxKind.ProtectedKeyword:
-                    return false;
-                case SyntaxKind.InternalKeyword when isInternalAccessible:
-                    return true;
-                case SyntaxKind.PublicKeyword:
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
         public static bool IsNullable(ITypeSymbol type, out ITypeSymbol underlyingType)
         {
             if (type.TypeKind == TypeKind.Struct && type.Name == "Nullable")

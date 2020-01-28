@@ -1,0 +1,72 @@
+﻿namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+{
+    class ClassA
+    {
+        public string Property1 { get; set; }
+        public string Property2 { get; set; }
+        public string Property3 { get; set; }
+        public string Property4 { get; set; }
+        public string Property5 { get; set; }
+        public string Property6 { get; set; }
+        public string Property7 { get; set; }
+        public string Property8 { get; set; }
+        public string Property9 { get; set; }
+        public string Property10 { get; set; } 
+        public string BaseProperty1 { get; set; }
+        public string BaseProperty2 { get; set; }
+        public string BaseProperty3 { get; set; }
+        public string BaseProperty4 { get; set; }
+        public string BaseProperty5 { get; set; }
+        public string BaseProperty6 { get; set; }
+        public string BaseProperty7 { get; set; }
+        public string BaseProperty8 { get; set; }
+        public string BaseProperty9 { get; set; }
+        public string BaseProperty10 { get; set; }
+        public string BaseProperty11 { get; set; }
+    }
+
+    class BaseClassB
+    {
+        public string BaseProperty1 { get; set; }
+        internal string BaseProperty2 { get; set; }
+        public string BaseProperty3 { get; private set; }
+        internal string BaseProperty4 { get; private set; }
+        public string BaseProperty5 { get; }
+        public string BaseProperty6 => string.Empty;
+        string BaseProperty7 { get; set; }
+        private string BaseProperty8 { get; set; }
+        protected string BaseProperty9 { get; set; }
+        protected string BaseProperty10 { get; private set; }
+        public string BaseProperty11 { get; protected set; }
+    }
+
+    class ClassB: BaseClassB
+    {
+        public string Property1 { get; set; }
+        internal string Property2 { get; set; }
+        public string Property3 { get; private set; }
+        internal string Property4 { get; private set; }
+        public string Property5 { get; }
+        public string Property6 => string.Empty;
+        string Property7 { get; set; }
+        private string Property8 { get; set; }
+        protected string Property9 { get; set; }
+        protected string Property10 { get; private set; }
+
+        private void Update(ClassA from)
+        {
+            Property1 = from.Property1;
+            Property2 = from.Property2;
+            Property3 = from.Property3;
+            Property4 = from.Property4;
+            Property7 = from.Property7;
+            Property8 = from.Property8;
+            Property9 = from.Property9;
+            Property10 = from.Property10;
+            BaseProperty1 = from.BaseProperty1;
+            BaseProperty2 = from.BaseProperty2;
+            BaseProperty9 = from.BaseProperty9;
+            BaseProperty11 = from.BaseProperty11;
+        }
+    }
+}

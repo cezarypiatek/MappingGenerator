@@ -318,10 +318,9 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///    public class Person
         ///    {
         ///        public int Age { get; set; }
-        ///        public string FirstName { get; set; }
-        ///        public string LastName { get; set; }
+        ///        public string Name { get; set; }
         ///
-        ///        public void [|Update|](int age, string firstName, string lastName)
+        ///        public void [|Update|](int age, string name)
         ///        {
         ///        }
         ///    }
@@ -339,14 +338,12 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///    public class Person
         ///    {
         ///        public int Age { get; set; }
-        ///        public string FirstName { get; set; }
-        ///        public string LastName { get; set; }
+        ///        public string Name { get; set; }
         ///
-        ///        public void Update(int age, string firstName, string lastName)
+        ///        public void Update(int age, string name)
         ///        {
         ///            Age = age;
-        ///            FirstName = firstName;
-        ///            LastName = lastName;
+        ///            Name = name;
         ///        }
         ///    }
         ///}.
@@ -684,9 +681,9 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public static List&lt;YY&gt; [|Map|](List&lt;XX&gt; categories)
         ///        {
+        ///            throw new NotImplementedException();
         ///        }
-        ///    }
-        ///}.
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _012_CollectionMappingWithSingularLambdaParameterName {
             get {
@@ -814,9 +811,7 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public static List&lt;ZZ&gt; [|MapNew|](List&lt;XX&gt; dictionary)
         ///        {
-        ///        }
-        ///    }
-        ///}.
+        ///            throw n [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _014_CollectionMappingWithGenericName {
             get {
@@ -880,9 +875,7 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public static List&lt;ZZ&gt; [|MapNew|](List&lt;XX&gt; usersList)
         ///        {
-        ///        }
-        ///    }
-        ///}.
+        ///            throw ne [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _015_CollectionMappingWithPostfixGenericName {
             get {
@@ -945,9 +938,9 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public static List&lt;YY&gt; [|Map|](List&lt;XX&gt; people)
         ///        {
+        ///            throw new NotImplementedException();
         ///        }
-        ///    }
-        ///}.
+        ///     [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _016_CollectionMappingWithIrregularSingularLambdaParameterName {
             get {
@@ -1010,9 +1003,8 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public static List&lt;YY&gt; [|Map|](List&lt;XX&gt; relatedPeople)
         ///        {
-        ///        }
-        ///    }
-        ///}.
+        ///            throw new NotImplementedException();
+        ///         [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _017_CollectionMappingWithIrregularCamelCaseSingularLambdaParameterName {
             get {
@@ -1075,9 +1067,7 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public static List&lt;ZZ&gt; [|MapNew|](List&lt;XX&gt; userList)
         ///        {
-        ///        }
-        ///    }
-        ///}.
+        ///            throw new [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _018_CollectionMappingWithPostfixGenericNameInSingular {
             get {
@@ -1305,9 +1295,8 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public static List&lt;YY&gt; [|Map|](IList&lt;XX&gt; categories)
         ///        {
-        ///            throw new NotImplementedException()
-        ///        }
-        /// [rest of string was truncated]&quot;;.
+        ///            throw new NotImplementedException();
+        ///        }        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _022_CollectionMappingIListToList {
             get {
@@ -1603,6 +1592,132 @@ namespace MappingGenerator.Test.MappingGenerator {
         internal static string _027_ConstructorWithSingleParameter_FIXED {
             get {
                 return ResourceManager.GetString("_027_ConstructorWithSingleParameter_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    class ClassA
+        ///    {
+        ///        public string Property1 { get; set; }
+        ///        public string Property2 { get; set; }
+        ///        public string Property3 { get; set; }
+        ///        public string Property4 { get; set; }
+        ///        public string Property5 { get; set; }
+        ///        public string Property6 { get; set; }
+        ///        public string Property7 { get; set; }
+        ///        public string Property8 { get; set; }
+        ///        public string Property9 { get; set; } [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _028_PrivateUpdateFieldAccessibility {
+            get {
+                return ResourceManager.GetString("_028_PrivateUpdateFieldAccessibility", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    class ClassA
+        ///    {
+        ///        public string Property1 { get; set; }
+        ///        public string Property2 { get; set; }
+        ///        public string Property3 { get; set; }
+        ///        public string Property4 { get; set; }
+        ///        public string Property5 { get; set; }
+        ///        public string Property6 { get; set; }
+        ///        public string Property7 { get; set; }
+        ///        public string Property8 { get; set; }
+        ///        public string Property9 { get; set; } [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _028_PrivateUpdateFieldAccessibility_FIXEDy {
+            get {
+                return ResourceManager.GetString("_028_PrivateUpdateFieldAccessibility_FIXEDy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    class ClassA
+        ///    {
+        ///        public string Property1 { get; set; }
+        ///        public string Property2 { get; set; }
+        ///        public string Property3 { get; set; }
+        ///        public string Property4 { get; set; }
+        ///        public string Property5 { get; set; }
+        ///        public string Property6 { get; set; }
+        ///        public string Property7 { get; set; }
+        ///        public string Property8 { get; set; }
+        ///        public string Property9 { get; set; } [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _029_ConstructorUpdateFieldAccessibility {
+            get {
+                return ResourceManager.GetString("_029_ConstructorUpdateFieldAccessibility", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    class ClassA
+        ///    {
+        ///        public string Property1 { get; set; }
+        ///        public string Property2 { get; set; }
+        ///        public string Property3 { get; set; }
+        ///        public string Property4 { get; set; }
+        ///        public string Property5 { get; set; }
+        ///        public string Property6 { get; set; }
+        ///        public string Property7 { get; set; }
+        ///        public string Property8 { get; set; }
+        ///        public string Property9 { get; set; } [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _029_ConstructorUpdateFieldAccessibility_FIXED {
+            get {
+                return ResourceManager.GetString("_029_ConstructorUpdateFieldAccessibility_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    class ClassA
+        ///    {
+        ///        public string Property1 { get; set; }
+        ///        public string Property2 { get; set; }
+        ///        public string Property3 { get; set; }
+        ///        public string Property4 { get; set; }
+        ///        public string Property5 { get; set; }
+        ///        public string Property6 { get; set; }
+        ///        public string Property7 { get; set; }
+        ///        public string Property8 { get; set; }
+        ///        public string Property9 { get; set; } [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _030_PubliclyUpdateFieldAccessibility {
+            get {
+                return ResourceManager.GetString("_030_PubliclyUpdateFieldAccessibility", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    class ClassA
+        ///    {
+        ///        public string Property1 { get; set; }
+        ///        public string Property2 { get; set; }
+        ///        public string Property3 { get; set; }
+        ///        public string Property4 { get; set; }
+        ///        public string Property5 { get; set; }
+        ///        public string Property6 { get; set; }
+        ///        public string Property7 { get; set; }
+        ///        public string Property8 { get; set; }
+        ///        public string Property9 { get; set; } [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _030_PubliclyUpdateFieldAccessibility_FIXED {
+            get {
+                return ResourceManager.GetString("_030_PubliclyUpdateFieldAccessibility_FIXED", resourceCulture);
             }
         }
     }

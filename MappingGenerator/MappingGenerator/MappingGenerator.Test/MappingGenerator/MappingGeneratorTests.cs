@@ -176,6 +176,24 @@ namespace MappingGenerator.Test.Mapping
         {
             TestCodeRefactoring(_027_ConstructorWithSingleParameter, _027_ConstructorWithSingleParameter_FIXED);
         }
+        
+        [Test]
+        public void should_be_able_to_update_using_private_method()
+        {
+            TestCodeRefactoring(_028_PrivateUpdateFieldAccessibility, _028_PrivateUpdateFieldAccessibility_FIXEDy);
+        } 
+        
+        [Test]
+        public void should_be_able_to_update_using_constructor()
+        {
+            TestCodeRefactoring(_029_ConstructorUpdateFieldAccessibility, _029_ConstructorUpdateFieldAccessibility_FIXED);
+        } 
+        
+        [Test]
+        public void should_be_able_to_update_public_fields()
+        {
+            TestCodeRefactoring(_030_PubliclyUpdateFieldAccessibility, _030_PubliclyUpdateFieldAccessibility_FIXED);
+        }
 
         protected override string LanguageName => LanguageNames.CSharp;
 

@@ -10,7 +10,7 @@ namespace MappingGenerator.RoslynHelpers
         {
             return GetRegularPropertySymbols(type)
                 .Select(x => new ObjectProperty(x))
-                .Where(x=>x.CanBeSetInConstructor());
+                .Where(x=>x.CanBeSetInConstructor(type));
         }
 
         public static IEnumerable<IObjectField> GetFieldsThaCanBeSetPublicly(ITypeSymbol type, IAssemblySymbol contextAssembly)

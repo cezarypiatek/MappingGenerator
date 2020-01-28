@@ -26,7 +26,7 @@ namespace MappingGenerator.RoslynHelpers
             throw new System.NotImplementedException();
         }
 
-        public bool CanBeSetInConstructor()
+        public bool CanBeSetInConstructor(ITypeSymbol fromType)
         {
             throw new System.NotImplementedException();
         }

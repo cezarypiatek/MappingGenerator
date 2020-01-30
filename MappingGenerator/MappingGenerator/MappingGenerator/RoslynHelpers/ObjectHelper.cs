@@ -18,29 +18,11 @@ namespace MappingGenerator.RoslynHelpers
                 ;
         }
 
-        private static bool IsPublicPropertySymbol(IPropertySymbol x)
-        {
-            if (x.IsStatic || x.IsIndexer || x.DeclaredAccessibility != Accessibility.Public)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        public static IEnumerable<IPropertySymbol> GetUnwrappingProperties(ITypeSymbol wrapperType, ITypeSymbol wrappedType)
-        {
-            return GetPublicPropertySymbols(wrapperType).Where(x => x.GetMethod.DeclaredAccessibility == Accessibility.Public && x.Type == wrappedType);
-        }
-
         public static IEnumerable<IMethodSymbol> GetUnwrappingMethods(ITypeSymbol wrapperType, ITypeSymbol wrappedType)
         {
             return GetPublicGetMethods(wrapperType).Where(x => x.DeclaredAccessibility == Accessibility.Public && x.ReturnType == wrappedType);
         }
 
-        public static IEnumerable<IPropertySymbol> GetPublicPropertySymbols(ITypeSymbol source)
-        {
-            return GetBaseTypesAndThis(source).SelectMany(x=> x.GetMembers()).OfType<IPropertySymbol>().Where(IsPublicPropertySymbol);
-        }
         public static IEnumerable<IMethodSymbol> GetPublicGetMethods(ITypeSymbol source)
         {
             return GetBaseTypesAndThis(source).SelectMany(x=> x.GetMembers()).Where(IsPublicGetMethod).OfType<IMethodSymbol>();

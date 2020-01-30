@@ -31,7 +31,7 @@ namespace MappingGenerator.Mappings.SourceFinders
             this.sourceGlobalAccessor = sourceGlobalAccessor;
             this.generator = generator;
             this.potentialPrefix = NameHelper.ToLocalVariableName(sourceGlobalAccessor.ToFullString());
-            this.sourceProperties = new Lazy<IReadOnlyList<IPropertySymbol>>(() => ObjectHelper.GetPublicPropertySymbols(sourceType)
+            this.sourceProperties = new Lazy<IReadOnlyList<IPropertySymbol>>(() => GetPublicPropertySymbols(sourceType)
                 .Where(property => property.GetMethod!=null)
                 .ToList());
             this.sourceMethods = new Lazy<IReadOnlyList<IMethodSymbol>>(()=> ObjectHelper.GetPublicGetMethods(sourceType).ToList());
@@ -145,13 +145,23 @@ namespace MappingGenerator.Mappings.SourceFinders
                         ExpressionType = subProperty.Type
                     };
                 }
-                return FindSubPropertySource(targetName, subProperty.Type, ObjectHelper.GetPublicPropertySymbols(subProperty.Type),  subPropertyAccessor, currentNamePart);
+                return FindSubPropertySource(targetName, subProperty.Type, GetPublicPropertySymbols(subProperty.Type),  subPropertyAccessor, currentNamePart);
             }
             return null;
         }
 
-       
+        private static IEnumerable<IPropertySymbol> GetPublicPropertySymbols(ITypeSymbol source)
+        {
+            return source.GetBaseTypesAndThis().SelectMany(x => x.GetMembers()).OfType<IPropertySymbol>().Where(IsPublicPropertySymbol);
+        }
 
-      
+        private static bool IsPublicPropertySymbol(IPropertySymbol x)
+        {
+            if (x.IsStatic || x.IsIndexer || x.DeclaredAccessibility != Accessibility.Public)
+            {
+                return false;
+            }
+            return true;
+        }
     }
 }

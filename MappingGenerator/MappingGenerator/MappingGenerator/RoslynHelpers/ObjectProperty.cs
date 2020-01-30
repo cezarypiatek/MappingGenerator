@@ -106,5 +106,11 @@ namespace MappingGenerator.RoslynHelpers
         {
             return x.IsKind(SyntaxKind.GetAccessorDeclaration) && x.Body == null && x.ExpressionBody == null;
         }
+
+        public bool CanBeGetPublicly()
+        {
+            //TODO: Handle Internal
+            return property.DeclaredAccessibility == Accessibility.Public && property.GetMethod != null;
+        }
     }
 }

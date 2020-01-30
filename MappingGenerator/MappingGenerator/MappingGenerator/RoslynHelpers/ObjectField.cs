@@ -30,5 +30,10 @@ namespace MappingGenerator.RoslynHelpers
         {
             throw new System.NotImplementedException();
         }
+
+        public bool CanBeGetPublicly()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

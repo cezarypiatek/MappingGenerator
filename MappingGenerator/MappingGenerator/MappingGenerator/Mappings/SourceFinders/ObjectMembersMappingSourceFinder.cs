@@ -19,7 +19,7 @@ namespace MappingGenerator.Mappings.SourceFinders
         private readonly ITypeSymbol sourceType;
         private readonly SyntaxNode sourceGlobalAccessor;
         private readonly SyntaxGenerator generator;
-        private readonly Lazy<IReadOnlyList<IPropertySymbol>> sourceProperties;
+        private readonly Lazy<IReadOnlyList<IObjectField>> sourceProperties;
         private readonly Lazy<IReadOnlyList<IMethodSymbol>> sourceMethods;
         private readonly string potentialPrefix;
         private readonly Lazy<bool> isSourceTypeEnumerable;
@@ -31,11 +31,14 @@ namespace MappingGenerator.Mappings.SourceFinders
             this.sourceGlobalAccessor = sourceGlobalAccessor;
             this.generator = generator;
             this.potentialPrefix = NameHelper.ToLocalVariableName(sourceGlobalAccessor.ToFullString());
-            this.sourceProperties = new Lazy<IReadOnlyList<IPropertySymbol>>(() => GetPublicPropertySymbols(sourceType)
-                .Where(property => property.GetMethod!=null)
-                .ToList());
+            this.sourceProperties = new Lazy<IReadOnlyList<IObjectField>>(() => GetPublicFields(sourceType).ToList());
             this.sourceMethods = new Lazy<IReadOnlyList<IMethodSymbol>>(()=> ObjectHelper.GetPublicGetMethods(sourceType).ToList());
             this.isSourceTypeEnumerable = new Lazy<bool>(() => sourceType.Interfaces.Any(x => x.ToDisplayString().StartsWith("System.Collections.Generic.IEnumerable<")));
+        }
+
+        private IEnumerable<IObjectField> GetPublicFields(ITypeSymbol type)
+        {
+            return type.GetObjectFields().Where(x => x.CanBeGetPublicly());
         }
 
         public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType)
@@ -125,7 +128,7 @@ namespace MappingGenerator.Mappings.SourceFinders
             return new string(capitalLetters);
         }
 
-        private MappingElement FindSubPropertySource(string targetName, ITypeSymbol containingType, IEnumerable<IPropertySymbol> properties, SyntaxNode currentAccessor, string prefix=null)
+        private MappingElement FindSubPropertySource(string targetName, ITypeSymbol containingType, IEnumerable<IObjectField> properties, SyntaxNode currentAccessor, string prefix=null)
         {
             if (ObjectHelper.IsSimpleType(containingType))
             {
@@ -145,23 +148,9 @@ namespace MappingGenerator.Mappings.SourceFinders
                         ExpressionType = subProperty.Type
                     };
                 }
-                return FindSubPropertySource(targetName, subProperty.Type, GetPublicPropertySymbols(subProperty.Type),  subPropertyAccessor, currentNamePart);
+                return FindSubPropertySource(targetName, subProperty.Type, GetPublicFields(subProperty.Type),  subPropertyAccessor, currentNamePart);
             }
             return null;
-        }
-
-        private static IEnumerable<IPropertySymbol> GetPublicPropertySymbols(ITypeSymbol source)
-        {
-            return source.GetBaseTypesAndThis().SelectMany(x => x.GetMembers()).OfType<IPropertySymbol>().Where(IsPublicPropertySymbol);
-        }
-
-        private static bool IsPublicPropertySymbol(IPropertySymbol x)
-        {
-            if (x.IsStatic || x.IsIndexer || x.DeclaredAccessibility != Accessibility.Public)
-            {
-                return false;
-            }
-            return true;
         }
     }
 }

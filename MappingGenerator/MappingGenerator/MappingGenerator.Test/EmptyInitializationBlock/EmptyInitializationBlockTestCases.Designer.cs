@@ -696,5 +696,68 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
                 return ResourceManager.GetString("_010_GroupByInLinq_txt_FIXED", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///
+        ///namespace MappingGenerator.Test.TestCases
+        ///{
+        ///    public class UserDTO
+        ///    {
+        ///        public string FirstName { get; set; }
+        ///        public string LastName { get; set; }
+        ///        public int Age { get; set; }
+        ///    }
+        ///
+        ///    class Class1
+        ///    {
+        ///        public void CreateUser()
+        ///        {
+        ///            var firstName = &quot;Cezary&quot;;
+        ///            var lastName = &quot;Piatek&quot;;
+        ///
+        ///            var user = new UserDTO()
+        ///            [|{
+        ///
+        ///            }|] [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _011_CompleteInitializationBlockWithLocals {
+            get {
+                return ResourceManager.GetString("_011_CompleteInitializationBlockWithLocals", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///
+        ///namespace MappingGenerator.Test.TestCases
+        ///{
+        ///    public class UserDTO
+        ///    {
+        ///        public string FirstName { get; set; }
+        ///        public string LastName { get; set; }
+        ///        public int Age { get; set; }
+        ///    }
+        ///
+        ///    class Class1
+        ///    {
+        ///        public void CreateUser()
+        ///        {
+        ///            var firstName = &quot;Cezary&quot;;
+        ///            var lastName = &quot;Piatek&quot;;
+        ///
+        ///            var user = new UserDTO()
+        ///            {
+        ///                Fir [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _011_CompleteInitializationBlockWithLocals_FIXED {
+            get {
+                return ResourceManager.GetString("_011_CompleteInitializationBlockWithLocals_FIXED", resourceCulture);
+            }
+        }
     }
 }

@@ -64,6 +64,12 @@ namespace MappingGenerator.Features.Refactorings
                 yield break;
             }
 
+            if (objectInitializer.FindContainer<VariableDeclaratorSyntax>() is { } vds)
+            {
+                var leftSymbol = semanticModel.GetDeclaredSymbol(vds);
+                localSymbols = localSymbols.Where(ls => ls != leftSymbol).ToList();
+            }
+
             yield return new LocalScopeMappingSourceFinder(semanticModel, localSymbols);
 
             foreach (var localSymbol in localSymbols)

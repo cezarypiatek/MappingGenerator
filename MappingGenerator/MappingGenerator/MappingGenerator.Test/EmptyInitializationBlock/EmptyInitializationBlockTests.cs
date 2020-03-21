@@ -90,6 +90,14 @@ namespace MappingGenerator.Test
             var fixedCode = EmptyInitializationBlockTestCases._010_GroupByInLinq_txt_FIXED;
             TestCodeRefactoring(test, fixedCode, 0);
         }
+        
+        [Test]
+        public void should_not_initialized_using_itself()
+        {
+            var test = EmptyInitializationBlockTestCases._011_CompleteInitializationBlockWithLocals;
+            var fixedCode = EmptyInitializationBlockTestCases._011_CompleteInitializationBlockWithLocals_FIXED;
+            TestCodeRefactoring(test, fixedCode, 0);
+        }
       
         protected override string LanguageName => LanguageNames.CSharp;
         protected override CodeRefactoringProvider CreateProvider()

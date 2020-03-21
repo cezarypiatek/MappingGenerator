@@ -178,4 +178,10 @@
   <data name="_010_GroupByInLinq_txt_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>TestCasesData\010_GroupByInLinq.txt_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="_011_CompleteInitializationBlockWithLocals" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCasesData\011_CompleteInitializationBlockWithLocals.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_011_CompleteInitializationBlockWithLocals_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCasesData\011_CompleteInitializationBlockWithLocals_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

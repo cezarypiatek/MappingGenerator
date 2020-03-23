@@ -27,7 +27,7 @@ Before you start any contributig work, plase read the [contribution guidline](/d
 
 ### Using along with Resharper
 
-If you are not able to open Roslyn refactoring menu (`ctr + .`) please verify your Resharper settings related to `Visual Studio Integration`. For more information please check [#50](https://github.com/cezarypiatek/MappingGenerator/issues/50)
+If you are not able to open Roslyn refactoring menu (`ctr + .`) please verify your Resharper settings related to `Visual Studio Integration` or `Visual Studio code analysis` (depends on the R# version). For more information please check [#50](https://github.com/cezarypiatek/MappingGenerator/issues/50)
 
 ![resharper settings](doc/resharper_settings.jpg)
 

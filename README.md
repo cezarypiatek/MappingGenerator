@@ -126,7 +126,7 @@ CS7036 There is no argument given that corresponds to the required formal parame
 - Provide local accessible variables as parameters for method and constructor invocation
 ![locals as parameters](doc/localsforconstructor.gif)
 
-- Create missing mapping lambda
+- Create missing mapping lambda  
 ![mapping lambda](doc/mapping_lambda.gif)
 
 -  Generate ICloneable interface implementation

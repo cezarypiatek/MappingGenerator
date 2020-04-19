@@ -98,6 +98,17 @@ namespace MappingGenerator.Test.MethodParameterSuggestion
                 "firstName:firstName, lastName:lastName, age:age"
             });
         }
+        
+        
+        [Test]
+        public void should_be_able_to_get_completion_that_match_implementation_to_interface()
+        {
+            TestCompletion(MethodParameterSuggestionTestCases._010_SuggestParamsWithInterface, new[]
+            {
+                "firstName, lastName, provider",
+                "firstName:firstName, lastName:lastName, other:provider"
+            });
+        }
 
 
         protected override string LanguageName => LanguageNames.CSharp;

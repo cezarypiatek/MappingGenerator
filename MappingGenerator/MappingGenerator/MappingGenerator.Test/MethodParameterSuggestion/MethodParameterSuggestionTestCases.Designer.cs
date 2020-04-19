@@ -313,5 +313,37 @@ namespace MappingGenerator.Test.MethodParameterSuggestion {
                 return ResourceManager.GetString("_009_SuggestParamsForExtensionMethod", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///
+        ///        public static UserDTO Map(string firstName, string lastName, IIdentityProvider  provider)
+        ///        {
+        ///            var user = new UserDTO();
+        ///            user.Update([||]);
+        ///            return user;
+        ///        }
+        ///    }
+        ///
+        ///    public class UserDTO
+        ///    {
+        ///    
+        ///    }
+        ///
+        ///    public interface I [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _010_SuggestParamsWithInterface {
+            get {
+                return ResourceManager.GetString("_010_SuggestParamsWithInterface", resourceCulture);
+            }
+        }
     }
 }

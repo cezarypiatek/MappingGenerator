@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using MappingGenerator.Mappings;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -18,7 +19,7 @@ namespace MappingGenerator.RoslynHelpers
                 ;
         }
 
-        private static bool IsPublicPropertySymbol(ISymbol x)
+        public static bool IsPublicPropertySymbol(ISymbol x)
         {
             if (x.Kind != SymbolKind.Property)
             {
@@ -67,13 +68,13 @@ namespace MappingGenerator.RoslynHelpers
                 {
                     yield return current;
                     current = current.BaseType;
-                }    
+                }
             }
         }
 
         public static bool IsSystemObject(ITypeSymbol current)
         {
-            return current.Name == "Object" && current.ContainingNamespace.Name =="System";
+            return current.Name == "Object" && current.ContainingNamespace.Name == "System";
         }
 
         public static bool IsReadonlyCollection(ITypeSymbol current)
@@ -81,9 +82,13 @@ namespace MappingGenerator.RoslynHelpers
             return current.Name == "ReadOnlyCollection";
         }
 
+        public static bool IsReadonlyDictionary(ITypeSymbol current)
+        {
+            return current.Name == "IReadOnlyDictionary";
+        }
+
         public static bool IsSimpleType(ITypeSymbol type)
         {
-
             switch (type.SpecialType)
             {
                 case SpecialType.System_Boolean:
@@ -126,7 +131,7 @@ namespace MappingGenerator.RoslynHelpers
             return ObjectHelper.GetPublicPropertySymbols(type)
                 .Where(property => property.SetMethod != null || property.CanBeSetOnlyFromConstructor());
         }
-        
+
         public static IEnumerable<IPropertySymbol> GetFieldsThaCanBeSetPublicly(ITypeSymbol type,
             IAssemblySymbol contextAssembly)
         {
@@ -154,11 +159,17 @@ namespace MappingGenerator.RoslynHelpers
                 .Where(property => property.SetMethod != null && property.CanBeSetPrivately());
         }
 
-        public static IAssemblySymbol FindContextAssembly(this SemanticModel semanticModel, SyntaxNode node )
+        public static IAssemblySymbol FindContextAssembly(this SemanticModel semanticModel, SyntaxNode node)
         {
             var type = node.FindNearestContainer<ClassDeclarationSyntax, StructDeclarationSyntax>();
             var symbol = semanticModel.GetDeclaredSymbol(type);
             return symbol.ContainingAssembly;
+        }
+
+        public static IEnumerable<IPropertySymbol> GetCollectionProperties(ITypeSymbol type, IAssemblySymbol contextAssembly)
+        {
+            return GetPublicPropertySymbols(type)
+                .Where(property => !IsSimpleType(property.Type) && MappingHelper.IsCollection(property.Type));
         }
     }
 }

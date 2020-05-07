@@ -27,7 +27,7 @@ namespace MappingGenerator.Mappings
         }
 
         protected override MappingElement TryToCreateMappingExpression(MappingElement source, ITypeSymbol targetType,
-            MappingPath mappingPath, MappingContext mappingContext)
+            MappingPath mappingPath, MappingContext mappingContext, bool skipCollections)
         {
             //TODO: check if source is not null (conditional member access)
 
@@ -74,7 +74,7 @@ namespace MappingGenerator.Mappings
                 }
             }
 
-            return base.TryToCreateMappingExpression(source, targetType, mappingPath, mappingContext);
+            return base.TryToCreateMappingExpression(source, targetType, mappingPath, mappingContext, skipCollections);
         }
 
         private bool IsGenericCloneMethod(ISymbol x)

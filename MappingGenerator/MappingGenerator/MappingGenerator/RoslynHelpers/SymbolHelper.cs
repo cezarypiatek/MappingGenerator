@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MappingGenerator.RoslynHelpers
 {
@@ -19,7 +19,7 @@ namespace MappingGenerator.RoslynHelpers
             {
                 return namedType.ConstraintTypes;
             }
-            return new []{typeSymbol};
+            return new[] { typeSymbol };
         }
 
         public static bool CanBeSetPrivately(this IPropertySymbol property)
@@ -29,14 +29,14 @@ namespace MappingGenerator.RoslynHelpers
             {
                 return false;
             }
-            return HasPrivateSetter(propertyDeclaration) || HasPublicSetter(propertyDeclaration, isInternalAccessible:true);
-        } 
-        
+            return HasPrivateSetter(propertyDeclaration) || HasPublicSetter(propertyDeclaration, isInternalAccessible: true);
+        }
+
         public static bool CanBeSetPublicly(this IPropertySymbol property, bool isInternalAccessible)
         {
             if (IsDeclaredOutsideTheSourcecode(property))
             {
-                return property.IsReadOnly == false && 
+                return property.IsReadOnly == false &&
                        property.SetMethod != null &&
                        property.SetMethod.DeclaredAccessibility == Accessibility.Public;
             }
@@ -56,10 +56,9 @@ namespace MappingGenerator.RoslynHelpers
             {
                 return property.IsReadOnly ||
                        (property.SetMethod != null &&
-                       new[] {Accessibility.Public, Accessibility.Protected}.Contains(property.SetMethod.DeclaredAccessibility)
+                       new[] { Accessibility.Public, Accessibility.Protected }.Contains(property.SetMethod.DeclaredAccessibility)
                        );
             }
-
 
             var propertyDeclaration = property.DeclaringSyntaxReferences.Select(x => x.GetSyntax()).OfType<PropertyDeclarationSyntax>().FirstOrDefault();
             if (propertyDeclaration?.AccessorList == null)
@@ -82,9 +81,9 @@ namespace MappingGenerator.RoslynHelpers
 
         private static bool HasPrivateSetter(PropertyDeclarationSyntax propertyDeclaration)
         {
-            return propertyDeclaration.AccessorList.Accessors.Any(x =>x.Keyword.Kind() == SyntaxKind.SetKeyword && x.Modifiers.Any(m => m.Kind() == SyntaxKind.PrivateKeyword));
-        } 
-        
+            return propertyDeclaration.AccessorList.Accessors.Any(x => x.Keyword.Kind() == SyntaxKind.SetKeyword && x.Modifiers.Any(m => m.Kind() == SyntaxKind.PrivateKeyword));
+        }
+
         private static bool HasPublicSetter(PropertyDeclarationSyntax propertyDeclaration, bool isInternalAccessible)
         {
             return propertyDeclaration.AccessorList.Accessors.Any(x =>
@@ -115,7 +114,7 @@ namespace MappingGenerator.RoslynHelpers
 
         private static bool IsAutoGetter(AccessorDeclarationSyntax x)
         {
-            return x.IsKind(SyntaxKind.GetAccessorDeclaration) && x.Body ==null && x.ExpressionBody == null;
+            return x.IsKind(SyntaxKind.GetAccessorDeclaration) && x.Body == null && x.ExpressionBody == null;
         }
 
         public static bool IsNullable(ITypeSymbol type, out ITypeSymbol underlyingType)
@@ -126,13 +125,19 @@ namespace MappingGenerator.RoslynHelpers
                 return true;
             }
 
+            if (type.NullableAnnotation == NullableAnnotation.Annotated)
+            {
+                underlyingType = type.OriginalDefinition;
+                return true;
+            }
+
             underlyingType = null;
             return false;
         }
 
         public static ITypeSymbol GetUnderlyingNullableType(ITypeSymbol type)
         {
-            return ((INamedTypeSymbol) type).TypeArguments.First();
+            return ((INamedTypeSymbol)type).TypeArguments.First();
         }
     }
 }

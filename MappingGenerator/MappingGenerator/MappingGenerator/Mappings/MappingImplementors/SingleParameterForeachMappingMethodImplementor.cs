@@ -33,12 +33,20 @@ namespace MappingGenerator.Mappings.MappingImplementors
         {
             foreach (var member in type.GetMembers().Where(ObjectHelper.IsPublicPropertySymbol).OfType<IPropertySymbol>())
             {
-                if (ObjectHelper.IsSimpleType(member.Type))
+                if (ObjectHelper.IsSimpleType(member.Type) && !MappingHelper.IsCollection(member.Type))
                 {
                     continue;
                 }
 
-                return member.SetMethod == null && MappingHelper.IsCollection(member.Type) || ContainsCollectionWithoutSetter(MappingHelper.GetElementType(member.Type));
+                if (member.SetMethod == null)
+                {
+                    return true;
+                }
+
+                if (ContainsCollectionWithoutSetter(MappingHelper.GetElementType(member.Type)))
+                {
+                    return true;
+                }
             }
             return false;
         }

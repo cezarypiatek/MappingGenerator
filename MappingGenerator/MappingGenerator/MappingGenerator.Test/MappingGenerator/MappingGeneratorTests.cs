@@ -221,6 +221,12 @@ namespace MappingGenerator.Test.Mapping
             TestCodeRefactoring(_035_ForeachMapping, _035_ForeachMapping_FIXED);
         }
 
+        [Test]
+        public void should_be_able_to_use_add_for_get_only_collection_with_single_object_before_list()
+        {
+            TestCodeRefactoring(_036_ForeachMappingObjectBeforeList, _036_ForeachMappingObjectBeforeList_FIXED);
+        }
+
         protected override string LanguageName => LanguageNames.CSharp;
 
         protected override CodeRefactoringProvider CreateProvider()

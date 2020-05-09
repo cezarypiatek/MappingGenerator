@@ -2039,5 +2039,59 @@ namespace MappingGenerator.Test.MappingGenerator {
                 return ResourceManager.GetString("_035_ForeachMapping_FIXED", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO [|Map|](UserEntity entity)
+        ///        {
+        ///            throw new NotImplementedException();
+        ///        }
+        ///    }
+        ///
+        ///    public class UserDTO
+        ///    {
+        ///        public int Age { get; set; }
+        ///        public AccountDTO Account { get; set; }
+        ///        public List&lt;AccountDTO&gt; Accounts [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _036_ForeachMappingObjectBeforeList {
+            get {
+                return ResourceManager.GetString("_036_ForeachMappingObjectBeforeList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO Map(UserEntity entity)
+        ///        {
+        ///            var userDTO = new UserDTO()
+        ///            {
+        ///                Age = entity.Age,
+        ///                Account = new AccountDTO()
+        ///                {
+        ///                    BankName = entity.Account.BankName,
+        ///                    Num [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _036_ForeachMappingObjectBeforeList_FIXED {
+            get {
+                return ResourceManager.GetString("_036_ForeachMappingObjectBeforeList_FIXED", resourceCulture);
+            }
+        }
     }
 }

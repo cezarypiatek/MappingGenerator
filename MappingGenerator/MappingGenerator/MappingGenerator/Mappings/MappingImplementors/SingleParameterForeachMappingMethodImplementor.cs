@@ -1,4 +1,4 @@
-﻿using MappingGenerator.RoslynHelpers;
+using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.Formatting;
@@ -33,7 +33,7 @@ namespace MappingGenerator.Mappings.MappingImplementors
         {
             foreach (var member in type.GetMembers().Where(ObjectHelper.IsPublicPropertySymbol).OfType<IPropertySymbol>())
             {
-                if (ObjectHelper.IsSimpleType(member.Type) && !MappingHelper.IsCollection(member.Type))
+                if (ObjectHelper.IsSimpleType(member.Type) || !MappingHelper.IsCollection(member.Type))
                 {
                     continue;
                 }

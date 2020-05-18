@@ -23,7 +23,7 @@ If you find this extension useful (you feel it helps you on the daily basis) you
 ![support guide](/doc/support_anim.gif)
 
 ### Contributing
-Before you start any contributig work, plase read the [contribution guidline](/docs/CONTRIBUTING.md)
+Before you start any contributing work, please read the [contribution guidline](/docs/CONTRIBUTING.md)
 
 ### Using along with Resharper
 

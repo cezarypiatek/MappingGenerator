@@ -12,6 +12,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.Formatting;
 using System.Linq;
+using MappingGenerator.Mappings.MappingImplementors;
 
 namespace MappingGenerator.Features.Refactorings
 {
@@ -109,7 +110,7 @@ namespace MappingGenerator.Features.Refactorings
         {
             //TODO: If subtypes contains clone method use it, remember about casting
             var mappingEngine = new CloneMappingEngine(semanticModel, generator, type.ContainingAssembly);
-            var newExpression = mappingEngine.MapExpression((ExpressionSyntax)generator.ThisExpression(), type, type);
+            var newExpression = mappingEngine.MapExpression((ExpressionSyntax)generator.ThisExpression(), type, type, new MappingContext());
             return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };
         }
     }

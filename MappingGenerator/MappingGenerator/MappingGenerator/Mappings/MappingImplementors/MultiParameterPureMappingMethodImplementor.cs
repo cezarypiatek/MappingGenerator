@@ -20,8 +20,9 @@ namespace MappingGenerator.Mappings.MappingImplementors
             var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
             var targetType = methodSymbol.ReturnType;
             var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol);
-            var newExpression = mappingEngine.AddInitializerWithMapping(
-                (ObjectCreationExpressionSyntax)generator.ObjectCreationExpression(targetType), new SingleSourceMatcher(sourceFinder), targetType);
+            var mappingContext = new MappingContext();
+            var objectCreationExpressionSyntax = (ObjectCreationExpressionSyntax)generator.ObjectCreationExpression(targetType);
+            var newExpression = mappingEngine.AddInitializerWithMapping(objectCreationExpressionSyntax, new SingleSourceMatcher(sourceFinder), targetType, mappingContext);
             return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };
         }
     }

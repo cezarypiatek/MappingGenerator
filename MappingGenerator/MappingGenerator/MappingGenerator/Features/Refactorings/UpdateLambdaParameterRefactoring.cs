@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MappingGenerator.Mappings;
+using MappingGenerator.Mappings.MappingImplementors;
 using MappingGenerator.Mappings.MappingMatchers;
 using MappingGenerator.Mappings.SourceFinders;
 using MappingGenerator.RoslynHelpers;
@@ -69,7 +70,7 @@ namespace MappingGenerator.Features.Refactorings
             var contextAssembly = semanticModel.FindContextAssembly(lambda);
             var mappingEngine = await MappingEngine.Create(document, cancellationToken, contextAssembly);
             var propertiesToSet = ObjectHelper.GetFieldsThaCanBeSetPublicly(createdObjectType, contextAssembly);
-            var statements = mappingEngine.MapUsingSimpleAssignment(propertiesToSet, mappingMatcher, globalTargetAccessor: SyntaxFactory.IdentifierName(GetParameterIdentifier(lambda)))
+            var statements = mappingEngine.MapUsingSimpleAssignment(propertiesToSet, mappingMatcher, new MappingContext(), globalTargetAccessor: SyntaxFactory.IdentifierName(GetParameterIdentifier(lambda)))
                 .Select(x=>x.AsStatement().WithTrailingTrivia(SyntaxFactory.EndOfLine("\r\n")));
             
             var newLambda = UpdateLambdaBody(lambda, SyntaxFactory.Block(statements)).WithAdditionalAnnotations(Formatter.Annotation);

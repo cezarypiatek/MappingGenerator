@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MappingGenerator.Mappings;
+using MappingGenerator.Mappings.MappingImplementors;
 using MappingGenerator.Mappings.MappingMatchers;
 using MappingGenerator.Mappings.SourceFinders;
 using MappingGenerator.RoslynHelpers;
@@ -145,7 +146,7 @@ namespace MappingGenerator.Features.Refactorings
             var createdObjectType = ModelExtensions.GetTypeInfo(semanticModel, oldObjCreation).Type;
             var mappingEngine = await MappingEngine.Create(document, cancellationToken, semanticModel.FindContextAssembly(objectInitializer));
             
-            var newObjectCreation = mappingEngine.AddInitializerWithMapping(oldObjCreation, mappingMatcher, createdObjectType);
+            var newObjectCreation = mappingEngine.AddInitializerWithMapping(oldObjCreation, mappingMatcher, createdObjectType, new MappingContext());
             return await document.ReplaceNodes(oldObjCreation, newObjectCreation, cancellationToken);
         }
     }

@@ -21,7 +21,7 @@ namespace MappingGenerator.Mappings.MappingImplementors
         {
             var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
             var targetType = methodSymbol.ReturnType;
-            var newExpression = mappingEngine.MapExpression((ExpressionSyntax)generator.ThisExpression(), methodSymbol.ContainingType, targetType);
+            var newExpression = mappingEngine.MapExpression((ExpressionSyntax)generator.ThisExpression(), methodSymbol.ContainingType, targetType, new MappingContext());
             return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };
         }
     }

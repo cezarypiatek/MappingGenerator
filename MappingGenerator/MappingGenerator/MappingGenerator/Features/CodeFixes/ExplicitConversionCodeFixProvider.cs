@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MappingGenerator.Mappings;
+using MappingGenerator.Mappings.MappingImplementors;
 using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
@@ -59,7 +60,7 @@ namespace MappingGenerator.Features.CodeFixes
             var mappingEngine = await CreateMappingEngine(document, assignmentExpression, cancellationToken);
             var sourceType = mappingEngine.GetExpressionTypeInfo(assignmentExpression.Right).Type;
             var destinationType = mappingEngine.GetExpressionTypeInfo(assignmentExpression.Left).Type;
-            var mappingExpression = mappingEngine.MapExpression(assignmentExpression.Right.WithoutTrivia(), sourceType, destinationType); 
+            var mappingExpression = mappingEngine.MapExpression(assignmentExpression.Right.WithoutTrivia(), sourceType, destinationType, new MappingContext()); 
             return await ReplaceNode(document, assignmentExpression, assignmentExpression.WithRight(mappingExpression), cancellationToken);
         }
 
@@ -76,7 +77,7 @@ namespace MappingGenerator.Features.CodeFixes
         {
             var mappingEngine = await CreateMappingEngine(document, returnStatement, cancellationToken);
             var returnExpressionTypeInfo = mappingEngine.GetExpressionTypeInfo(returnStatement.Expression);
-            var mappingExpression = mappingEngine.MapExpression(returnStatement.Expression.WithoutTrivia(), returnExpressionTypeInfo.Type, returnExpressionTypeInfo.ConvertedType); 
+            var mappingExpression = mappingEngine.MapExpression(returnStatement.Expression.WithoutTrivia(), returnExpressionTypeInfo.Type, returnExpressionTypeInfo.ConvertedType, new MappingContext()); 
             return await ReplaceNode(document, returnStatement, returnStatement.WithExpression(mappingExpression), cancellationToken);
         }
 
@@ -84,7 +85,7 @@ namespace MappingGenerator.Features.CodeFixes
         {
             var mappingEngine = await CreateMappingEngine(document, yieldStatement, cancellationToken);
             var returnExpressionTypeInfo = mappingEngine.GetExpressionTypeInfo(yieldStatement.Expression);
-            var mappingExpression = mappingEngine.MapExpression(yieldStatement.Expression.WithoutTrivia(), returnExpressionTypeInfo.Type, returnExpressionTypeInfo.ConvertedType); 
+            var mappingExpression = mappingEngine.MapExpression(yieldStatement.Expression.WithoutTrivia(), returnExpressionTypeInfo.Type, returnExpressionTypeInfo.ConvertedType, new MappingContext()); 
             return await ReplaceNode(document, yieldStatement, yieldStatement.WithExpression(mappingExpression), cancellationToken);
         }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MappingGenerator.Mappings;
+using MappingGenerator.Mappings.MappingImplementors;
 using MappingGenerator.Mappings.SourceFinders;
 using MappingGenerator.MethodHelpers;
 using MappingGenerator.RoslynHelpers;
@@ -133,7 +134,7 @@ namespace MappingGenerator.Features.CodeFixes
 
             var contextAssembly = semanticModel.FindContextAssembly(invocation);
             var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
-            var mappingLambda = mappingEngine.CreateMappingLambda("x", sourceElementType, targetElementType, new MappingPath());
+            var mappingLambda = mappingEngine.CreateMappingLambda("x", sourceElementType, targetElementType, new MappingPath(), new MappingContext());
             return await document.ReplaceNodes(invocation, invocation.WithArgumentList(SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument((ExpressionSyntax)mappingLambda))), cancellationToken);
         }
 

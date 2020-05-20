@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using MappingGenerator.Mappings.MappingImplementors;
 using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -25,7 +26,8 @@ namespace MappingGenerator.Mappings
             return  ObjectHelper.IsSimpleType(targetType) == false && ObjectHelper.IsSimpleType(sourceType) == false;
         }
 
-        protected override MappingElement TryToCreateMappingExpression(MappingElement source, ITypeSymbol targetType, MappingPath mappingPath)
+        protected override MappingElement TryToCreateMappingExpression(MappingElement source, ITypeSymbol targetType,
+            MappingPath mappingPath, MappingContext mappingContext)
         {
             //TODO: check if source is not null (conditional member access)
 
@@ -72,7 +74,7 @@ namespace MappingGenerator.Mappings
                 }
             }
 
-            return base.TryToCreateMappingExpression(source, targetType, mappingPath);
+            return base.TryToCreateMappingExpression(source, targetType, mappingPath, mappingContext);
         }
 
         private bool IsGenericCloneMethod(ISymbol x)

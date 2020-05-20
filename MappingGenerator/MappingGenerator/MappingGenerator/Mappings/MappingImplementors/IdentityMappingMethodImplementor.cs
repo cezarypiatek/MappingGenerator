@@ -19,7 +19,7 @@ namespace MappingGenerator.Mappings.MappingImplementors
             var source = methodSymbol.Parameters[0];
             var targetType = methodSymbol.ReturnType;
             var newExpression = cloneMappingEngine.MapExpression((ExpressionSyntax)generator.IdentifierName(source.Name),
-                source.Type, targetType);
+                source.Type, targetType, new MappingContext());
             return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };
         }
     }

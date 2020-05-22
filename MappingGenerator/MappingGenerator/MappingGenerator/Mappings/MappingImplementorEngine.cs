@@ -28,12 +28,12 @@ namespace MappingGenerator.Mappings
             return this.implementors.Any(x => x.CanImplement(methodSymbol));
         }
 
-        public IEnumerable<SyntaxNode> GenerateMappingCode(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
+        public IEnumerable<SyntaxNode> GenerateMappingCode(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel, MappingContext mappingContext)
         {
             var matchedImplementor = implementors.FirstOrDefault(x => x.CanImplement(methodSymbol));
             if (matchedImplementor != null)
             {
-                return matchedImplementor.GenerateImplementation(methodSymbol, generator, semanticModel);
+                return matchedImplementor.GenerateImplementation(methodSymbol, generator, semanticModel, mappingContext);
             }
             return Enumerable.Empty<SyntaxNode>();
         }
@@ -51,15 +51,15 @@ namespace MappingGenerator.Mappings
             new ThisObjectToOtherMappingMethodImplementor()
         };
 
-        public BlockSyntax GenerateMappingBlock(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
+        public BlockSyntax GenerateMappingBlock(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel, MappingContext mappingContext)
         {
-            var mappingStatements = GenerateMappingStatements(methodSymbol, generator, semanticModel);
+            var mappingStatements = GenerateMappingStatements(methodSymbol, generator, semanticModel, mappingContext);
             return SyntaxFactory.Block(mappingStatements).WithAdditionalAnnotations(Formatter.Annotation);
         }
 
-        public IEnumerable<StatementSyntax> GenerateMappingStatements(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
+        public IEnumerable<StatementSyntax> GenerateMappingStatements(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel, MappingContext mappingContext)
         {
-            var mappingExpressions = GenerateMappingCode(methodSymbol, generator, semanticModel);
+            var mappingExpressions = GenerateMappingCode(methodSymbol, generator, semanticModel, mappingContext);
             var mappingStatements = mappingExpressions.Select(e => e.AsStatement());
             return mappingStatements;
         }

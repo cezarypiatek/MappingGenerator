@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace MappingGenerator.Mappings
 {
@@ -15,5 +16,17 @@ namespace MappingGenerator.Mappings
             });
 
         public bool WrapInCustomConversion { get; set; }
+
+        public Dictionary<(ITypeSymbol fromType, ITypeSymbol toType), ExpressionSyntax> CustomConversions { get; }  = new Dictionary<(ITypeSymbol fromType, ITypeSymbol toType), ExpressionSyntax>();
+
+        public ExpressionSyntax? FindConversion(ITypeSymbol fromType, ITypeSymbol toType)
+        {
+            if (CustomConversions.TryGetValue((fromType, toType), out var conversion))
+            {
+                return conversion;
+            }
+
+            return null;
+        }
     }
 }

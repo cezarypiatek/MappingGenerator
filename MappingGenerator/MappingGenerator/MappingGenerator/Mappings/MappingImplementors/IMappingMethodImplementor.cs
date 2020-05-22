@@ -8,6 +8,6 @@ namespace MappingGenerator.Mappings.MappingImplementors
     {
         bool CanImplement(IMethodSymbol methodSymbol);
 
-        IEnumerable<SyntaxNode> GenerateImplementation(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel);
+        IEnumerable<SyntaxNode> GenerateImplementation(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel, MappingContext mappingContext);
     }
 }

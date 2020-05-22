@@ -17,11 +17,12 @@ namespace MappingGenerator.Mappings.MappingImplementors
                    ObjectHelper.IsSimpleType(methodSymbol.ReturnType) == false;
         }
 
-        public IEnumerable<SyntaxNode> GenerateImplementation(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
+        public IEnumerable<SyntaxNode> GenerateImplementation(IMethodSymbol methodSymbol, SyntaxGenerator generator,
+            SemanticModel semanticModel, MappingContext mappingContext)
         {
             var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
             var targetType = methodSymbol.ReturnType;
-            var newExpression = mappingEngine.MapExpression((ExpressionSyntax)generator.ThisExpression(), methodSymbol.ContainingType, targetType, new MappingContext());
+            var newExpression = mappingEngine.MapExpression((ExpressionSyntax)generator.ThisExpression(), methodSymbol.ContainingType, targetType, mappingContext);
             return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };
         }
     }

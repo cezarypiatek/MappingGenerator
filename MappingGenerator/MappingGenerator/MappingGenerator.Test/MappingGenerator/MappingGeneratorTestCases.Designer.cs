@@ -318,10 +318,9 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///    public class Person
         ///    {
         ///        public int Age { get; set; }
-        ///        public string FirstName { get; set; }
-        ///        public string LastName { get; set; }
+        ///        public string Name { get; set; }
         ///
-        ///        public void [|Update|](int age, string firstName, string lastName)
+        ///        public void [|Update|](int age, string name)
         ///        {
         ///        }
         ///    }
@@ -339,14 +338,12 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///    public class Person
         ///    {
         ///        public int Age { get; set; }
-        ///        public string FirstName { get; set; }
-        ///        public string LastName { get; set; }
+        ///        public string Name { get; set; }
         ///
-        ///        public void Update(int age, string firstName, string lastName)
+        ///        public void Update(int age, string name)
         ///        {
         ///            Age = age;
-        ///            FirstName = firstName;
-        ///            LastName = lastName;
+        ///            Name = name;
         ///        }
         ///    }
         ///}.
@@ -684,9 +681,9 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public static List&lt;YY&gt; [|Map|](List&lt;XX&gt; categories)
         ///        {
+        ///            throw new NotImplementedException();
         ///        }
-        ///    }
-        ///}.
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _012_CollectionMappingWithSingularLambdaParameterName {
             get {
@@ -814,9 +811,7 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public static List&lt;ZZ&gt; [|MapNew|](List&lt;XX&gt; dictionary)
         ///        {
-        ///        }
-        ///    }
-        ///}.
+        ///            throw n [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _014_CollectionMappingWithGenericName {
             get {
@@ -880,9 +875,7 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public static List&lt;ZZ&gt; [|MapNew|](List&lt;XX&gt; usersList)
         ///        {
-        ///        }
-        ///    }
-        ///}.
+        ///            throw ne [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _015_CollectionMappingWithPostfixGenericName {
             get {
@@ -945,9 +938,9 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public static List&lt;YY&gt; [|Map|](List&lt;XX&gt; people)
         ///        {
+        ///            throw new NotImplementedException();
         ///        }
-        ///    }
-        ///}.
+        ///     [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _016_CollectionMappingWithIrregularSingularLambdaParameterName {
             get {
@@ -1010,9 +1003,8 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public static List&lt;YY&gt; [|Map|](List&lt;XX&gt; relatedPeople)
         ///        {
-        ///        }
-        ///    }
-        ///}.
+        ///            throw new NotImplementedException();
+        ///         [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _017_CollectionMappingWithIrregularCamelCaseSingularLambdaParameterName {
             get {
@@ -1075,9 +1067,7 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public static List&lt;ZZ&gt; [|MapNew|](List&lt;XX&gt; userList)
         ///        {
-        ///        }
-        ///    }
-        ///}.
+        ///            throw new [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _018_CollectionMappingWithPostfixGenericNameInSingular {
             get {
@@ -1305,9 +1295,8 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public static List&lt;YY&gt; [|Map|](IList&lt;XX&gt; categories)
         ///        {
-        ///            throw new NotImplementedException()
-        ///        }
-        /// [rest of string was truncated]&quot;;.
+        ///            throw new NotImplementedException();
+        ///        }        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _022_CollectionMappingIListToList {
             get {
@@ -1603,6 +1592,59 @@ namespace MappingGenerator.Test.MappingGenerator {
         internal static string _027_ConstructorWithSingleParameter_FIXED {
             get {
                 return ResourceManager.GetString("_027_ConstructorWithSingleParameter_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO [|Map|](UserEntity entity)
+        ///        {
+        ///            throw new NotImplementedException();
+        ///        }
+        ///
+        ///        private static AddressDTO MapAddress(AddressEntity addressEntity)
+        ///        {
+        ///            return new AddressDTO()
+        ///            {
+        ///                City = addres [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _028_PureMappingMethodWithCustomConversions {
+            get {
+                return ResourceManager.GetString("_028_PureMappingMethodWithCustomConversions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO Map(UserEntity entity)
+        ///        {
+        ///            return new UserDTO()
+        ///            {
+        ///                Age = entity.Age,
+        ///                Debs = entity.Debs.ConvertAll(entityDeb =&gt; new AccountDTO()
+        ///                {
+        ///                    BankName = entityDeb.BankName,
+        ///   [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _028_PureMappingMethodWithCustomConversions_FIXED {
+            get {
+                return ResourceManager.GetString("_028_PureMappingMethodWithCustomConversions_FIXED", resourceCulture);
             }
         }
     }

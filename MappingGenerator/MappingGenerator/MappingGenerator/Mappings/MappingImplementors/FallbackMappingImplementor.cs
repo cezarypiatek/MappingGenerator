@@ -19,11 +19,12 @@ namespace MappingGenerator.Mappings.MappingImplementors
             return implementors.Any(x => x.CanImplement(methodSymbol));
         }
 
-        public IEnumerable<SyntaxNode> GenerateImplementation(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
+        public IEnumerable<SyntaxNode> GenerateImplementation(IMethodSymbol methodSymbol, SyntaxGenerator generator,
+            SemanticModel semanticModel, MappingContext mappingContext)
         {
             foreach (var implementor in implementors)
             {
-                var result = implementor.GenerateImplementation(methodSymbol, generator, semanticModel).ToList();
+                var result = implementor.GenerateImplementation(methodSymbol, generator, semanticModel, mappingContext).ToList();
                 if (result.Count > 0)
                 {
                     return result;

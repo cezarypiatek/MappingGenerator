@@ -51,9 +51,9 @@ namespace MappingGenerator.Mappings
             return MapExpression(mappingSource, destinationType, mappingContext).Expression;
         }
 
-        public MappingElement MapExpression(MappingElement element, ITypeSymbol targetType, MappingContext mappingContext, MappingPath mappingPath = null)
+        public MappingElement MapExpression(MappingElement source, ITypeSymbol targetType, MappingContext mappingContext, MappingPath mappingPath = null)
         {
-            if (element == null)
+            if (source == null)
             {
                 return null;
             }
@@ -63,37 +63,47 @@ namespace MappingGenerator.Mappings
                 mappingPath = new MappingPath();
             }
 
-            var sourceType = element.ExpressionType;
+            var sourceType = source.ExpressionType;
             if (mappingPath.AddToMapped(sourceType) == false)
             {
                 return new MappingElement()
                 {
                     ExpressionType = sourceType,
-                    Expression = element.Expression.WithTrailingTrivia(SyntaxFactory.Comment(" /* Stop recursive mapping */"))
+                    Expression = source.Expression.WithTrailingTrivia(SyntaxFactory.Comment(" /* Stop recursive mapping */"))
                 };
             }
 
+
+            if (mappingContext.FindConversion(sourceType, targetType) is {} userDefinedConversion)
+            {
+                return new MappingElement()
+                {
+                    ExpressionType = targetType,
+                    Expression = (ExpressionSyntax) syntaxGenerator.InvocationExpression(userDefinedConversion, source.Expression)
+                };
+            }
+
+
             if (ObjectHelper.IsSimpleType(targetType) && SymbolHelper.IsNullable(sourceType, out var underlyingType) )
             {
-                element = new MappingElement()
+                source = new MappingElement()
                 {
-                    Expression =  (ExpressionSyntax)syntaxGenerator.MemberAccessExpression(element.Expression, "Value"),
+                    Expression =  (ExpressionSyntax)syntaxGenerator.MemberAccessExpression(source.Expression, "Value"),
                     ExpressionType = underlyingType
                 };
             }
 
-            if (IsUnwrappingNeeded(targetType, element))
+            if (IsUnwrappingNeeded(targetType, source))
             {
-                return TryToUnwrap(targetType, element);
+                return TryToUnwrap(targetType, source);
             }
 
-            
             if (ShouldCreateConversionBetweenTypes(targetType, sourceType))
             {
-                return TryToCreateMappingExpression(element, targetType, mappingPath, mappingContext);
+                return TryToCreateMappingExpression(source, targetType, mappingPath, mappingContext);
             }
 
-            return element;
+            return source;
         }
 
         protected virtual bool ShouldCreateConversionBetweenTypes(ITypeSymbol targetType, ITypeSymbol sourceType)

@@ -177,6 +177,12 @@ namespace MappingGenerator.Test.Mapping
             TestCodeRefactoring(_027_ConstructorWithSingleParameter, _027_ConstructorWithSingleParameter_FIXED);
         }
 
+        [Test]
+        public void should_be_able_to_generate_mapping_using_custom_conversions()
+        {
+            TestCodeRefactoring(_028_PureMappingMethodWithCustomConversions, _028_PureMappingMethodWithCustomConversions_FIXED, 1);
+        }
+
         protected override string LanguageName => LanguageNames.CSharp;
 
         protected override CodeRefactoringProvider CreateProvider()

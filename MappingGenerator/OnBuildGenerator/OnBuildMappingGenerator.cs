@@ -36,7 +36,7 @@ namespace MappingGenerator.OnBuildGenerator
                     if (x is MethodDeclarationSyntax methodDeclaration)
                     {
                         var methodSymbol = context.SemanticModel.GetDeclaredSymbol(methodDeclaration);
-                        var statements = ImplementorEngine.CanProvideMappingImplementationFor(methodSymbol) ? ImplementorEngine.GenerateMappingStatements(methodSymbol, syntaxGenerator, context.SemanticModel) :
+                        var statements = ImplementorEngine.CanProvideMappingImplementationFor(methodSymbol) ? ImplementorEngine.GenerateMappingStatements(methodSymbol, syntaxGenerator, context.SemanticModel, new MappingContext()) :
                                 new List<StatementSyntax>()
                                 {
                                     GenerateThrowNotSupportedException(context, syntaxGenerator, methodSymbol.Name)

@@ -1,4 +1,5 @@
 using System.Composition;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MappingGenerator.Mappings;
@@ -16,7 +17,8 @@ namespace MappingGenerator.Features.Refactorings
     [ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(MappingGeneratorRefactoring)), Shared]
     public class MappingGeneratorRefactoring : CodeRefactoringProvider
     {
-        private const string title = "Generate mapping code";
+        private const string GenerateWholeMappingTitle = "Generate mapping code";
+        private const string GenerateMappingWithMembersTitle = "Generate mapping code";
 
         private static readonly MappingImplementorEngine MappingImplementorEngine = new MappingImplementorEngine();
 
@@ -41,8 +43,8 @@ namespace MappingGenerator.Features.Refactorings
 
                         if (MappingImplementorEngine.CanProvideMappingImplementationFor(methodSymbol))
                         {
-                            var generateMappingAction = CodeAction.Create(title: title, createChangedDocument: async (c) => await GenerateMappingMethodBody(context.Document, methodDeclaration, c), equivalenceKey: title);
-                            context.RegisterRefactoring(generateMappingAction);
+                            context.RegisterRefactoring(CodeAction.Create(title: GenerateWholeMappingTitle, createChangedDocument: async (c) => await GenerateMappingMethodBody(context.Document, methodDeclaration, false, c), equivalenceKey: GenerateWholeMappingTitle));
+                            context.RegisterRefactoring(CodeAction.Create(title: GenerateMappingWithMembersTitle, createChangedDocument: async (c) => await GenerateMappingMethodBody(context.Document, methodDeclaration, true, c), equivalenceKey: GenerateWholeMappingTitle));
                         }
                     }
                     break;
@@ -68,12 +70,27 @@ namespace MappingGenerator.Features.Refactorings
             return false;
         }
 
-        private async Task<Document> GenerateMappingMethodBody(Document document, BaseMethodDeclarationSyntax methodSyntax, CancellationToken cancellationToken)
+        private async Task<Document> GenerateMappingMethodBody(Document document, BaseMethodDeclarationSyntax methodSyntax, bool useMembersMappers, CancellationToken cancellationToken)
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var methodSymbol = semanticModel.GetDeclaredSymbol(methodSyntax);
             var generator = SyntaxGenerator.GetGenerator(document);
-            var blockSyntax = MappingImplementorEngine.GenerateMappingBlock(methodSymbol, generator, semanticModel);
+            var mappingContext = new MappingContext();
+
+            if (useMembersMappers)
+            {
+                var userDefinedConversions = methodSymbol.ContainingType.GetMembers().OfType<IMethodSymbol>().Where(methodSymbol => methodSymbol.ReturnsVoid == false && methodSymbol.Parameters.Length == 1);
+                foreach (var userDefinedConversion in userDefinedConversions)
+                {
+                    if (userDefinedConversion == methodSymbol)
+                    {
+                        continue;
+                    }
+
+                    mappingContext.CustomConversions[(userDefinedConversion.Parameters.First().Type, userDefinedConversion.ReturnType)] = (ExpressionSyntax) generator.IdentifierName(userDefinedConversion.Name);
+                }
+            }
+            var blockSyntax = MappingImplementorEngine.GenerateMappingBlock(methodSymbol, generator, semanticModel, mappingContext);
             return await document.ReplaceNodes(methodSyntax, methodSyntax.WithOnlyBody(blockSyntax), cancellationToken);
         }
     }

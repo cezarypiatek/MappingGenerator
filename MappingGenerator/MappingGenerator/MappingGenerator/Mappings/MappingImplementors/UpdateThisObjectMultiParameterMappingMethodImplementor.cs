@@ -18,12 +18,13 @@ namespace MappingGenerator.Mappings.MappingImplementors
             return methodSymbol.Parameters.Length > 1 && methodSymbol.ReturnsVoid;
         }
 
-        public IEnumerable<SyntaxNode> GenerateImplementation(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel)
+        public IEnumerable<SyntaxNode> GenerateImplementation(IMethodSymbol methodSymbol, SyntaxGenerator generator,
+            SemanticModel semanticModel, MappingContext mappingContext)
         {
             var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
             var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters);
             var targets = ObjectHelper.GetFieldsThaCanBeSetPrivately(methodSymbol.ContainingType);
-            return mappingEngine.MapUsingSimpleAssignment(targets, new SingleSourceMatcher(sourceFinder), new MappingContext());
+            return mappingEngine.MapUsingSimpleAssignment(targets, new SingleSourceMatcher(sourceFinder), mappingContext);
         }
     }
 }

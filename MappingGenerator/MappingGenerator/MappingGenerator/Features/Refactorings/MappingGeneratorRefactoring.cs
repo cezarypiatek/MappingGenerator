@@ -76,13 +76,14 @@ namespace MappingGenerator.Features.Refactorings
             var methodSymbol = semanticModel.GetDeclaredSymbol(methodSyntax);
             var generator = SyntaxGenerator.GetGenerator(document);
             var mappingContext = new MappingContext();
+            var accessibilityHelper = new AccessibilityHelper(methodSymbol.ContainingType);
+
 
             if (useMembersMappers)
             {
-                var userDefinedConversions = methodSymbol.ContainingType.GetMembers().OfType<IMethodSymbol>().Where(methodSymbol => methodSymbol.ReturnsVoid == false && methodSymbol.Parameters.Length == 1);
-                foreach (var userDefinedConversion in userDefinedConversions)
+                foreach (var userDefinedConversion in CustomConversionHelper.FindCustomConversionMethods(methodSymbol))
                 {
-                    if (userDefinedConversion == methodSymbol)
+                    if (userDefinedConversion == methodSymbol || accessibilityHelper.IsSymbolAccessible(userDefinedConversion, methodSymbol.ContainingType) == false)
                     {
                         continue;
                     }

@@ -17,14 +17,28 @@ namespace MappingGenerator.Mappings.MappingMatchers
             this.sourceFinder = sourceFinder;
         }
 
-        public IReadOnlyList<MappingMatch> MatchAll(IEnumerable<IPropertySymbol> targets, SyntaxGenerator syntaxGenerator,  SyntaxNode globalTargetAccessor = null)
+        public (IReadOnlyList<MappingMatch> matched, IReadOnlyList<IPropertySymbol> unmatched) MatchAll(IEnumerable<IPropertySymbol> targets, SyntaxGenerator syntaxGenerator,  SyntaxNode globalTargetAccessor = null)
         {
-            return targets.Select(property => new MappingMatch
+            var matched = new List<MappingMatch>();
+            var unmatchedTargets = new List<IPropertySymbol>();
+            foreach (var target in targets)
+            {
+                if (sourceFinder.FindMappingSource(target.Name, target.Type) is { } matchingSource)
                 {
-                    Source = sourceFinder.FindMappingSource(property.Name, property.Type),
-                    Target = CreateTargetElement(globalTargetAccessor, property, syntaxGenerator)
-                })
-                .Where(x => x.Source != null).ToList();
+                    matched.Add(new MappingMatch()
+                    {
+                      Source  = matchingSource,
+                      Target = CreateTargetElement(globalTargetAccessor, target, syntaxGenerator),
+                    });
+                }
+
+                else
+                {
+                    unmatchedTargets.Add(target);
+                }
+            }
+
+            return (matched, unmatchedTargets);
         }
 
         private MappingElement CreateTargetElement(SyntaxNode globalTargetAccessor, IPropertySymbol property,
@@ -45,5 +59,12 @@ namespace MappingGenerator.Mappings.MappingMatchers
             }
             return generator.MemberAccessExpression(globalTargetAccessor, property.Name);
         }
+    }
+
+    class MappingMatchSummary
+    {
+        public IReadOnlyList<MappingMatch> Matched { get; set; }
+        public IReadOnlyList<IPropertySymbol> UnmatchedTargets { get; set; }
+
     }
 }

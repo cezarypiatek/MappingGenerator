@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using MappingGenerator.Mappings.SourceFinders;
 using Microsoft.CodeAnalysis;
@@ -16,10 +15,12 @@ namespace MappingGenerator.Mappings.MappingMatchers
             matchers = sourceFinders.Select(x => new SingleSourceMatcher(x)).ToList();
         }
 
-        public IReadOnlyList<MappingMatch> MatchAll(IEnumerable<IPropertySymbol> targets, SyntaxGenerator syntaxGenerator, SyntaxNode globalTargetAccessor = null)
+        public (IReadOnlyList<MappingMatch> matched, IReadOnlyList<IPropertySymbol> unmatched) MatchAll(
+            IEnumerable<IPropertySymbol> targets, SyntaxGenerator syntaxGenerator,
+            SyntaxNode globalTargetAccessor = null)
         {
             return matchers.Select(x => x.MatchAll(targets, syntaxGenerator, globalTargetAccessor))
-                .OrderByDescending(x => x.Count).FirstOrDefault() ?? Array.Empty<MappingMatch>();
+                .OrderByDescending(x => x.matched.Count).FirstOrDefault();
         }
     }
 }

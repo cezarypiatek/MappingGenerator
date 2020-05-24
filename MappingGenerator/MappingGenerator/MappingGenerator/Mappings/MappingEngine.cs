@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -202,9 +203,12 @@ namespace MappingGenerator.Mappings
             {
                 mappingPath = new MappingPath();
             }
-          
-            return mappingMatcher.MatchAll(targets, syntaxGenerator, globalTargetAccessor)
-                .Select(match =>
+
+            var (matched, unmatched) = mappingMatcher.MatchAll(targets, syntaxGenerator, globalTargetAccessor);
+
+
+            var mappingExpressions = matched
+                .Select((match, index) =>
                 {
                     var sourceMappingElement = this.MapExpression(match.Source, match.Target.ExpressionType, mappingContext, mappingPath.Clone());
                     var sourceExpression = sourceMappingElement.Expression;
@@ -218,8 +222,18 @@ namespace MappingGenerator.Mappings
                         }
                     }
 
-                    return (ExpressionSyntax)syntaxGenerator.AssignmentStatement(match.Target.Expression, sourceExpression);
-                }).ToList();
+                    var assignmentStatement = (ExpressionSyntax)syntaxGenerator.AssignmentStatement(match.Target.Expression, sourceExpression);
+                    if (index == 0 && mappingContext.GenerateToDoForMissingMappings) {
+
+                        var comments = unmatched.Select(missing => SyntaxFactory.Comment($"//TODO: Missing mapping source for '{missing.Name}'{Environment.NewLine}"));
+                        foreach (var comment in comments)
+                        {
+                            assignmentStatement = assignmentStatement.WithLeadingTrivia().WithLeadingTrivia(comment);
+                        }
+                    }
+                    return assignmentStatement;
+                });
+            return mappingExpressions.ToList();
         }
 
         private bool IsUnwrappingNeeded(ITypeSymbol targetType, MappingElement element)

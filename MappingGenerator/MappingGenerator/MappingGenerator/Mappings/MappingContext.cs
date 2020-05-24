@@ -6,6 +6,7 @@ namespace MappingGenerator.Mappings
 {
     public class MappingContext
     {
+        public bool GenerateToDoForMissingMappings { get; set; }
         public HashSet<MappingType> MissingConversions { get; } = new HashSet<MappingType>();
 
         public void AddMissingConversion(ITypeSymbol fromType, ITypeSymbol toType) => MissingConversions.Add(

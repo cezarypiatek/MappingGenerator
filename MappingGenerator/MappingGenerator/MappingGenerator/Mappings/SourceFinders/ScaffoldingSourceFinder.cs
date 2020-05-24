@@ -51,7 +51,7 @@ namespace MappingGenerator.Mappings.SourceFinders
 
             if (type.TypeKind == TypeKind.Enum && type is INamedTypeSymbol namedTypeSymbol)
             {
-                var enumOptions = namedTypeSymbol.MemberNames.Where(x=>x!="value__" && x!=".ctor").ToList();
+                var enumOptions = namedTypeSymbol.MemberNames.Where(x=>x!="value__" && x!=".ctor").OrderBy(x=>x).ToList();
                 if (enumOptions.Count > 0)
                 {
                     return syntaxGenerator.MemberAccessExpression(syntaxGenerator.IdentifierName(namedTypeSymbol.Name), syntaxGenerator.IdentifierName(enumOptions[0]));

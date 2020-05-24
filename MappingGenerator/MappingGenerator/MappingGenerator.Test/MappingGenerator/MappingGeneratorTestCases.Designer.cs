@@ -1647,5 +1647,58 @@ namespace MappingGenerator.Test.MappingGenerator {
                 return ResourceManager.GetString("_028_PureMappingMethodWithCustomConversions_FIXED", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper: BaseMapper
+        ///    {
+        ///        public static UserDTO [|Map|](UserEntity entity)
+        ///        {
+        ///            throw new NotImplementedException();
+        ///        }
+        ///    }
+        ///
+        ///    public class BaseMapper
+        ///    {
+        ///        protected static AddressDTO MapAddress(AddressEntity addressEntity)
+        ///        {
+        ///            return new A [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _029_PureMappingMethodWithInheritedCustomConversions {
+            get {
+                return ResourceManager.GetString("_029_PureMappingMethodWithInheritedCustomConversions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper: BaseMapper
+        ///    {
+        ///        public static UserDTO Map(UserEntity entity)
+        ///        {
+        ///            return new UserDTO()
+        ///            {
+        ///                Age = entity.Age,
+        ///                Debs = entity.Debs.ConvertAll(entityDeb =&gt; new AccountDTO()
+        ///                {
+        ///                    BankName = entityDeb.B [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _029_PureMappingMethodWithInheritedCustomConversions_FIXED {
+            get {
+                return ResourceManager.GetString("_029_PureMappingMethodWithInheritedCustomConversions_FIXED", resourceCulture);
+            }
+        }
     }
 }

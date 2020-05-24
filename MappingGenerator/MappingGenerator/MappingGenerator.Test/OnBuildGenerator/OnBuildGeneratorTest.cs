@@ -20,5 +20,18 @@ namespace MappingGenerator.Test.OnBuildGenerator
 
             generatorFixture.AssertGeneratedCode(_001_SimpleMappingInterface, _001_SimpleMappingInterface_TRANSFORMED, IgnoreGeneratorVersionPattern);
         }
+
+
+        [Test]
+        public void should_be_able_to_generate_mapping_interface_implementation_using_custom_mappers()
+        {
+            var generatorFixture = new SmartCodeGeneratorFixture(typeof(OnBuildMappingGenerator), new[]
+            {
+                ReferenceSource.FromType<MappingInterface>()
+            });
+
+
+            generatorFixture.AssertGeneratedCode(_003_ExternalTypeMappers, _003_ExternalTypeMappers_TRANSFORMED, IgnoreGeneratorVersionPattern);
+        }
     }
 }

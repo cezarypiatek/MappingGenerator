@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis;
 
 namespace MappingGenerator.RoslynHelpers
 {
-    internal class AccessibilityHelper
+    public class AccessibilityHelper
     {
         private readonly Lazy<INamedTypeSymbol> _contextSymbol;
         public AccessibilityHelper(INamedTypeSymbol contextSymbol)

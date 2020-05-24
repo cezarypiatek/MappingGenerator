@@ -9,7 +9,13 @@ namespace MappingGenerator.Mappings
     {
         public static IEnumerable<IMethodSymbol> FindCustomConversionMethods(IMethodSymbol methodSymbol)
         {
-            var userDefinedConversions = methodSymbol.ContainingType.GetBaseTypesAndThis()
+            var containingType = methodSymbol.ContainingType;
+            return FindCustomConversionMethods(containingType);
+        }
+
+        public static IEnumerable<IMethodSymbol> FindCustomConversionMethods(INamedTypeSymbol containingType)
+        {
+            var userDefinedConversions = containingType.GetBaseTypesAndThis()
                 .SelectMany(t => t.GetMembers().OfType<IMethodSymbol>().Where(IsConversionMethod));
             return userDefinedConversions;
         }

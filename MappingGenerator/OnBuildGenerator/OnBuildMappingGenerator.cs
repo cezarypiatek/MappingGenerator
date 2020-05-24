@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MappingGenerator.Mappings;
+using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -20,9 +21,18 @@ namespace MappingGenerator.OnBuildGenerator
         public Task<GenerationResult> GenerateAsync(CSharpSyntaxNode processedNode, AttributeData markerAttribute, TransformationContext context, CancellationToken cancellationToken)
         {
             var syntaxGenerator = SyntaxGenerator.GetGenerator(context.Document);
+            var mappingContext = new MappingContext();
             var mappingDeclaration = (InterfaceDeclarationSyntax)processedNode;
-
             var interfaceSymbol = context.SemanticModel.GetDeclaredSymbol(mappingDeclaration);
+            var accessibilityHelper = new AccessibilityHelper(interfaceSymbol);
+            foreach (var x in FindCustomMapperTypes(markerAttribute).SelectMany(CustomConversionHelper.FindCustomConversionMethods))
+            {
+                if (x.IsStatic && accessibilityHelper.IsSymbolAccessible(x, interfaceSymbol))
+                {
+                    mappingContext.CustomConversions[(x.Parameters[0].Type, x.ReturnType)] = (ExpressionSyntax)syntaxGenerator.MemberAccessExpression((ExpressionSyntax)syntaxGenerator.IdentifierName(x.ContainingType.ToDisplayString()), x.Name);
+                }
+            }
+            
             var mappingClass = (ClassDeclarationSyntax)syntaxGenerator.ClassDeclaration(
                 mappingDeclaration.Identifier.Text.Substring(1),
                 accessibility: Accessibility.Public,
@@ -36,7 +46,7 @@ namespace MappingGenerator.OnBuildGenerator
                     if (x is MethodDeclarationSyntax methodDeclaration)
                     {
                         var methodSymbol = context.SemanticModel.GetDeclaredSymbol(methodDeclaration);
-                        var statements = ImplementorEngine.CanProvideMappingImplementationFor(methodSymbol) ? ImplementorEngine.GenerateMappingStatements(methodSymbol, syntaxGenerator, context.SemanticModel, new MappingContext()) :
+                        var statements = ImplementorEngine.CanProvideMappingImplementationFor(methodSymbol) ? ImplementorEngine.GenerateMappingStatements(methodSymbol, syntaxGenerator, context.SemanticModel, mappingContext) :
                                 new List<StatementSyntax>()
                                 {
                                     GenerateThrowNotSupportedException(context, syntaxGenerator, methodSymbol.Name)
@@ -66,6 +76,29 @@ namespace MappingGenerator.OnBuildGenerator
                     SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(interfaceSymbol.ContainingNamespace.ToDisplayString())),
                 })
             });
+        }
+
+        private static IEnumerable<INamedTypeSymbol> FindCustomMapperTypes(AttributeData markerAttribute)
+        {
+            if (markerAttribute.NamedArguments != null)
+            {
+                foreach (var argument in markerAttribute.NamedArguments)
+                {
+                    if (argument.Key == nameof(MappingInterface.CustomStaticMappers) &&
+                        argument.Value.Kind == TypedConstantKind.Array && argument.Value.Type is IArrayTypeSymbol arrayType &&
+                        arrayType.ElementType.ToDisplayString() == "System.Type")
+                    {
+                        foreach (var typedConstant in argument.Value.Values)
+                        {
+                            if (typedConstant.Kind == TypedConstantKind.Type &&
+                                typedConstant.Value is INamedTypeSymbol typeWithConverters)
+                            {
+                                yield return typeWithConverters;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private static StatementSyntax GenerateThrowNotSupportedException(TransformationContext context, SyntaxGenerator syntaxGenerator, string methodName)

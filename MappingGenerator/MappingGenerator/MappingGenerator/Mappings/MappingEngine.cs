@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using MappingGenerator.Mappings.MappingImplementors;
 using MappingGenerator.Mappings.MappingMatchers;
 using MappingGenerator.Mappings.SourceFinders;
 using MappingGenerator.MethodHelpers;
@@ -352,11 +351,36 @@ namespace MappingGenerator.Mappings
 
         private static SyntaxNode AddMaterializeCollectionInvocation(SyntaxGenerator generator, SyntaxNode sourceAccess, ITypeSymbol targetListType)
         {
-            var materializeFunction =  targetListType.Kind == SymbolKind.ArrayType? "ToArray": "ToList";
+            var materializeFunction =  GetCollectionMaterializeFunction(targetListType);
             var toListAccess = generator.MemberAccessExpression(sourceAccess, materializeFunction );
             return generator.InvocationExpression(toListAccess);
         }
 
+        private static string GetCollectionMaterializeFunction(ITypeSymbol targetListType)
+        {
+            var targetTypeName = targetListType.ToDisplayString();
+            if (targetTypeName.StartsWith("System.Collections.Immutable.ImmutableArray") || targetTypeName.StartsWith("System.Collections.Immutable.IImmutableArray"))
+            {
+                return "ToImmutableArray";
+            }
+            
+            if (targetTypeName.StartsWith("System.Collections.Immutable.ImmutableList") || targetTypeName.StartsWith("System.Collections.Immutable.IImmutableList"))
+            {
+                return "ToImmutableList";
+            }
+            
+            if (targetTypeName.StartsWith("System.Collections.Immutable.ToImmutableSortedSet"))
+            {
+                return "ToImmutableList";
+            }
+
+            if (targetTypeName.StartsWith("System.Collections.Immutable.ImmutableHashSet") || targetTypeName.StartsWith("System.Collections.Immutable.IImmutableSet"))
+            {
+                return "ToImmutableHashSet";
+            }
+
+            return targetListType.Kind == SymbolKind.ArrayType? "ToArray": "ToList";
+        }
 
 
         public ExpressionSyntax CreateDefaultExpression(ITypeSymbol typeSymbol)

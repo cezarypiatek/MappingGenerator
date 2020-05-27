@@ -66,15 +66,23 @@ namespace MappingGenerator.OnBuildGenerator
                 }));
             
             var newRoot = WrapInTheSameNamespace(mappingClass, processedNode);
+            var usings = new List<UsingDirectiveSyntax>()
+            {
+                SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("System")),
+                SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("System.Linq")),
+                SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(interfaceSymbol.ContainingNamespace.ToDisplayString()))
+            };
+
+            var immutableList = context.SemanticModel.Compilation.GetTypeByMetadataName("System.Collections.Immutable.IImmutableList`1");
+            if (immutableList != null)
+            {
+                usings.Add(SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("System.Collections.Immutable")));
+            }
+
             return Task.FromResult(new GenerationResult()
             {
                 Members = SyntaxFactory.SingletonList(newRoot),
-                Usings = new SyntaxList<UsingDirectiveSyntax>(new[]
-                {
-                    SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("System")),
-                    SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("System.Linq")),
-                    SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(interfaceSymbol.ContainingNamespace.ToDisplayString())),
-                })
+                Usings = new SyntaxList<UsingDirectiveSyntax>(usings)
             });
         }
 

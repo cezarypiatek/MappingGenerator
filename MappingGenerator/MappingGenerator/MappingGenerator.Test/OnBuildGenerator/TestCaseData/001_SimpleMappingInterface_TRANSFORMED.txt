@@ -13,6 +13,7 @@ using System.Collections.ObjectModel;
 using MappingGenerator.OnBuildGenerator;
 using System.Linq;
 using MappingGenerator.Test.MappingGenerator.TestCaseData;
+using System.Collections.Immutable;
 
 namespace MappingGenerator.Test.MappingGenerator.TestCaseData
 {

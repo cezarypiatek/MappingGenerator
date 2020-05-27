@@ -1,4 +1,5 @@
-﻿using MappingGenerator.OnBuildGenerator;
+﻿using System.Collections.Immutable;
+using MappingGenerator.OnBuildGenerator;
 using NUnit.Framework;
 using SmartCodeGenerator.TestKit;
 using static MappingGenerator.Test.OnBuildGenerator.OnBuildGeneratorTestCases;
@@ -14,7 +15,8 @@ namespace MappingGenerator.Test.OnBuildGenerator
         {
             var generatorFixture = new SmartCodeGeneratorFixture(typeof(OnBuildMappingGenerator), new[]
             {
-                ReferenceSource.FromType<MappingInterface>()
+                ReferenceSource.FromType<MappingInterface>(),
+                ReferenceSource.FromType(typeof(ImmutableArray<>)),
             });
 
 

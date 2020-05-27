@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 
 namespace MappingGenerator.Test.MappingGenerator.TestCaseData
 {
@@ -28,6 +29,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public int Total { get; set; }
         public AddressDTO MainAddress { get; set; }
         public ReadOnlyCollection<AddressDTO> Addresses { get; set; }
+        public ImmutableArray<AddressDTO> ExtraAddresses { get; set; }
         public int UnitId { get; set; }
         public decimal ExtraSavings { get; set; }
         public Nullable<decimal> Savings { get; set; }
@@ -85,6 +87,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public AddressEntity MainAddress { get; set; }
         public string AddressCity { get; set; }
         public List<AddressEntity> Addresses { get; set; }
+        public AddressEntity[] ExtraAddresses { get; set; }
         public UnitEntity Unit { get; set; }
 
         public int GetTotal()

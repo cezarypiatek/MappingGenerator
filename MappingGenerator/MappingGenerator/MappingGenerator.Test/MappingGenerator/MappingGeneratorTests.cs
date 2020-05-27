@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using MappingGenerator.Features.Refactorings;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.CodeAnalysis;
@@ -198,7 +199,8 @@ namespace MappingGenerator.Test.Mapping
 
         protected override IReadOnlyCollection<MetadataReference> References => new MetadataReference[]
         {
-            MetadataReference.CreateFromFile(typeof(IdentityUser).Assembly.Location)
+            MetadataReference.CreateFromFile(typeof(IdentityUser).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(ImmutableArray<>).Assembly.Location), 
         };
     }
 }

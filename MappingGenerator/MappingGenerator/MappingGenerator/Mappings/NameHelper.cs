@@ -33,6 +33,18 @@ namespace MappingGenerator.Mappings
             return $"{withoutForbiddenSigns.Substring(0, 1).ToLower()}{withoutForbiddenSigns.Substring(1)}";
         }
 
+        public static string ToLocalVariableName(string proposalLocalName, string conflictingLocalName)
+        {
+            var localName = ToLocalVariableName(proposalLocalName);
+
+            if (localName == conflictingLocalName)
+            {
+                localName += "Target";
+            }
+
+            return localName;
+        }
+
         private static readonly string[] CollectionSynonyms = new[] {"List", "Collection", "Set", "Queue", "Dictionary", "Stack", "Array"};
 
         private static string ToSingularLocalVariableName(string proposalLocalName)

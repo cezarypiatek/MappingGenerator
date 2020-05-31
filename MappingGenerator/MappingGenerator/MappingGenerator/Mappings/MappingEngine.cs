@@ -39,18 +39,92 @@ namespace MappingGenerator.Mappings
             return new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
         }
 
+        public List<SyntaxNode> MapUsingForeachExpression(ExpressionSyntax sourceExpression, ExpressionSyntax targetExpression, ITypeSymbol sourceType, ITypeSymbol targetType, MappingContext mappingContext, bool skipInitialer = false)
+        {
+            var syntaxNodes = new List<SyntaxNode>();
+
+            if (targetExpression == null)
+            {
+                targetExpression = SyntaxFactory.IdentifierName(NameHelper.ToLocalVariableName(targetType.Name, sourceExpression.ToFullString()));
+            }
+
+            if (!skipInitialer)
+            {
+                var initializer = MapExpression(sourceExpression, sourceType, targetType, mappingContext, skipCollections: true);
+                syntaxNodes.Add(syntaxGenerator.LocalDeclarationStatement(targetExpression.ToFullString(), initializer));
+            }
+
+            var mappingSourceFinder = new ObjectMembersMappingSourceFinder(sourceType, sourceExpression, syntaxGenerator);
+            var sourceMatcher = new SingleSourceMatcher(mappingSourceFinder);
+
+            foreach (var mappingMatch in sourceMatcher.MatchAll(ObjectHelper.GetCollectionProperties(targetType), syntaxGenerator))
+            {
+                var sourceElementType = MappingHelper.GetElementType(mappingMatch.Source.ExpressionType);
+                var targetElementType = MappingHelper.GetElementType(mappingMatch.Target.ExpressionType);
+
+                var sourceMemberAccess = (SyntaxNode)mappingMatch.Source.Expression;
+                var targetMemberAccess = syntaxGenerator.MemberAccessExpression(targetExpression, mappingMatch.Target.Expression);
+
+                var subStatementSyntaxNodes = new List<SyntaxNode>();
+                if (ObjectHelper.IsSimpleType(sourceElementType) && ObjectHelper.IsSimpleType(targetElementType))
+                {
+                    var addMemberAccess = syntaxGenerator.MemberAccessExpression(targetMemberAccess, "AddRange");
+                    syntaxNodes.Add(SyntaxFactory.ExpressionStatement((ExpressionSyntax)syntaxGenerator.InvocationExpression(addMemberAccess, sourceMemberAccess)));
+                }
+                else if (!ObjectHelper.IsSimpleType(sourceElementType) && !ObjectHelper.IsSimpleType(targetElementType))
+                {
+                    var foreachSourceExpression = SyntaxFactory.IdentifierName(NameHelper.CreateLambdaParameterName(mappingMatch.Target.Expression));
+                    var subTargetExpression = SyntaxFactory.IdentifierName(NameHelper.ToLocalVariableName(targetElementType.Name, foreachSourceExpression.ToFullString()));
+
+                    subStatementSyntaxNodes.AddRange(MapUsingForeachExpression(
+                        foreachSourceExpression,
+                        subTargetExpression,
+                        sourceElementType,
+                        targetElementType,
+                        mappingContext));
+
+                    var addMemberAccess = syntaxGenerator.MemberAccessExpression(targetMemberAccess, "Add");
+                    subStatementSyntaxNodes.Add(SyntaxFactory.ExpressionStatement((ExpressionSyntax)syntaxGenerator.InvocationExpression(addMemberAccess, subTargetExpression)));
+
+                    if (MappingHelper.IsDictionary(mappingMatch.Source.ExpressionType))
+                    {
+                        sourceMemberAccess = syntaxGenerator.MemberAccessExpression(sourceMemberAccess, "Values");
+                    }
+
+                    syntaxNodes.Add(SyntaxFactory.ForEachStatement(
+                        SyntaxFactory.IdentifierName("var"),
+                        foreachSourceExpression.Identifier,
+                        (ExpressionSyntax)sourceMemberAccess,
+                        SyntaxFactory.Block(subStatementSyntaxNodes.Cast<StatementSyntax>())));
+                }
+            }
+
+            foreach (var mappingMatch in sourceMatcher.MatchAll(ObjectHelper.GetComplexProperties(targetType), syntaxGenerator))
+            {
+                syntaxNodes.AddRange(MapUsingForeachExpression(
+                    mappingMatch.Source.Expression,
+                    (ExpressionSyntax)syntaxGenerator.MemberAccessExpression(targetExpression, mappingMatch.Target.Expression),
+                    mappingMatch.Source.ExpressionType,
+                    mappingMatch.Target.ExpressionType,
+                    mappingContext,
+                    skipInitialer: true));
+            }
+
+            return syntaxNodes;
+        }
+
         public ExpressionSyntax MapExpression(ExpressionSyntax sourceExpression, ITypeSymbol sourceType,
-            ITypeSymbol destinationType, MappingContext mappingContext)
+            ITypeSymbol destinationType, MappingContext mappingContext, bool skipCollections = false)
         {
             var mappingSource = new MappingElement
             {
                 Expression = sourceExpression,
                 ExpressionType = sourceType
             };
-            return MapExpression(mappingSource, destinationType, mappingContext).Expression;
+            return MapExpression(mappingSource, destinationType, mappingContext, skipCollections).Expression;
         }
 
-        public MappingElement MapExpression(MappingElement source, ITypeSymbol targetType, MappingContext mappingContext, MappingPath mappingPath = null)
+        public MappingElement MapExpression(MappingElement source, ITypeSymbol targetType, MappingContext mappingContext, bool skipCollections = false, MappingPath mappingPath = null)
         {
             if (source == null)
             {
@@ -99,7 +173,7 @@ namespace MappingGenerator.Mappings
 
             if (ShouldCreateConversionBetweenTypes(targetType, sourceType))
             {
-                return TryToCreateMappingExpression(source, targetType, mappingPath, mappingContext);
+                return TryToCreateMappingExpression(source, targetType, mappingPath, mappingContext, skipCollections);
             }
 
             return source;
@@ -111,11 +185,11 @@ namespace MappingGenerator.Mappings
         }
 
         protected virtual MappingElement TryToCreateMappingExpression(MappingElement source, ITypeSymbol targetType,
-            MappingPath mappingPath, MappingContext mappingContext)
+            MappingPath mappingPath, MappingContext mappingContext, bool skipCollections)
         {
             //TODO: If source expression is method or constructor invocation then we should extract local variable and use it im mappings as a reference
             var namedTargetType = targetType as INamedTypeSymbol;
-            
+
             if (namedTargetType != null)
             {
                 var directlyMappingConstructor = namedTargetType.Constructors.FirstOrDefault(c => c.Parameters.Length == 1 && c.Parameters[0].Type.Equals(source.ExpressionType));
@@ -160,7 +234,7 @@ namespace MappingGenerator.Mappings
                     return new MappingElement()
                     {
                         ExpressionType = targetType,
-                        Expression =   AddInitializerWithMapping(creationExpression, mappingMatcher, targetType, mappingContext, mappingPath)
+                        Expression =   AddInitializerWithMapping(creationExpression, mappingMatcher, targetType, mappingContext, skipCollections, mappingPath)
                     };
                 }
             }
@@ -171,7 +245,7 @@ namespace MappingGenerator.Mappings
             return new MappingElement()
             {
                 ExpressionType = targetType,
-                Expression = AddInitializerWithMapping(objectCreationExpressionSyntax, subMappingMatcher, targetType, mappingContext, mappingPath)
+                Expression = AddInitializerWithMapping(objectCreationExpressionSyntax, subMappingMatcher, targetType, mappingContext, skipCollections, mappingPath)
             };
         }
 
@@ -180,10 +254,16 @@ namespace MappingGenerator.Mappings
             ObjectCreationExpressionSyntax objectCreationExpression, IMappingMatcher mappingMatcher,
             ITypeSymbol createdObjectTyp,
             MappingContext mappingContext,
+            bool skipCollections = false,
             MappingPath mappingPath = null)
         {
             var propertiesToSet = ObjectHelper.GetFieldsThaCanBeSetPublicly(createdObjectTyp, contextAssembly);
-            var assignments = MapUsingSimpleAssignment(propertiesToSet, mappingMatcher, mappingContext, mappingPath).ToList();
+            if (skipCollections)
+            {
+                propertiesToSet = propertiesToSet.Where(x => ObjectHelper.IsSimpleType(x.Type) || !MappingHelper.IsCollection(x.Type));
+            }
+
+            var assignments = MapUsingSimpleAssignment(propertiesToSet, mappingMatcher, mappingContext, skipCollections, mappingPath).ToList();
             if (assignments.Count == 0)
             {
                 return objectCreationExpression;
@@ -195,17 +275,18 @@ namespace MappingGenerator.Mappings
         public IEnumerable<ExpressionSyntax> MapUsingSimpleAssignment(IEnumerable<IPropertySymbol> targets,
             IMappingMatcher mappingMatcher,
             MappingContext mappingContext,
+            bool skipCollections = false,
             MappingPath mappingPath = null, SyntaxNode globalTargetAccessor = null)
         {
             if (mappingPath == null)
             {
                 mappingPath = new MappingPath();
             }
-          
+
             return mappingMatcher.MatchAll(targets, syntaxGenerator, globalTargetAccessor)
                 .Select(match =>
                 {
-                    var sourceMappingElement = this.MapExpression(match.Source, match.Target.ExpressionType, mappingContext, mappingPath.Clone());
+                    var sourceMappingElement = this.MapExpression(match.Source, match.Target.ExpressionType, mappingContext, skipCollections, mappingPath.Clone());
                     var sourceExpression = sourceMappingElement.Expression;
                     if (sourceMappingElement.ExpressionType != match.Target.ExpressionType)
                     {
@@ -244,7 +325,7 @@ namespace MappingGenerator.Mappings
                 if (wrapper.Type == WrapperInfoType.Method)
                 {
                     var unwrappingMethodAccess = syntaxGenerator.MemberAccessExpression(sourceAccess, wrapper.UnwrappingMethod.Name);
-                    
+
                     return new MappingElement()
                     {
                         Expression = (InvocationExpressionSyntax) syntaxGenerator.InvocationExpression(unwrappingMethodAccess),
@@ -344,7 +425,7 @@ namespace MappingGenerator.Mappings
                 ExpressionType = sourceListElementType,
                 Expression = syntaxGenerator.IdentifierName(lambdaParameterName) as ExpressionSyntax
             };
-            var listElementMappingStm = MapExpression(source, targetListElementType, mappingContext, mappingPath);
+            var listElementMappingStm = MapExpression(source, targetListElementType, mappingContext, false, mappingPath);
 
 		    return syntaxGenerator.ValueReturningLambdaExpression(lambdaParameterName, listElementMappingStm.Expression);
 	    }

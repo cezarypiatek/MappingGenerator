@@ -1,0 +1,69 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Collections.ObjectModel;
+
+namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+{
+    public class TestMapper
+    {
+        public static UserDTO Map(UserEntity entity)
+        {
+            var userDTO = new UserDTO()
+            {
+                Age = entity.Age,
+                Account = new AccountDTO()
+                {
+                    BankName = entity.Account.BankName,
+                    Number = entity.Account.Number
+                }
+            };
+            foreach (var address in entity.Account.Addresses)
+            {
+                var addressDTO = new AddressDTO()
+                {
+                    Name = address.Name
+                };
+                userDTO.Account.Addresses.Add(addressDTO);
+            }
+
+            return userDTO;
+        }
+    }
+
+    public class UserDTO
+    {
+        public int Age { get; set; }
+        public AccountDTO Account { get; set; }
+    }
+
+    public class UserEntity
+    {
+        public int Age { get; set; }
+        public AccountEntity Account { get; set; }
+    }
+
+    public class AccountDTO
+    {
+        public string BankName { get; set; }
+        public string Number { get; set; }
+        public List<AddressDTO> Addresses { get; } = new List<AddressDTO>();
+    }
+
+    public class AccountEntity
+    {
+        public string BankName { get; set; }
+        public string Number { get; set; }
+        public List<AddressEntity> Addresses { get; set; }
+    }
+
+    public class AddressDTO
+    {
+        public string Name { get; set; }
+    }
+
+    public class AddressEntity
+    {
+        public string Name { get; set; }
+    }
+}

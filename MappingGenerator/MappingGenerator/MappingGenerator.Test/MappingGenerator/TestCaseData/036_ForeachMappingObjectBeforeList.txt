@@ -1,0 +1,41 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Collections.ObjectModel;
+
+namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+{
+    public class TestMapper
+    {
+        public static UserDTO [|Map|](UserEntity entity)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class UserDTO
+    {
+        public int Age { get; set; }
+        public AccountDTO Account { get; set; }
+        public List<AccountDTO> Accounts { get; } = new List<AccountDTO>();
+    }
+
+    public class UserEntity
+    {
+        public int Age { get; set; }
+        public AccountEntity Account { get; set; }
+        public List<AccountEntity> Accounts { get; set; }
+    }
+
+    public class AccountDTO
+    {
+        public string BankName { get; set; }
+        public string Number { get; set; }
+    }
+
+    public class AccountEntity
+    {
+        public string BankName { get; set; }
+        public string Number { get; set; }
+    }
+}

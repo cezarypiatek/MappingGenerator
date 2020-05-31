@@ -18,9 +18,15 @@ namespace MappingGenerator.Mappings
 
         public static bool IsCollection(ITypeSymbol typeSymbol)
         {
-            return ObjectHelper.HasInterface(typeSymbol, "System.Collections.ICollection") || 
-                   ObjectHelper.HasInterface(typeSymbol, "System.Collections.IEnumerable") || 
+            return ObjectHelper.HasInterface(typeSymbol, "System.Collections.ICollection") ||
+                   ObjectHelper.HasInterface(typeSymbol, "System.Collections.IEnumerable") ||
                    typeSymbol.Kind == SymbolKind.ArrayType;
+        }
+
+        public static bool IsDictionary(ITypeSymbol typeSymbol)
+        {
+            return ObjectHelper.HasInterface(typeSymbol, "System.Collections.IDictionary") ||
+                ObjectHelper.IsReadonlyDictionary(typeSymbol);
         }
 
         public static ITypeSymbol GetElementType(ITypeSymbol collectionType)
@@ -35,7 +41,7 @@ namespace MappingGenerator.Mappings
                             var indexer = namedType.GetMembers(WellKnownMemberNames.Indexer).OfType<IPropertySymbol>().FirstOrDefault();
                             if (indexer != null)
                             {
-                               return indexer.Type;
+                                return indexer.Type;
                             }
 
                             throw new NotSupportedException("Cannot determine collection element type");
@@ -45,6 +51,10 @@ namespace MappingGenerator.Mappings
                             return namedType.BaseType;
                         }
                         return GetElementType(namedType.BaseType);
+                    }
+                    if (IsDictionary(namedType))
+                    {
+                        return namedType.TypeArguments[1];
                     }
                     return namedType.TypeArguments[0];
                 case IArrayTypeSymbol arrayType:
@@ -65,7 +75,7 @@ namespace MappingGenerator.Mappings
                 .WithLeadingTrivia(SyntaxTriviaList.Create(SyntaxFactory.EndOfLine(Environment.NewLine)));
         }
 
-       
+
 
         public static SyntaxNode WrapInReadonlyCollectionIfNecessary(this SyntaxNode node, bool isReadonly,
             SyntaxGenerator generator)
@@ -91,7 +101,7 @@ namespace MappingGenerator.Mappings
                     {
                         //TODO:verify parameters list
                         //TODO:Check explicit interface implementation
-                        if (md.Identifier.Text == member.Identifier.Text && 
+                        if (md.Identifier.Text == member.Identifier.Text &&
                             md.ReturnType.ToString() == member.ReturnType.ToString() &&
                             md.ParameterList.Parameters.Count == member.ParameterList.Parameters.Count)
                         {

@@ -41,6 +41,7 @@ namespace MappingGenerator.Mappings
         private readonly IReadOnlyList<IMappingMethodImplementor> implementors = new List<IMappingMethodImplementor>()
         {
             new IdentityMappingMethodImplementor(),
+            new SingleParameterForeachMappingMethodImplementor(),
             new SingleParameterPureMappingMethodImplementor(),
             new MultiParameterPureMappingMethodImplementor(),
             new FallbackMappingImplementor(new UpdateSecondParameterMappingMethodImplementor(),new UpdateThisObjectMultiParameterMappingMethodImplementor()),

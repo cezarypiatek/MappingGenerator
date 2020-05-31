@@ -25,12 +25,24 @@ namespace MappingGenerator.Mappings
         public static string ToLocalVariableName(string proposalLocalName)
         {
             var nameParts = proposalLocalName.Replace("@","").Trim().Split(ForbiddenSigns).Where(x=> string.IsNullOrWhiteSpace(x) == false).Select(x=>
-            {
-                var cleanElement = x.Trim();
-                return $"{cleanElement.Substring(0, 1).ToUpper()}{cleanElement.Substring(1)}";
-            });
+              {
+                  var cleanElement = x.Trim();
+                  return $"{cleanElement.Substring(0, 1).ToUpper()}{cleanElement.Substring(1)}";
+              });
             var withoutForbiddenSigns = string.Join("",nameParts);
             return $"{withoutForbiddenSigns.Substring(0, 1).ToLower()}{withoutForbiddenSigns.Substring(1)}";
+        }
+
+        public static string ToLocalVariableName(string proposalLocalName, string conflictingLocalName)
+        {
+            var localName = ToLocalVariableName(proposalLocalName);
+
+            if (localName == conflictingLocalName)
+            {
+                localName += "Target";
+            }
+
+            return localName;
         }
 
         private static readonly string[] CollectionSynonyms = new[] {"List", "Collection", "Set", "Queue", "Dictionary", "Stack", "Array"};

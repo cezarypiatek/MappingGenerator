@@ -298,4 +298,52 @@
   <data name="_029_PureMappingMethodWithInheritedCustomConversions_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>TestCaseData\029_PureMappingMethodWithInheritedCustomConversions_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="_030_ForeachMappingForNestedObject" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\030_ForeachMappingForNestedObject.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_030_ForeachMappingForNestedObject_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\030_ForeachMappingForNestedObject_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_031_ForeachMappingForNestedObjectLevel2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\031_ForeachMappingForNestedObjectLevel2.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_031_ForeachMappingForNestedObjectLevel2_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\031_ForeachMappingForNestedObjectLevel2_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_032_ForeachMappingConflictingLocalVariableName" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\032_ForeachMappingConflictingLocalVariableName.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_032_ForeachMappingConflictingLocalVariableName_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\032_ForeachMappingConflictingLocalVariableName_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_033_ForeachMappingWithDictionary" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\033_ForeachMappingWithDictionary.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_033_ForeachMappingWithDictionary_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\033_ForeachMappingWithDictionary_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_034_ForeachMappingForSimpleType" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\034_ForeachMappingForSimpleType.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_034_ForeachMappingForSimpleType_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\034_ForeachMappingForSimpleType_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_035_ForeachMapping" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\035_ForeachMapping.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_035_ForeachMapping_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\035_ForeachMapping_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_036_ForeachMappingObjectBeforeList" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\036_ForeachMappingObjectBeforeList.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_036_ForeachMappingObjectBeforeList_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\036_ForeachMappingObjectBeforeList_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_037_ForeachMappingComplexType" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\037_ForeachMappingComplexType.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_037_ForeachMappingComplexType_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\037_ForeachMappingComplexType_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

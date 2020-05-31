@@ -182,7 +182,7 @@ namespace MappingGenerator.Mappings
             MappingContext mappingContext,
             MappingPath mappingPath = null)
         {
-            var propertiesToSet = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(createdObjectTyp, contextAssembly);
+            var propertiesToSet = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(createdObjectTyp, contextAssembly, mappingContext);
             var assignments = MapUsingSimpleAssignment(propertiesToSet, mappingMatcher, mappingContext, mappingPath).ToList();
             if (assignments.Count == 0)
             {

@@ -9,15 +9,19 @@ namespace MappingGenerator.Mappings
     {
         public INamedTypeSymbol ContextSymbol { get; }
 
+        public AccessibilityHelper AccessibilityHelper { get; }
+
         public MappingContext(INamedTypeSymbol contextSymbol)
         {
             ContextSymbol = contextSymbol;
+            AccessibilityHelper = new AccessibilityHelper(contextSymbol);
         }
 
         public MappingContext(SyntaxNode contextExpression, SemanticModel semanticModel)
         {
             var typeDeclaration = contextExpression.FindContainer<TypeDeclarationSyntax>();
             ContextSymbol =  semanticModel.GetDeclaredSymbol(typeDeclaration) as INamedTypeSymbol;
+            AccessibilityHelper = new AccessibilityHelper(ContextSymbol);
         }
 
         public HashSet<MappingType> MissingConversions { get; } = new HashSet<MappingType>();

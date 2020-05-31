@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using MappingGenerator.Mappings;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -119,9 +120,9 @@ namespace MappingGenerator.RoslynHelpers
         ITypeSymbol Type { get; }
         ISymbol UnderlyingSymbol { get; }
 
-        bool CanBeSetPublicly(IAssemblySymbol contextAssembly);
-        bool CanBeSetPrivately(ITypeSymbol fromType);
-        bool CanBeSetInConstructor(ITypeSymbol fromType);
+        bool CanBeSetPublicly(IAssemblySymbol contextAssembly, MappingContext mappingContext);
+        bool CanBeSetPrivately(ITypeSymbol fromType, MappingContext mappingContext);
+        bool CanBeSetInConstructor(ITypeSymbol fromType, MappingContext mappingContext);
 
         bool CanBeGetPublicly();
     }

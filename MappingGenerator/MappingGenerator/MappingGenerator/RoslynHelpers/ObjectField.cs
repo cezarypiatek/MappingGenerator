@@ -1,3 +1,4 @@
+using MappingGenerator.Mappings;
 using Microsoft.CodeAnalysis;
 
 namespace MappingGenerator.RoslynHelpers
@@ -16,17 +17,17 @@ namespace MappingGenerator.RoslynHelpers
         public ITypeSymbol Type => fieldSymbol.Type;
 
         public ISymbol UnderlyingSymbol => fieldSymbol;
-        public bool CanBeSetPublicly(IAssemblySymbol contextAssembly)
+        public bool CanBeSetPublicly(IAssemblySymbol contextAssembly, MappingContext mappingContext)
         {
             throw new System.NotImplementedException();
         }
 
-        public bool CanBeSetPrivately(ITypeSymbol fromType)
+        public bool CanBeSetPrivately(ITypeSymbol fromType, MappingContext mappingContext)
         {
             throw new System.NotImplementedException();
         }
 
-        public bool CanBeSetInConstructor(ITypeSymbol fromType)
+        public bool CanBeSetInConstructor(ITypeSymbol fromType, MappingContext mappingContext)
         {
             throw new System.NotImplementedException();
         }

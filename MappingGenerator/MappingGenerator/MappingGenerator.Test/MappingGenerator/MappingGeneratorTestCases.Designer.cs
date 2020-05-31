@@ -1146,13 +1146,12 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///    {
         ///        public static ApplicationUserEntity ToEntity(this UserModel model)
         ///        {
-        ///            return new ApplicationUserEntity()
+        ///            var applicationUserEntity = new ApplicationUserEntity()
         ///            {
         ///                NewProperty1 = model.NewProperty1,
         ///                NewProperty2 = model.NewProperty2,
         ///                Email = model.Email,
-        ///                EmailConfirmed = model.EmailConfirmed,
-        ///                Pas [rest of string was truncated]&quot;;.
+        ///                EmailConfirmed = model.EmailConfirmed, [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _019_MappingPropertiesInheritedFromLibraryClass_FIXED {
             get {
@@ -2091,6 +2090,63 @@ namespace MappingGenerator.Test.MappingGenerator {
         internal static string _036_ForeachMappingObjectBeforeList_FIXED {
             get {
                 return ResourceManager.GetString("_036_ForeachMappingObjectBeforeList_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO [|Map|](UserEntity entity)
+        ///        {
+        ///            throw new NotImplementedException();
+        ///        }
+        ///    }
+        ///
+        ///    public class UserDTO
+        ///    {
+        ///        public int Age { get; set; }
+        ///        public AccountDTO Account { get; set; }
+        ///    }
+        ///
+        ///    public class UserEntity
+        ///   [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _037_ForeachMappingComplexType {
+            get {
+                return ResourceManager.GetString("_037_ForeachMappingComplexType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO [|Map|](UserEntity entity)
+        ///        {
+        ///            var userDTO = new UserDTO()
+        ///            {
+        ///                Age = entity.Age,
+        ///                Account = new AccountDTO()
+        ///                {
+        ///                    BankName = entity.Account.BankName,
+        ///                    [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _037_ForeachMappingComplexType_FIXED {
+            get {
+                return ResourceManager.GetString("_037_ForeachMappingComplexType_FIXED", resourceCulture);
             }
         }
     }

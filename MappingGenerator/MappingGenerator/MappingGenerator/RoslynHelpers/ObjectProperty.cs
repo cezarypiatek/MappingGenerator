@@ -1,4 +1,5 @@
 using System.Linq;
+using MappingGenerator.Mappings;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -19,7 +20,7 @@ namespace MappingGenerator.RoslynHelpers
         public ITypeSymbol Type => property.Type;
 
         public ISymbol UnderlyingSymbol => property;
-        public bool CanBeSetPublicly(IAssemblySymbol contextAssembly)
+        public bool CanBeSetPublicly(IAssemblySymbol contextAssembly, MappingContext mappingContext)
         {
             if(property.SetMethod == null)
             {
@@ -46,14 +47,14 @@ namespace MappingGenerator.RoslynHelpers
             return true;
         }
 
-        public bool CanBeSetPrivately(ITypeSymbol fromType)
+        public bool CanBeSetPrivately(ITypeSymbol fromType, MappingContext mappingContext)
         {
             if (property.SetMethod == null)
             {
                 return false;
             }
 
-            if (this.CanBeSetPublicly(fromType.ContainingAssembly))
+            if (this.CanBeSetPublicly(fromType.ContainingAssembly, mappingContext))
             {
                 return true;
             }
@@ -66,9 +67,9 @@ namespace MappingGenerator.RoslynHelpers
             return property.SetMethod.DeclaredAccessibility == Accessibility.Private && property.ContainingType.Equals(fromType);
         }
 
-        public bool CanBeSetInConstructor(ITypeSymbol fromType)
+        public bool CanBeSetInConstructor(ITypeSymbol fromType, MappingContext mappingContext)
         {
-            if (CanBeSetPrivately(fromType))
+            if (CanBeSetPrivately(fromType, mappingContext))
             {
                 return true;
             }

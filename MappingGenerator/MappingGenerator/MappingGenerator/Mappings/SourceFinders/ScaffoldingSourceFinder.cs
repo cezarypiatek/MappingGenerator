@@ -21,22 +21,21 @@ namespace MappingGenerator.Mappings.SourceFinders
             _contextAssembly = contextAssembly;
         }
 
-        public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType,
-            MappingContext mappingContext)
+        public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType, MappingContext mappingContext)
         {
-            return FindMappingSource(targetType, new MappingPath());
+            return FindMappingSource(targetType, mappingContext, new MappingPath());
         }
 
-        private MappingElement FindMappingSource(ITypeSymbol targetType, MappingPath mappingPath)
+        private MappingElement FindMappingSource(ITypeSymbol targetType, MappingContext mappingContext, MappingPath mappingPath)
         {
             return new MappingElement
             {
                 ExpressionType = targetType,
-                Expression = (ExpressionSyntax) GetDefaultExpression(targetType, mappingPath)
+                Expression = (ExpressionSyntax) GetDefaultExpression(targetType, mappingContext, mappingPath)
             };  
         }
 
-        internal SyntaxNode GetDefaultExpression(ITypeSymbol type, MappingPath mappingPath)
+        internal SyntaxNode GetDefaultExpression(ITypeSymbol type, MappingContext mappingContext, MappingPath mappingPath)
         {
             if (mappingPath.AddToMapped(type) == false)
             {
@@ -92,7 +91,7 @@ namespace MappingGenerator.Mappings.SourceFinders
                     }
                     var subType = MappingHelper.GetElementType(type);
                     var initializationBlockExpressions = new SeparatedSyntaxList<ExpressionSyntax>();
-                    var subTypeDefault = (ExpressionSyntax)GetDefaultExpression(subType, mappingPath.Clone());
+                    var subTypeDefault = (ExpressionSyntax)GetDefaultExpression(subType, mappingContext, mappingPath.Clone());
                     if (subTypeDefault != null)
                     {
                         initializationBlockExpressions = initializationBlockExpressions.Add(subTypeDefault);
@@ -157,15 +156,15 @@ namespace MappingGenerator.Mappings.SourceFinders
                     if (hasDefaultConstructor == false && publicConstructors.Count > 0)
                     {
                         var randomConstructor = publicConstructors.First();
-                        var constructorArguments = randomConstructor.Parameters.Select(p => GetDefaultExpression(p.Type, mappingPath.Clone())).ToList();
+                        var constructorArguments = randomConstructor.Parameters.Select(p => GetDefaultExpression(p.Type, mappingContext, mappingPath.Clone())).ToList();
                         objectCreationExpression = (ObjectCreationExpressionSyntax)syntaxGenerator.ObjectCreationExpression(nt, constructorArguments);
                     }
 
-                    var fields = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(nt, _contextAssembly);
+                    var fields = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(nt, _contextAssembly, mappingContext);
                     var assignments = fields.Select(x =>
                     {
                         var identifier = (ExpressionSyntax)(SyntaxFactory.IdentifierName(x.Name));
-                        return (ExpressionSyntax)syntaxGenerator.AssignmentStatement(identifier, this.FindMappingSource(x.Type, mappingPath.Clone()).Expression);
+                        return (ExpressionSyntax)syntaxGenerator.AssignmentStatement(identifier, this.FindMappingSource(x.Type, mappingContext, mappingPath.Clone()).Expression);
                     }).ToList();
 
                     if (assignments.Count == 0)

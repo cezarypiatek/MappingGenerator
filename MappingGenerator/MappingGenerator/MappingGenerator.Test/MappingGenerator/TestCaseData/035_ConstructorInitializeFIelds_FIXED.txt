@@ -1,0 +1,66 @@
+﻿namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+{
+    class ClassA: BaseClassA
+    {
+        public string Field1;
+        public string Field2;
+        public string Field3;
+        public string Field4;
+        public string BaseField1;
+        public string BaseField2;
+        public string BaseField3;
+        public string BaseField4;
+        public string ExtraField1;
+        protected string ExtraField2;
+        private string ExtraField3;
+        internal string ExtraField4;
+
+        public ClassA(ClassB input)
+        {
+            Field1 = input.Field1;
+            Field4 = input.Field4;
+            BaseField1 = input.BaseField1;
+            BaseField4 = input.BaseField4;
+            ExtraField1 = input.ExtraField1;
+            ExtraField2 = input.ExtraField2;
+            ExtraField3 = input.ExtraField3;
+            ExtraField4 = input.ExtraField4;
+            BaseExtraField1 = input.BaseExtraField1;
+            BaseExtraField2 = input.BaseExtraField2;
+            BaseExtraField4 = input.BaseExtraField4;
+        }
+    }
+    
+    class BaseClassA
+    {
+        public string BaseExtraField1;
+        protected string BaseExtraField2;
+        private string BaseExtraField3;
+        internal string BaseExtraField4;
+    }
+
+
+    class ClassB: BaseClassB
+    {
+        public string Field1;
+        private string Field2;
+        protected string Field3;
+        internal string Field4;
+        public string ExtraField1;
+        public string ExtraField2;
+        public string ExtraField3;
+        public string ExtraField4;
+        public string BaseExtraField1;
+        public string BaseExtraField2;
+        public string BaseExtraField3;
+        public string BaseExtraField4;
+    }
+
+    class BaseClassB
+    {
+        public string BaseField1;
+        private string BaseField2;
+        protected string BaseField3;
+        internal string BaseField4;
+    }
+}

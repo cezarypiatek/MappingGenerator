@@ -1,0 +1,69 @@
+﻿namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+{
+    class ClassA: BaseClassA
+    {
+        public string Field1;
+        public string Field2;
+        public string Field3;
+        public string Field4;
+        public string BaseField1;
+        public string BaseField2;
+        public string BaseField3;
+        public string BaseField4;
+        public string ExtraField1;
+        protected string ExtraField2;
+        private string ExtraField3;
+        internal string ExtraField4;
+    }
+    
+    class BaseClassA
+    {
+        public string BaseExtraField1;
+        protected string BaseExtraField2;
+        private string BaseExtraField3;
+        internal string BaseExtraField4;
+    }
+
+
+    class ClassB: BaseClassB
+    {
+        public string Field1;
+        private string Field2;
+        protected string Field3;
+        internal string Field4;
+        public string ExtraField1;
+        public string ExtraField2;
+        public string ExtraField3;
+        public string ExtraField4;
+        public string BaseExtraField1;
+        public string BaseExtraField2;
+        public string BaseExtraField3;
+        public string BaseExtraField4;
+    }
+
+    class BaseClassB
+    {
+        public string BaseField1;
+        private string BaseField2;
+        protected string BaseField3;
+        internal string BaseField4;
+    }
+
+    class Mapper
+    {
+        public ClassB Map(ClassA from)
+        {
+            return new ClassB()
+            {
+                Field1 = from.Field1,
+                Field4 = from.Field4,
+                ExtraField1 = from.ExtraField1,
+                ExtraField4 = from.ExtraField4,
+                BaseExtraField1 = from.BaseExtraField1,
+                BaseExtraField4 = from.BaseExtraField4,
+                BaseField1 = from.BaseField1,
+                BaseField4 = from.BaseField4
+            };
+        }
+    }
+}

@@ -18,17 +18,23 @@ namespace MappingGenerator.RoslynHelpers
 
         public bool CanBeSet(ITypeSymbol via, MappingContext mappingContext)
         {
-            throw new System.NotImplementedException();
+            if (fieldSymbol.IsReadOnly)
+            {
+                return false;
+            }
+
+            return mappingContext.AccessibilityHelper.IsSymbolAccessible(fieldSymbol, via);
+
         }
 
         public bool CanBeSetInConstructor(ITypeSymbol via, MappingContext mappingContext)
         {
-            throw new System.NotImplementedException();
+            return mappingContext.AccessibilityHelper.IsSymbolAccessible(fieldSymbol, via);
         }
 
         public bool CanBeGet(ITypeSymbol via, MappingContext mappingContext)
         {
-            throw new System.NotImplementedException();
+            return mappingContext.AccessibilityHelper.IsSymbolAccessible(fieldSymbol, via);
         }
     }
 }

@@ -1826,5 +1826,156 @@ namespace MappingGenerator.Test.MappingGenerator {
                 return ResourceManager.GetString("_032_PubliclyUpdateFieldAccessibility_FIXED", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///using System.Collections.Immutable;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO [|Map|](UserEntity entity)
+        ///        {
+        ///            throw new NotImplementedException();
+        ///        }
+        ///    }
+        ///
+        ///    public class UserDTO
+        ///    {
+        ///        public string FirstName;
+        ///        public string LastName;
+        ///        public int Age; [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _033_PureMappingMethodWithFields {
+            get {
+                return ResourceManager.GetString("_033_PureMappingMethodWithFields", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///using System.Collections.Immutable;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO Map(UserEntity entity)
+        ///        {
+        ///            return new UserDTO()
+        ///            {
+        ///                FirstName = entity.FirstName,
+        ///                LastName = entity.LastName,
+        ///                Age = entity.Age,
+        ///                Cash  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _033_PureMappingMethodWithFields_FIXED {
+            get {
+                return ResourceManager.GetString("_033_PureMappingMethodWithFields_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    class ClassA: BaseClassA
+        ///    {
+        ///        public string Field1;
+        ///        public string Field2;
+        ///        public string Field3;
+        ///        public string Field4;
+        ///        public string BaseField1;
+        ///        public string BaseField2;
+        ///        public string BaseField3;
+        ///        public string BaseField4;
+        ///        public string ExtraField1;
+        ///        protected string ExtraField2;
+        ///        private string ExtraField3;
+        ///        internal string ExtraFiel [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _034_PubliclyUpdateFieldAccessibilityForFields {
+            get {
+                return ResourceManager.GetString("_034_PubliclyUpdateFieldAccessibilityForFields", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    class ClassA: BaseClassA
+        ///    {
+        ///        public string Field1;
+        ///        public string Field2;
+        ///        public string Field3;
+        ///        public string Field4;
+        ///        public string BaseField1;
+        ///        public string BaseField2;
+        ///        public string BaseField3;
+        ///        public string BaseField4;
+        ///        public string ExtraField1;
+        ///        protected string ExtraField2;
+        ///        private string ExtraField3;
+        ///        internal string ExtraFiel [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _034_PubliclyUpdateFieldAccessibilityForFields_FIXED {
+            get {
+                return ResourceManager.GetString("_034_PubliclyUpdateFieldAccessibilityForFields_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    class ClassA: BaseClassA
+        ///    {
+        ///        public string Field1;
+        ///        public string Field2;
+        ///        public string Field3;
+        ///        public string Field4;
+        ///        public string BaseField1;
+        ///        public string BaseField2;
+        ///        public string BaseField3;
+        ///        public string BaseField4;
+        ///        public string ExtraField1;
+        ///        protected string ExtraField2;
+        ///        private string ExtraField3;
+        ///        internal string ExtraFiel [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _035_ConstructorInitializeFIelds {
+            get {
+                return ResourceManager.GetString("_035_ConstructorInitializeFIelds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    class ClassA: BaseClassA
+        ///    {
+        ///        public string Field1;
+        ///        public string Field2;
+        ///        public string Field3;
+        ///        public string Field4;
+        ///        public string BaseField1;
+        ///        public string BaseField2;
+        ///        public string BaseField3;
+        ///        public string BaseField4;
+        ///        public string ExtraField1;
+        ///        protected string ExtraField2;
+        ///        private string ExtraField3;
+        ///        internal string ExtraFiel [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _035_ConstructorInitializeFIelds_FIXED {
+            get {
+                return ResourceManager.GetString("_035_ConstructorInitializeFIelds_FIXED", resourceCulture);
+            }
+        }
     }
 }

@@ -19,57 +19,21 @@ namespace MappingGenerator.RoslynHelpers
 
         public ITypeSymbol Type => property.Type;
 
-        public ISymbol UnderlyingSymbol => property;
-        public bool CanBeSetPublicly(IAssemblySymbol contextAssembly, MappingContext mappingContext)
+        public bool CanBeSet(ITypeSymbol via, MappingContext mappingContext)
         {
+            //TODO: handle properties that can be set via {}
             if(property.SetMethod == null)
             {
                 return false;
             }
 
-            var canSetInternalFields = contextAssembly.IsSameAssemblyOrHasFriendAccessTo(property.ContainingAssembly);
-            if(property.DeclaredAccessibility != Accessibility.Public)
-            {
-                if (property.DeclaredAccessibility != Accessibility.Internal || canSetInternalFields == false)
-                {
-                    return false;
-                }
-            }
-
-            if (property.SetMethod.DeclaredAccessibility != Accessibility.Public)
-            {
-                if (property.SetMethod.DeclaredAccessibility != Accessibility.Internal || canSetInternalFields == false)
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return mappingContext.AccessibilityHelper.IsSymbolAccessible(property.SetMethod, via);
         }
 
-        public bool CanBeSetPrivately(ITypeSymbol fromType, MappingContext mappingContext)
+
+        public bool CanBeSetInConstructor(ITypeSymbol via, MappingContext mappingContext)
         {
-            if (property.SetMethod == null)
-            {
-                return false;
-            }
-
-            if (this.CanBeSetPublicly(fromType.ContainingAssembly, mappingContext))
-            {
-                return true;
-            }
-
-            if (property.SetMethod.DeclaredAccessibility == Accessibility.Protected)
-            {
-                return true;
-            }
-
-            return property.SetMethod.DeclaredAccessibility == Accessibility.Private && property.ContainingType.Equals(fromType);
-        }
-
-        public bool CanBeSetInConstructor(ITypeSymbol fromType, MappingContext mappingContext)
-        {
-            if (CanBeSetPrivately(fromType, mappingContext))
+            if (CanBeSet(via, mappingContext))
             {
                 return true;
             }
@@ -87,7 +51,7 @@ namespace MappingGenerator.RoslynHelpers
 
             if (HasPrivateSetter(propertyDeclaration))
             {
-                if (property.ContainingType.Equals(fromType) == false)
+                if (property.ContainingType.Equals(via) == false)
                 {
                     return false;
                 }
@@ -108,10 +72,14 @@ namespace MappingGenerator.RoslynHelpers
             return x.IsKind(SyntaxKind.GetAccessorDeclaration) && x.Body == null && x.ExpressionBody == null;
         }
 
-        public bool CanBeGetPublicly()
+        public bool CanBeGet(ITypeSymbol via, MappingContext mappingContext)
         {
-            //TODO: Handle Internal
-            return property.DeclaredAccessibility == Accessibility.Public && property.GetMethod != null;
+            if (property.GetMethod == null)
+            {
+                return false;
+            }
+
+            return mappingContext.AccessibilityHelper.IsSymbolAccessible(property.GetMethod, via);
         }
     }
 }

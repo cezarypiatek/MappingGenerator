@@ -12,11 +12,12 @@ namespace MappingGenerator.Mappings.SourceFinders
             this.sourceFinders = sourceFinders;
         }
 
-        public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType)
+        public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType,
+            MappingContext mappingContext)
         {
             foreach (var sourceFinder in sourceFinders)
             {
-                var mappingElement = sourceFinder.FindMappingSource(targetName, targetType);
+                var mappingElement = sourceFinder.FindMappingSource(targetName, targetType, mappingContext);
                 if (mappingElement != null)
                 {
                     return mappingElement;

@@ -30,12 +30,14 @@ namespace MappingGenerator.Features.CodeFixes
             var overloadParameterSets = invocation.GetOverloadParameterSets(semanticModel);
             if (overloadParameterSets != null)
             {
+                var mappingContext = new MappingContext();
                 var contextAssembly = semanticModel.FindContextAssembly(invocation.SourceNode);
                 var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
-                var parametersMatch = MethodHelper.FindBestParametersMatch(mappingSourceFinder, overloadParameterSets);
+                var parametersMatch = MethodHelper.FindBestParametersMatch(mappingSourceFinder, overloadParameterSets, mappingContext);
                 if (parametersMatch != null)
                 {
-                    var argumentList = parametersMatch.ToArgumentListSyntax(mappingEngine, generateNamedParameters);
+                    
+                    var argumentList = parametersMatch.ToArgumentListSyntax(mappingEngine, mappingContext, generateNamedParameters);
                     return await document.ReplaceNodes(invocation.SourceNode, invocation.WithArgumentList(argumentList), cancellationToken);
                 }
             }

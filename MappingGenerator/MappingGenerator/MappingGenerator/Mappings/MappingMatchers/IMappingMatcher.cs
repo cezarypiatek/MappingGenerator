@@ -6,6 +6,7 @@ namespace MappingGenerator.Mappings.MappingMatchers
 {
     public interface IMappingMatcher
     {
-        IReadOnlyList<MappingMatch> MatchAll(IEnumerable<IPropertySymbol> targets, SyntaxGenerator syntaxGenerator, SyntaxNode globalTargetAccessor = null);
+        IReadOnlyList<MappingMatch> MatchAll(IEnumerable<IPropertySymbol> targets, SyntaxGenerator syntaxGenerator,
+            MappingContext mappingContext, SyntaxNode globalTargetAccessor = null);
     }
 }

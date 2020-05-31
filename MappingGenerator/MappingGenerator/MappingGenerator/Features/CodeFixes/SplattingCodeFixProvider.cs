@@ -72,10 +72,12 @@ namespace MappingGenerator.Features.CodeFixes
                 var contextAssembly = semanticModel.FindContextAssembly(invocation.SourceNode);
                 var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
                 var invalidArgumentList = invocation.Arguments;
-                var parametersMatch = FindParametersMatch(invalidArgumentList, overloadParameterSets, semanticModel, syntaxGenerator);
+                var mappingContext = new MappingContext();
+                var parametersMatch = FindParametersMatch(invalidArgumentList, overloadParameterSets, semanticModel, syntaxGenerator, mappingContext);
                 if (parametersMatch != null)
                 {
-                    var argumentList = parametersMatch.ToArgumentListSyntax(mappingEngine, generateNamedParameters);
+                    
+                    var argumentList = parametersMatch.ToArgumentListSyntax(mappingEngine, mappingContext, generateNamedParameters);
                     return await document.ReplaceNodes(invocation.SourceNode, invocation.WithArgumentList(argumentList), cancellationToken);
                 
                 }
@@ -84,10 +86,12 @@ namespace MappingGenerator.Features.CodeFixes
             return document;
         }
 
-        private static MatchedParameterList FindParametersMatch(ArgumentListSyntax invalidArgumentList, IEnumerable<ImmutableArray<IParameterSymbol>> overloadParameterSets, SemanticModel semanticModel, SyntaxGenerator syntaxGenerator) 
+        private static MatchedParameterList FindParametersMatch(ArgumentListSyntax invalidArgumentList,
+            IEnumerable<ImmutableArray<IParameterSymbol>> overloadParameterSets, SemanticModel semanticModel,
+            SyntaxGenerator syntaxGenerator, MappingContext mappingContext) 
         {
             var sourceFinder = CreateSourceFinderBasedOnInvalidArgument(invalidArgumentList, semanticModel, syntaxGenerator);
-            var parametersMatch = MethodHelper.FindBestParametersMatch(sourceFinder, overloadParameterSets);
+            var parametersMatch = MethodHelper.FindBestParametersMatch(sourceFinder, overloadParameterSets, mappingContext);
             return parametersMatch;
         }
 

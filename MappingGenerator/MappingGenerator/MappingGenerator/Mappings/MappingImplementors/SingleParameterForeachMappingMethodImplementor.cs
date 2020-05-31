@@ -32,17 +32,18 @@ namespace MappingGenerator.Mappings.MappingImplementors
         {
             foreach (var member in ObjectHelper.GetPublicPropertySymbols(type))
             {
-                if (ObjectHelper.IsSimpleType(member.Type) || !MappingHelper.IsCollection(member.Type))
+                if (ObjectHelper.IsSimpleType(member.Type))
                 {
                     continue;
                 }
 
-                if (member.SetMethod == null)
+                var isCollection = MappingHelper.IsCollection(member.Type);
+                if (isCollection && member.SetMethod == null)
                 {
                     return true;
                 }
 
-                if (ContainsCollectionWithoutSetter(MappingHelper.GetElementType(member.Type)))
+                if (ContainsCollectionWithoutSetter(isCollection ? MappingHelper.GetElementType(member.Type) : member.Type))
                 {
                     return true;
                 }

@@ -29,8 +29,19 @@ namespace MappingGenerator.Mappings.MappingImplementors
             return syntaxNodes;
         }
 
-        private bool ContainsCollectionWithoutSetter(ITypeSymbol type)
+        private bool ContainsCollectionWithoutSetter(ITypeSymbol type, MappingPath mappingPath = null)
         {
+            if (mappingPath == null)
+            {
+                mappingPath = new MappingPath();
+            }
+
+            if (!mappingPath.AddToMapped(type))
+            {
+                /* Stop recursive mapping */
+                return false;
+            }
+
             foreach (var member in ObjectHelper.GetPublicPropertySymbols(type))
             {
                 if (ObjectHelper.IsSimpleType(member.Type))
@@ -44,7 +55,7 @@ namespace MappingGenerator.Mappings.MappingImplementors
                     return true;
                 }
 
-                if (ContainsCollectionWithoutSetter(isCollection ? MappingHelper.GetElementType(member.Type) : member.Type))
+                if (ContainsCollectionWithoutSetter(isCollection ? MappingHelper.GetElementType(member.Type) : member.Type, mappingPath))
                 {
                     return true;
                 }

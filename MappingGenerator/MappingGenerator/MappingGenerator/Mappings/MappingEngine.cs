@@ -43,7 +43,7 @@ namespace MappingGenerator.Mappings
         {
             var element = new MappingForeachElement();
 
-            if(targetExpression == null)
+            if (targetExpression == null)
             {
                 var targetVariableName = NameHelper.ToLocalVariableName(targetType.Name);
                 if (sourceExpression.ToFullString() == targetVariableName)

@@ -146,11 +146,11 @@ namespace MappingGenerator.Mappings
             {
                 //maybe there is constructor that accepts parameter matching source properties
                 var constructorOverloadParameterSets = namedTargetType.Constructors.Select(x => x.Parameters);
-                var matchedOverload = MethodHelper.FindBestParametersMatch(subMappingSourceFinder, constructorOverloadParameterSets);
+                var matchedOverload = MethodHelper.FindBestParametersMatch(subMappingSourceFinder, constructorOverloadParameterSets, mappingContext);
 
                 if (matchedOverload != null)
                 {
-                    var creationExpression = ((ObjectCreationExpressionSyntax)syntaxGenerator.ObjectCreationExpression(targetType, matchedOverload.ToArgumentListSyntax(this).Arguments));
+                    var creationExpression = ((ObjectCreationExpressionSyntax)syntaxGenerator.ObjectCreationExpression(targetType, matchedOverload.ToArgumentListSyntax(this, new MappingContext()).Arguments));
                     var matchedSources = matchedOverload.GetMatchedSources();
                     var restSourceFinder = new IgnorableMappingSourceFinder(subMappingSourceFinder,  foundElement =>
                         {
@@ -202,7 +202,7 @@ namespace MappingGenerator.Mappings
                 mappingPath = new MappingPath();
             }
           
-            return mappingMatcher.MatchAll(targets, syntaxGenerator, globalTargetAccessor)
+            return mappingMatcher.MatchAll(targets, syntaxGenerator, mappingContext, globalTargetAccessor)
                 .Select(match =>
                 {
                     var sourceMappingElement = this.MapExpression(match.Source, match.Target.ExpressionType, mappingContext, mappingPath.Clone());

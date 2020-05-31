@@ -17,11 +17,12 @@ namespace MappingGenerator.Mappings.MappingMatchers
             this.sourceFinder = sourceFinder;
         }
 
-        public IReadOnlyList<MappingMatch> MatchAll(IEnumerable<IPropertySymbol> targets, SyntaxGenerator syntaxGenerator,  SyntaxNode globalTargetAccessor = null)
+        public IReadOnlyList<MappingMatch> MatchAll(IEnumerable<IPropertySymbol> targets,
+            SyntaxGenerator syntaxGenerator, MappingContext mappingContext, SyntaxNode globalTargetAccessor = null)
         {
             return targets.Select(property => new MappingMatch
                 {
-                    Source = sourceFinder.FindMappingSource(property.Name, property.Type),
+                    Source = sourceFinder.FindMappingSource(property.Name, property.Type, mappingContext),
                     Target = CreateTargetElement(globalTargetAccessor, property, syntaxGenerator)
                 })
                 .Where(x => x.Source != null).ToList();

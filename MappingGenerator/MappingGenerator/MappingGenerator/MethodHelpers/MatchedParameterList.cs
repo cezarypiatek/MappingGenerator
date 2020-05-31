@@ -45,7 +45,7 @@ namespace MappingGenerator.MethodHelpers
             }
         }
 
-        public ArgumentListSyntax ToArgumentListSyntax(MappingEngine mappingEngine, bool generateNamedParameters = true)
+        public ArgumentListSyntax ToArgumentListSyntax(MappingEngine mappingEngine, MappingContext mappingContext, bool generateNamedParameters = true)
         {
             return Matches.Aggregate(SyntaxFactory.ArgumentList(), (list, match) =>
             {
@@ -56,7 +56,7 @@ namespace MappingGenerator.MethodHelpers
                 }
 
                 var parameterType = match.Parameter.Type;
-                var expression = mappingEngine.MapExpression(match.Source, parameterType, new MappingContext())?.Expression ?? mappingEngine.CreateDefaultExpression(parameterType);
+                var expression = mappingEngine.MapExpression(match.Source, parameterType, mappingContext)?.Expression ?? mappingEngine.CreateDefaultExpression(parameterType);
                 var argument = generateNamedParameters
                     ? SyntaxFactory.Argument(SyntaxFactory.NameColon(match.Parameter.Name), SyntaxFactory.Token(SyntaxKind.None), expression)
                     : SyntaxFactory.Argument(expression);

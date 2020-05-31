@@ -14,9 +14,10 @@ namespace MappingGenerator.Mappings.SourceFinders
             this.ignore = ignore;
         }
 
-        public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType)
+        public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType,
+            MappingContext mappingContext)
         {
-            var mapping = wrappedFinder.FindMappingSource(targetName, targetType);
+            var mapping = wrappedFinder.FindMappingSource(targetName, targetType, mappingContext);
             return mapping == null || ignore(mapping) ? null : mapping;
         }
 

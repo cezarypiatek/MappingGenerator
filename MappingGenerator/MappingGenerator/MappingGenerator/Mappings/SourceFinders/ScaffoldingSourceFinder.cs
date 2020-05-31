@@ -21,7 +21,8 @@ namespace MappingGenerator.Mappings.SourceFinders
             _contextAssembly = contextAssembly;
         }
 
-        public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType)
+        public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType,
+            MappingContext mappingContext)
         {
             return FindMappingSource(targetType, new MappingPath());
         }

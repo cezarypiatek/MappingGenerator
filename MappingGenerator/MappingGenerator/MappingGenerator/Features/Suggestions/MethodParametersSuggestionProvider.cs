@@ -93,10 +93,12 @@ namespace MappingGenerator.Features.Suggestions
             {
                 var contextAssembly = semanticModel.FindContextAssembly(invocation.SourceNode);
                 var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
-                var parametersMatch = MethodHelper.FindBestParametersMatch(mappingSourceFinder, overloadParameterSets);
+                var mappingContext = new MappingContext();
+                var parametersMatch = MethodHelper.FindBestParametersMatch(mappingSourceFinder, overloadParameterSets, mappingContext);
                 if (parametersMatch != null)
                 {
-                    var argumentList = parametersMatch.ToArgumentListSyntax(mappingEngine, generateNamedParameters);
+                    
+                    var argumentList = parametersMatch.ToArgumentListSyntax(mappingEngine, mappingContext, generateNamedParameters);
                     var chunks = argumentList.Arguments.Select(a => a.ToString());
                     return string.Join(", ", chunks);
                 }

@@ -11,7 +11,7 @@ namespace MappingGenerator.Mappings.SourceFinders
 {
     public interface IMappingSourceFinder
     {
-        MappingElement FindMappingSource(string targetName, ITypeSymbol targetType);
+        MappingElement FindMappingSource(string targetName, ITypeSymbol targetType, MappingContext mappingContext);
     }
 
     public class ObjectMembersMappingSourceFinder : IMappingSourceFinder
@@ -38,7 +38,8 @@ namespace MappingGenerator.Mappings.SourceFinders
             this.isSourceTypeEnumerable = new Lazy<bool>(() => sourceType.Interfaces.Any(x => x.ToDisplayString().StartsWith("System.Collections.Generic.IEnumerable<")));
         }
 
-        public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType)
+        public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType,
+            MappingContext mappingContext)
         {
             return TryFindSource(targetName) ?? TryFindSourceForEnumerable(targetName, targetType);
         }

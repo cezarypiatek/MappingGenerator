@@ -3,7 +3,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.Formatting;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MappingGenerator.Mappings.MappingImplementors
 {
@@ -31,7 +30,7 @@ namespace MappingGenerator.Mappings.MappingImplementors
 
         private bool ContainsCollectionWithoutSetter(ITypeSymbol type)
         {
-            foreach (var member in type.GetMembers().Where(ObjectHelper.IsPublicPropertySymbol).OfType<IPropertySymbol>())
+            foreach (var member in ObjectHelper.GetPublicPropertySymbols(type))
             {
                 if (ObjectHelper.IsSimpleType(member.Type) || !MappingHelper.IsCollection(member.Type))
                 {

@@ -1,4 +1,6 @@
+using System.Collections.Immutable;
 using System.Composition;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,6 +13,7 @@ using Microsoft.CodeAnalysis.CodeRefactorings;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
+using Microsoft.CodeAnalysis.Formatting;
 
 namespace MappingGenerator.Features.Refactorings
 {
@@ -18,7 +21,7 @@ namespace MappingGenerator.Features.Refactorings
     public class MappingGeneratorRefactoring : CodeRefactoringProvider
     {
         private const string GenerateWholeMappingTitle = "Generate mapping code";
-        private const string GenerateMappingWithMembersTitle = "Generate mapping code";
+        private const string GenerateMappingWithMembersTitle = "Generate mapping code using member functions";
 
         private static readonly MappingImplementorEngine MappingImplementorEngine = new MappingImplementorEngine();
 
@@ -43,8 +46,9 @@ namespace MappingGenerator.Features.Refactorings
 
                         if (MappingImplementorEngine.CanProvideMappingImplementationFor(methodSymbol))
                         {
+                           
                             context.RegisterRefactoring(CodeAction.Create(title: GenerateWholeMappingTitle, createChangedDocument: async (c) => await GenerateMappingMethodBody(context.Document, methodDeclaration, false, c), equivalenceKey: GenerateWholeMappingTitle));
-                            context.RegisterRefactoring(CodeAction.Create(title: GenerateMappingWithMembersTitle, createChangedDocument: async (c) => await GenerateMappingMethodBody(context.Document, methodDeclaration, true, c), equivalenceKey: GenerateWholeMappingTitle));
+                            context.RegisterRefactoring(CodeAction.Create(title: GenerateMappingWithMembersTitle, createChangedDocument: async (c) => await GenerateMappingMethodBody(context.Document, methodDeclaration, true, c), equivalenceKey: GenerateMappingWithMembersTitle));
                         }
                     }
                     break;

@@ -70,7 +70,8 @@ namespace MappingGenerator.Features.Refactorings
             var contextAssembly = semanticModel.FindContextAssembly(lambda);
             var mappingEngine = await MappingEngine.Create(document, cancellationToken, contextAssembly);
             var propertiesToSet = ObjectHelper.GetFieldsThaCanBeSetPublicly(createdObjectType, contextAssembly);
-            var statements = mappingEngine.MapUsingSimpleAssignment(propertiesToSet, mappingMatcher, new MappingContext(), globalTargetAccessor: SyntaxFactory.IdentifierName(GetParameterIdentifier(lambda)))
+            var mappingContext = new MappingContext(lambda, semanticModel);
+            var statements = mappingEngine.MapUsingSimpleAssignment(propertiesToSet, mappingMatcher, mappingContext, globalTargetAccessor: SyntaxFactory.IdentifierName(GetParameterIdentifier(lambda)))
                 .Select(x=>x.AsStatement().WithTrailingTrivia(SyntaxFactory.EndOfLine("\r\n")));
             
             var newLambda = UpdateLambdaBody(lambda, SyntaxFactory.Block(statements)).WithAdditionalAnnotations(Formatter.Annotation);

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -6,6 +7,19 @@ namespace MappingGenerator.Mappings
 {
     public class MappingContext
     {
+        public INamedTypeSymbol ContextSymbol { get; }
+
+        public MappingContext(INamedTypeSymbol contextSymbol)
+        {
+            ContextSymbol = contextSymbol;
+        }
+
+        public MappingContext(SyntaxNode contextExpression, SemanticModel semanticModel)
+        {
+            var typeDeclaration = contextExpression.FindContainer<TypeDeclarationSyntax>();
+            ContextSymbol =  semanticModel.GetDeclaredSymbol(typeDeclaration) as INamedTypeSymbol;
+        }
+
         public HashSet<MappingType> MissingConversions { get; } = new HashSet<MappingType>();
 
         public void AddMissingConversion(ITypeSymbol fromType, ITypeSymbol toType) => MissingConversions.Add(

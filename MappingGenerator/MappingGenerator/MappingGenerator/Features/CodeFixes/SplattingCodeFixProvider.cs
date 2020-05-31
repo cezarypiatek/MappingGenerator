@@ -72,7 +72,7 @@ namespace MappingGenerator.Features.CodeFixes
                 var contextAssembly = semanticModel.FindContextAssembly(invocation.SourceNode);
                 var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
                 var invalidArgumentList = invocation.Arguments;
-                var mappingContext = new MappingContext();
+                var mappingContext = new MappingContext(invocation.SourceNode, semanticModel);
                 var parametersMatch = FindParametersMatch(invalidArgumentList, overloadParameterSets, semanticModel, syntaxGenerator, mappingContext);
                 if (parametersMatch != null)
                 {

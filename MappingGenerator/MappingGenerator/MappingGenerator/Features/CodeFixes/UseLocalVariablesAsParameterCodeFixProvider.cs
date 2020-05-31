@@ -30,7 +30,7 @@ namespace MappingGenerator.Features.CodeFixes
             var overloadParameterSets = invocation.GetOverloadParameterSets(semanticModel);
             if (overloadParameterSets != null)
             {
-                var mappingContext = new MappingContext();
+                var mappingContext = new MappingContext(invocation.SourceNode, semanticModel);
                 var contextAssembly = semanticModel.FindContextAssembly(invocation.SourceNode);
                 var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
                 var parametersMatch = MethodHelper.FindBestParametersMatch(mappingSourceFinder, overloadParameterSets, mappingContext);
@@ -136,7 +136,7 @@ namespace MappingGenerator.Features.CodeFixes
 
             var contextAssembly = semanticModel.FindContextAssembly(invocation);
             var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
-            var mappingLambda = mappingEngine.CreateMappingLambda("x", sourceElementType, targetElementType, new MappingPath(), new MappingContext());
+            var mappingLambda = mappingEngine.CreateMappingLambda("x", sourceElementType, targetElementType, new MappingPath(), new MappingContext(invocation, semanticModel));
             return await document.ReplaceNodes(invocation, invocation.WithArgumentList(SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument((ExpressionSyntax)mappingLambda))), cancellationToken);
         }
 

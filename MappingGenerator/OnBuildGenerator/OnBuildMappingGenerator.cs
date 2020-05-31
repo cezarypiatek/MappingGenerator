@@ -21,9 +21,9 @@ namespace MappingGenerator.OnBuildGenerator
         public Task<GenerationResult> GenerateAsync(CSharpSyntaxNode processedNode, AttributeData markerAttribute, TransformationContext context, CancellationToken cancellationToken)
         {
             var syntaxGenerator = SyntaxGenerator.GetGenerator(context.Document);
-            var mappingContext = new MappingContext();
             var mappingDeclaration = (InterfaceDeclarationSyntax)processedNode;
             var interfaceSymbol = context.SemanticModel.GetDeclaredSymbol(mappingDeclaration);
+            var mappingContext = new MappingContext(interfaceSymbol);
             var accessibilityHelper = new AccessibilityHelper(interfaceSymbol);
             foreach (var x in FindCustomMapperTypes(markerAttribute).SelectMany(CustomConversionHelper.FindCustomConversionMethods))
             {

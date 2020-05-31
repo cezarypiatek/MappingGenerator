@@ -12,11 +12,7 @@ namespace MappingGenerator.Mappings
 
         public static string CreateLambdaParameterName(SyntaxNode sourceList)
         {
-            return CreateLambdaParameterName(sourceList.ToFullString());
-        }
-
-        public static string CreateLambdaParameterName(string originalName)
-        {
+            var originalName = sourceList.ToFullString();
             var localVariableName = ToLocalVariableName(originalName);
             var finalName = ToSingularLocalVariableName(localVariableName);
             if (originalName == finalName)

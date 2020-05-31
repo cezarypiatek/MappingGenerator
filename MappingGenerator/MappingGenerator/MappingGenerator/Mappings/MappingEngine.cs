@@ -39,47 +39,48 @@ namespace MappingGenerator.Mappings
             return new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
         }
 
-        public MappingForeachElement MapUsingForeachExpression(string sourceName, ITypeSymbol sourceType, ITypeSymbol destinationType, MappingContext mappingContext)
+        public MappingForeachElement MapUsingForeachExpression(string sourceName, ITypeSymbol sourceType, ITypeSymbol targetType, MappingContext mappingContext)
         {
             var element = new MappingForeachElement();
 
-            var destinationVariableName = NameHelper.ToLocalVariableName(destinationType.Name);
-            if (sourceName == destinationVariableName)
+            var targetVariableName = NameHelper.ToLocalVariableName(targetType.Name);
+            if (sourceName == targetVariableName)
             {
-                destinationVariableName += "Target";
+                targetVariableName += "Target";
             }
-            element.TargetName = destinationVariableName;
+            element.TargetName = targetVariableName;
 
-            var initializer = MapExpression(SyntaxFactory.IdentifierName(sourceName), sourceType, destinationType, mappingContext, skipCollections: true);
+            var initializer = MapExpression(SyntaxFactory.IdentifierName(sourceName), sourceType, targetType, mappingContext, skipCollections: true);
             element.SyntaxNodes.Add(syntaxGenerator.LocalDeclarationStatement(element.TargetName, initializer));
 
-            var sourceProperties = ObjectHelper.GetPublicPropertySymbols(sourceType).ToList();
+            var targetCollections = ObjectHelper.GetCollectionProperties(targetType, contextAssembly);
+            var mappingSourceFinder = new ObjectMembersMappingSourceFinder(sourceType, SyntaxFactory.IdentifierName(sourceName), syntaxGenerator);
+            var sourceMatcher = new SingleSourceMatcher(mappingSourceFinder);
 
-            foreach (var item in ObjectHelper.GetCollectionProperties(destinationType, contextAssembly))
+            foreach (var mappingMatch in sourceMatcher.MatchAll(targetCollections, syntaxGenerator))
             {
-                var sourceProperty = sourceProperties.First(x => x.Name == item.Name);
-                var sourceElementType = MappingHelper.GetElementType(sourceProperty.Type);
-                var destinationElementType = MappingHelper.GetElementType(item.Type);
+                var sourceElementType = MappingHelper.GetElementType(mappingMatch.Source.ExpressionType);
+                var targetElementType = MappingHelper.GetElementType(mappingMatch.Target.ExpressionType);
 
-                var sourceMemberAccess = syntaxGenerator.MemberAccessExpression(SyntaxFactory.IdentifierName(NameHelper.ToLocalVariableName(sourceName)), item.Name);
-                var targetMemberAccess = syntaxGenerator.MemberAccessExpression(SyntaxFactory.IdentifierName(element.TargetName), item.Name);
+                var sourceMemberAccess = (SyntaxNode)mappingMatch.Source.Expression;
+                var targetMemberAccess = syntaxGenerator.MemberAccessExpression(SyntaxFactory.IdentifierName(element.TargetName), mappingMatch.Target.Expression);
 
                 var subStatementSyntaxNodes = new List<SyntaxNode>();
-                if (ObjectHelper.IsSimpleType(sourceElementType) && ObjectHelper.IsSimpleType(destinationElementType))
+                if (ObjectHelper.IsSimpleType(sourceElementType) && ObjectHelper.IsSimpleType(targetElementType))
                 {
                     var addMemberAccess = syntaxGenerator.MemberAccessExpression(targetMemberAccess, "AddRange");
                     element.SyntaxNodes.Add(SyntaxFactory.ExpressionStatement((ExpressionSyntax)syntaxGenerator.InvocationExpression(addMemberAccess, sourceMemberAccess)));
                 }
-                else if (!ObjectHelper.IsSimpleType(sourceElementType) && !ObjectHelper.IsSimpleType(destinationElementType))
+                else if (!ObjectHelper.IsSimpleType(sourceElementType) && !ObjectHelper.IsSimpleType(targetElementType))
                 {
-                    var foreachVariableName = NameHelper.CreateLambdaParameterName(item.Name);
-                    var subElement = MapUsingForeachExpression(foreachVariableName, sourceElementType, destinationElementType, mappingContext);
+                    var foreachVariableName = NameHelper.CreateLambdaParameterName(mappingMatch.Target.Expression);
+                    var subElement = MapUsingForeachExpression(foreachVariableName, sourceElementType, targetElementType, mappingContext);
                     subStatementSyntaxNodes.AddRange(subElement.SyntaxNodes);
 
                     var addMemberAccess = syntaxGenerator.MemberAccessExpression(targetMemberAccess, "Add");
                     subStatementSyntaxNodes.Add(SyntaxFactory.ExpressionStatement((ExpressionSyntax)syntaxGenerator.InvocationExpression(addMemberAccess, SyntaxFactory.IdentifierName(subElement.TargetName))));
 
-                    if (MappingHelper.IsDictionary(sourceProperty.Type))
+                    if (MappingHelper.IsDictionary(mappingMatch.Source.ExpressionType))
                     {
                         sourceMemberAccess = syntaxGenerator.MemberAccessExpression(sourceMemberAccess, "Values");
                     }

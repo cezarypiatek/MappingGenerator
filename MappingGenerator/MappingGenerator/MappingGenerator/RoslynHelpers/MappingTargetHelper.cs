@@ -14,12 +14,12 @@ namespace MappingGenerator.RoslynHelpers
 
         public static IEnumerable<IObjectField> GetFieldsThaCanBeSetPublicly(ITypeSymbol type, IAssemblySymbol contextAssembly, MappingContext mappingContext)
         {
-            return type.GetObjectFields().Where(x => x.CanBeSetPublicly(contextAssembly, mappingContext));
+            return type.GetObjectFields().Where(x => x.CanBeSet(type, mappingContext));
         }
 
         public static IEnumerable<IObjectField> GetFieldsThaCanBeSetPrivately(ITypeSymbol type, MappingContext mappingContext)
         {
-            return type.GetObjectFields().Where(x => x.CanBeSetPrivately(type, mappingContext));
+            return type.GetObjectFields().Where(x => x.CanBeSet(type, mappingContext));
         }
     }
 }

@@ -118,12 +118,10 @@ namespace MappingGenerator.RoslynHelpers
     {
         string Name { get; }
         ITypeSymbol Type { get; }
-        ISymbol UnderlyingSymbol { get; }
 
-        bool CanBeSetPublicly(IAssemblySymbol contextAssembly, MappingContext mappingContext);
-        bool CanBeSetPrivately(ITypeSymbol fromType, MappingContext mappingContext);
-        bool CanBeSetInConstructor(ITypeSymbol fromType, MappingContext mappingContext);
+        bool CanBeSet(ITypeSymbol via, MappingContext mappingContext);
+        bool CanBeSetInConstructor(ITypeSymbol via, MappingContext mappingContext);
 
-        bool CanBeGetPublicly();
+        bool CanBeGet(ITypeSymbol via, MappingContext mappingContext);
     }
 }

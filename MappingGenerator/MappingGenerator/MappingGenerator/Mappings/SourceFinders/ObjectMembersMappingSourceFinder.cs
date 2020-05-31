@@ -31,19 +31,19 @@ namespace MappingGenerator.Mappings.SourceFinders
             this.sourceGlobalAccessor = sourceGlobalAccessor;
             this.generator = generator;
             this.potentialPrefix = NameHelper.ToLocalVariableName(sourceGlobalAccessor.ToFullString());
-            this.sourceProperties = new Lazy<IReadOnlyList<IObjectField>>(() => GetPublicFields(sourceType).ToList());
+            this.sourceProperties = new Lazy<IReadOnlyList<IObjectField>>(() => sourceType.GetObjectFields().ToList());
             this.sourceMethods = new Lazy<IReadOnlyList<IMethodSymbol>>(()=> ObjectHelper.GetPublicGetMethods(sourceType).ToList());
             this.isSourceTypeEnumerable = new Lazy<bool>(() => sourceType.Interfaces.Any(x => x.ToDisplayString().StartsWith("System.Collections.Generic.IEnumerable<")));
         }
 
-        private IEnumerable<IObjectField> GetPublicFields(ITypeSymbol type)
+        private IEnumerable<IObjectField> GetPublicFields(ITypeSymbol type, MappingContext mappingContext)
         {
-            return type.GetObjectFields().Where(x => x.CanBeGetPublicly());
+            return type.GetObjectFields().Where(x => x.CanBeGet(type, mappingContext));
         }
 
         public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType, MappingContext mappingContext)
         {
-            return TryFindSource(targetName) ?? TryFindSourceForEnumerable(targetName, targetType);
+            return TryFindSource(targetName, mappingContext, sourceType) ?? TryFindSourceForEnumerable(targetName, targetType);
         }
 
 
@@ -76,10 +76,13 @@ namespace MappingGenerator.Mappings.SourceFinders
             };
         }
 
-        private MappingElement TryFindSource(string targetName)
+        private MappingElement TryFindSource(string targetName, MappingContext mappingContext, ITypeSymbol accessedVia)
         {
             //Direct 1-1 mapping
-            var matchedSourceProperty = sourceProperties.Value.FirstOrDefault(x => x.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase) || $"{potentialPrefix}{x.Name}".Equals(targetName, StringComparison.OrdinalIgnoreCase));
+            var matchedSourceProperty = sourceProperties.Value
+                .Where(x => x.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase) || $"{potentialPrefix}{x.Name}".Equals(targetName, StringComparison.OrdinalIgnoreCase))
+                .FirstOrDefault(p => p.CanBeGet(accessedVia, mappingContext));
+
             if (matchedSourceProperty != null)
             {
                 return new MappingElement()
@@ -90,7 +93,7 @@ namespace MappingGenerator.Mappings.SourceFinders
             }
 
             //Non-direct (mapping like y.UserName = x.User.Name)
-            var source = FindSubPropertySource(targetName, sourceType, sourceProperties.Value, sourceGlobalAccessor);
+            var source = FindSubPropertySource(targetName, sourceType, sourceProperties.Value, sourceGlobalAccessor, mappingContext);
             if (source != null)
             {
                 return source;
@@ -116,7 +119,7 @@ namespace MappingGenerator.Mappings.SourceFinders
                 {
                     var rest = Regex.Split(targetName, @"(?<!^)(?=[A-Z])").Skip(potentialPrefix.Length);
                     var newTarget = $"{potentialPrefix}{string.Join("", rest)}";
-                    return TryFindSource(newTarget);
+                    return TryFindSource(newTarget, mappingContext, accessedVia);
                 }
             }
             return null;
@@ -128,14 +131,17 @@ namespace MappingGenerator.Mappings.SourceFinders
             return new string(capitalLetters);
         }
 
-        private MappingElement FindSubPropertySource(string targetName, ITypeSymbol containingType, IEnumerable<IObjectField> properties, SyntaxNode currentAccessor, string prefix=null)
+        private MappingElement FindSubPropertySource(string targetName, ITypeSymbol containingType,
+            IEnumerable<IObjectField> properties, SyntaxNode currentAccessor, MappingContext mappingContext,
+            string prefix = null)
         {
             if (ObjectHelper.IsSimpleType(containingType))
             {
                 return null;
             }
 
-            var subProperty = properties.FirstOrDefault(x=> targetName.StartsWith($"{prefix}{x.Name}", StringComparison.OrdinalIgnoreCase));
+            var subProperty = properties.Where(x => targetName.StartsWith($"{prefix}{x.Name}", StringComparison.OrdinalIgnoreCase))
+                .FirstOrDefault(p => p.CanBeGet(containingType, mappingContext));
             if (subProperty != null)
             {
                 var currentNamePart = $"{prefix}{subProperty.Name}";
@@ -148,7 +154,7 @@ namespace MappingGenerator.Mappings.SourceFinders
                         ExpressionType = subProperty.Type
                     };
                 }
-                return FindSubPropertySource(targetName, subProperty.Type, GetPublicFields(subProperty.Type),  subPropertyAccessor, currentNamePart);
+                return FindSubPropertySource(targetName, subProperty.Type, subProperty.Type.GetObjectFields(),  subPropertyAccessor, mappingContext, currentNamePart);
             }
             return null;
         }

@@ -32,7 +32,13 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         {
             return new UserDTO()
             {
+                LastName = LastName,
                 Age = Age,
+                Account = new AccountDTO()
+                {
+                    BankName = Account.BankName,
+                    Number = Account.Number
+                },
                 Debs = Debs.ConvertAll(thisDeb => new AccountDTO()
                 {
                     BankName = thisDeb.BankName,

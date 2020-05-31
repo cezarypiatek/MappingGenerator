@@ -32,13 +32,8 @@ namespace MappingGenerator.Mappings.SourceFinders
             this.generator = generator;
             this.potentialPrefix = NameHelper.ToLocalVariableName(sourceGlobalAccessor.ToFullString());
             this.sourceProperties = new Lazy<IReadOnlyList<IObjectField>>(() => sourceType.GetObjectFields().ToList());
-            this.sourceMethods = new Lazy<IReadOnlyList<IMethodSymbol>>(()=> ObjectHelper.GetPublicGetMethods(sourceType).ToList());
+            this.sourceMethods = new Lazy<IReadOnlyList<IMethodSymbol>>(()=> ObjectHelper.GetWithGetPrefixMethods(sourceType).ToList());
             this.isSourceTypeEnumerable = new Lazy<bool>(() => sourceType.Interfaces.Any(x => x.ToDisplayString().StartsWith("System.Collections.Generic.IEnumerable<")));
-        }
-
-        private IEnumerable<IObjectField> GetPublicFields(ITypeSymbol type, MappingContext mappingContext)
-        {
-            return type.GetObjectFields().Where(x => x.CanBeGet(type, mappingContext));
         }
 
         public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType, MappingContext mappingContext)

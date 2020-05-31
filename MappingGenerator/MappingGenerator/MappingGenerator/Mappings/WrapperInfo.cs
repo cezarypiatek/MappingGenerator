@@ -1,3 +1,4 @@
+using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
 
 namespace MappingGenerator.Mappings
@@ -5,7 +6,7 @@ namespace MappingGenerator.Mappings
     class WrapperInfo
     {
         public WrapperInfoType Type { get;}
-        public IPropertySymbol UnwrappingProperty { get;  }
+        public IObjectField UnwrappingObjectField { get;  }
         public IMethodSymbol UnwrappingMethod { get;  }
 
         public WrapperInfo()
@@ -13,10 +14,10 @@ namespace MappingGenerator.Mappings
             Type = WrapperInfoType.No;
         }
 
-        public WrapperInfo(IPropertySymbol unwrappingProperty)
+        public WrapperInfo(IObjectField unwrappingObjectField)
         {
-            UnwrappingProperty = unwrappingProperty;
-            Type = WrapperInfoType.Property;
+            UnwrappingObjectField = unwrappingObjectField;
+            Type = WrapperInfoType.ObjectField;
         }
 
         public WrapperInfo(IMethodSymbol unwrappingMethod)
@@ -29,7 +30,7 @@ namespace MappingGenerator.Mappings
     enum WrapperInfoType
     {
         No,
-        Property,
+        ObjectField,
         Method
     }
 }

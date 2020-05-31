@@ -171,5 +171,11 @@ namespace MappingGenerator.RoslynHelpers
             return GetPublicPropertySymbols(type)
                 .Where(property => !IsSimpleType(property.Type) && MappingHelper.IsCollection(property.Type));
         }
+
+        public static IEnumerable<IPropertySymbol> GetComplexProperties(ITypeSymbol type)
+        {
+            return GetPublicPropertySymbols(type)
+                .Where(property => !IsSimpleType(property.Type) && !MappingHelper.IsCollection(property.Type));
+        }
     }
 }

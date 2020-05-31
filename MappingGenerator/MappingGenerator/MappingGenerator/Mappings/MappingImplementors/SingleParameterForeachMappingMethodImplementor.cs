@@ -1,5 +1,6 @@
 using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.Formatting;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace MappingGenerator.Mappings.MappingImplementors
             var targetType = methodSymbol.ReturnType;
 
             var syntaxNodes = new List<SyntaxNode>();
-            syntaxNodes.AddRange(mappingEngine.MapUsingForeachExpression(source.Name, source.Type, targetType, mappingContext).SyntaxNodes);
+            syntaxNodes.AddRange(mappingEngine.MapUsingForeachExpression((ExpressionSyntax)generator.IdentifierName(source.Name), null, source.Type, targetType, mappingContext).SyntaxNodes);
             syntaxNodes.Add(generator.ReturnStatement(generator.IdentifierName(NameHelper.ToLocalVariableName(targetType.Name))).WithAdditionalAnnotations(Formatter.Annotation));
 
             return syntaxNodes;

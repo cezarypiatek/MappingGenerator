@@ -24,7 +24,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                 {
                     Name = address.Name
                 };
-                userDTO.Account.Addresses.Add(accountDTO);
+                userDTO.Account.Addresses.Add(addressDTO);
             }
 
             return userDTO;

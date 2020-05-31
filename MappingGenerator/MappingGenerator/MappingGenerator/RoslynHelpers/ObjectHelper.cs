@@ -8,25 +8,14 @@ namespace MappingGenerator.RoslynHelpers
 {
     public static class ObjectHelper
     {
-        private static bool IsPublicGetMethod(ISymbol x)
+        public static IEnumerable<IMethodSymbol> GetWithGetPrefixMethods(ITypeSymbol source)
         {
-            return x is IMethodSymbol mSymbol
-                   && mSymbol.ReturnsVoid == false
-                   && mSymbol.Parameters.Length == 0
-                   && x.DeclaredAccessibility == Accessibility.Public
-                   && x.IsImplicitlyDeclared == false
-                   && mSymbol.MethodKind == MethodKind.Ordinary
-                ;
-        }
-
-        public static IEnumerable<IMethodSymbol> GetUnwrappingMethods(ITypeSymbol wrapperType, ITypeSymbol wrappedType)
-        {
-            return GetPublicGetMethods(wrapperType).Where(x => x.DeclaredAccessibility == Accessibility.Public && x.ReturnType == wrappedType);
-        }
-
-        public static IEnumerable<IMethodSymbol> GetPublicGetMethods(ITypeSymbol source)
-        {
-            return GetBaseTypesAndThis(source).SelectMany(x=> x.GetMembers()).Where(IsPublicGetMethod).OfType<IMethodSymbol>();
+            return GetBaseTypesAndThis(source).SelectMany(x=> x.GetMembers()).OfType<IMethodSymbol>().Where(mSymbol =>
+                                                                                                                 mSymbol.ReturnsVoid == false
+                                                                                                                 && mSymbol.IsStatic == false 
+                                                                                                                 && mSymbol.IsImplicitlyDeclared == false
+                                                                                                                 && mSymbol.Parameters.Length == 0
+                                                                                                                 && mSymbol.MethodKind == MethodKind.Ordinary);
         }
 
         public static IEnumerable<ITypeSymbol> GetBaseTypesAndThis(this ITypeSymbol type)

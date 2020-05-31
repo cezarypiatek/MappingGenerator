@@ -8,13 +8,30 @@ namespace MappingGenerator.RoslynHelpers
     {
         public static IEnumerable<IObjectField> GetObjectFields(this ITypeSymbol type)
         {
-            return GetRegularPropertySymbols(type)
-                .Select(x => new ObjectProperty(x));
-        }
+            foreach (var symbol in type.GetBaseTypesAndThis().SelectMany(x => x.GetMembers()))
+            {
+                if (symbol.IsStatic)
+                {
+                    continue;
+                }
 
-        private static IEnumerable<IPropertySymbol> GetRegularPropertySymbols(this ITypeSymbol source)
-        {
-            return source.GetBaseTypesAndThis().SelectMany(x => x.GetMembers()).OfType<IPropertySymbol>().Where(x => x.IsStatic == false && x.IsIndexer == false);
+                if (symbol is IPropertySymbol property)
+                {
+                    if (property.IsIndexer == false)
+                    {
+                        yield return new ObjectProperty(property);
+                    }
+                    continue;
+                }
+
+                if (symbol is IFieldSymbol fieldSymbol)
+                {
+                    if (fieldSymbol.IsImplicitlyDeclared == false)
+                    {
+                        yield return new ObjectField(fieldSymbol);
+                    }
+                }
+            }
         }
-    }
+    } 
 }

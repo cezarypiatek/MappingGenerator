@@ -1,0 +1,147 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Collections.ObjectModel;
+using System.Collections.Immutable;
+
+namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+{
+    public class TestMapper
+    {
+        public static UserDTO [|Map|](UserEntity entity)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class UserDTO
+    {
+        public string FirstName;
+        public string LastName;
+        public int Age;
+        public int Cash;
+        public AccountDTO Account;
+        public List<AccountDTO> Debs;
+        public UserSourceDTO Source;
+        public string Login;
+        public byte[] ImageData;
+        public List<int> LuckyNumbers;
+        public int Total;
+        public AddressDTO MainAddress;
+        public ReadOnlyCollection<AddressDTO> Addresses;
+        public ImmutableArray<AddressDTO> ExtraAddresses;
+        public int UnitId;
+        public decimal ExtraSavings;
+        public Nullable<decimal> Savings;
+        public DateTime Birthday;
+        public AuthenticationKind Authentication;
+        public string SecondAuthentication;
+        public AuthenticationKind ThirdAuthentication;
+        public int? FourthAuthentication;
+        public AuthenticationKind? FifthAuthentication;
+    }
+
+    public class UserSourceDTO
+    {
+        public string ProviderName;
+        public string ProviderAddress;
+        public bool IsActive;
+
+        public UserSourceDTO(string providerName, string providerAddress)
+        {
+            ProviderName = providerName;
+            ProviderAddress = providerAddress;
+        }
+    }
+    
+    public class AccountDTO
+    {
+        public string BankName;
+        public string Number;
+    }
+
+    public class AddressDTO
+    {
+        public string City;
+        public string ZipCode;
+        public string Street;
+        public string FlatNo;
+        public string BuildingNo;
+    }
+
+    //---- Entities
+
+    public class UserEntity
+    {
+        public string FirstName;
+        public string LastName;
+        public int Age;
+        public AccountEntity Account;
+        public List<AccountEntity> Debs;
+        public UserSourceEntity Source;
+        public string Name;
+        public CustomerKind Kind;
+        public double Cash { get; }
+        public byte[] ImageData;
+        public List<int> LuckyNumbers;
+        public AddressEntity MainAddress;
+        public string AddressCity;
+        public List<AddressEntity> Addresses;
+        public AddressEntity[] ExtraAddresses;
+        public UnitEntity Unit;
+
+        public int GetTotal()
+        {
+            throw new NotImplementedException();
+        }
+
+        public decimal? ExtraSavings;
+        public Nullable<decimal> Savings;
+        public DateTime Birthday;
+        public AuthenticationKind Authentication;
+        public AuthenticationKind SecondAuthentication;
+        public string ThirdAuthentication;
+        public AuthenticationKind? FourthAuthentication;
+        public int? FifthAuthentication;
+    }
+
+    public class AddressEntity
+    {   
+        public string City;
+        public string ZipCode;
+        public string Street;
+        public string FlatNo;
+        public string BuildingNo;
+    }
+
+    public class UnitEntity
+    {
+        public int Id;
+        public string Name;
+    }
+
+    public class UserSourceEntity
+    {
+        public string ProviderName;
+        public string ProviderAddress;
+        public bool IsActive;
+    }
+
+    public class AccountEntity
+    {
+        public string BankName;
+        public string Number;
+    }
+
+    public enum AuthenticationKind
+    {
+        Password,
+        AD
+    }
+
+    public enum CustomerKind
+    {
+        Regular,
+        Special
+    }
+}

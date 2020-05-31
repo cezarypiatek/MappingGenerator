@@ -207,6 +207,24 @@ namespace MappingGenerator.Test.Mapping
         {
             TestCodeRefactoring(_031_PureMappingMethodWithInheritedCustomConversions, _031_PureMappingMethodWithInheritedCustomConversions_FIXED, 1);
         }
+        
+        [Test]
+        public void should_be_able_to_generate_mapping_using_fields()
+        {
+            TestCodeRefactoring(_033_PureMappingMethodWithFields, _033_PureMappingMethodWithFields_FIXED, 1);
+        }
+        
+        [Test]
+        public void should_be_able_to_map_fields_with_respect_to_accessibility()
+        {
+            TestCodeRefactoring(_034_PubliclyUpdateFieldAccessibilityForFields, _034_PubliclyUpdateFieldAccessibilityForFields_FIXED, 1);
+        }
+        
+        [Test]
+        public void should_be_able_to_initialize_fields_in_constructor()
+        {
+            TestCodeRefactoring(_035_ConstructorInitializeFIelds, _035_ConstructorInitializeFIelds_FIXED, 1);
+        }
 
         protected override string LanguageName => LanguageNames.CSharp;
 

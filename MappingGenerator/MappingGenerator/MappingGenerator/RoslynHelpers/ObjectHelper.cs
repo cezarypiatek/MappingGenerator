@@ -166,7 +166,7 @@ namespace MappingGenerator.RoslynHelpers
             return symbol.ContainingAssembly;
         }
 
-        public static IEnumerable<IPropertySymbol> GetCollectionProperties(ITypeSymbol type, IAssemblySymbol contextAssembly)
+        public static IEnumerable<IPropertySymbol> GetCollectionProperties(ITypeSymbol type)
         {
             return GetPublicPropertySymbols(type)
                 .Where(property => !IsSimpleType(property.Type) && MappingHelper.IsCollection(property.Type));

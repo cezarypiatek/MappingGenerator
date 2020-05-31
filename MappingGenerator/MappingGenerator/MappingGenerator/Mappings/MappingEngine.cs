@@ -53,7 +53,7 @@ namespace MappingGenerator.Mappings
             var initializer = MapExpression(SyntaxFactory.IdentifierName(sourceName), sourceType, targetType, mappingContext, skipCollections: true);
             element.SyntaxNodes.Add(syntaxGenerator.LocalDeclarationStatement(element.TargetName, initializer));
 
-            var targetCollections = ObjectHelper.GetCollectionProperties(targetType, contextAssembly);
+            var targetCollections = ObjectHelper.GetCollectionProperties(targetType);
             var mappingSourceFinder = new ObjectMembersMappingSourceFinder(sourceType, SyntaxFactory.IdentifierName(sourceName), syntaxGenerator);
             var sourceMatcher = new SingleSourceMatcher(mappingSourceFinder);
 

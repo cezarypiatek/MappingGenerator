@@ -150,7 +150,7 @@ namespace MappingGenerator.Mappings
 
                 if (matchedOverload != null)
                 {
-                    var creationExpression = ((ObjectCreationExpressionSyntax)syntaxGenerator.ObjectCreationExpression(targetType, matchedOverload.ToArgumentListSyntax(this, new MappingContext()).Arguments));
+                    var creationExpression = ((ObjectCreationExpressionSyntax)syntaxGenerator.ObjectCreationExpression(targetType, matchedOverload.ToArgumentListSyntax(this, mappingContext).Arguments));
                     var matchedSources = matchedOverload.GetMatchedSources();
                     var restSourceFinder = new IgnorableMappingSourceFinder(subMappingSourceFinder,  foundElement =>
                         {

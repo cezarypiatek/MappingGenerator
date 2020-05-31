@@ -46,7 +46,8 @@ namespace MappingGenerator.Features.Refactorings
             var generator = SyntaxGenerator.GetGenerator(document);
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var methodSymbol =  semanticModel.GetDeclaredSymbol(methodDeclaration);
-            var cloneExpression = CreateCloneExpression(generator, semanticModel, methodSymbol.ReturnType as INamedTypeSymbol);
+            var mappingContext = new MappingContext(methodSymbol.ContainingType);
+            var cloneExpression = CreateCloneExpression(generator, semanticModel, methodSymbol.ReturnType as INamedTypeSymbol, mappingContext);
             return await document.ReplaceNodes(methodDeclaration.Body, ((BaseMethodDeclarationSyntax) generator.MethodDeclaration(methodSymbol, cloneExpression)).Body, cancellationToken);
         }
 
@@ -85,10 +86,11 @@ namespace MappingGenerator.Features.Refactorings
             TypeDeclarationSyntax typeDeclaration, SemanticModel semanticModel)
         {
             var typeSymbol = semanticModel.GetDeclaredSymbol(typeDeclaration);
+            var mappingContext = new MappingContext(typeDeclaration, semanticModel);
+            var cloneExpression = CreateCloneExpression(generator, semanticModel, typeSymbol, mappingContext);
             return generator.MethodDeclaration("Clone", 
                 accessibility: Accessibility.Public,
-               
-                statements:CreateCloneExpression(generator, semanticModel, typeSymbol),
+                statements:cloneExpression,
                 returnType: SyntaxFactory.ParseTypeName(typeDeclaration.Identifier.Text))
                 .WithAdditionalAnnotations(Formatter.Annotation) as MethodDeclarationSyntax;
         }
@@ -106,11 +108,11 @@ namespace MappingGenerator.Features.Refactorings
             
         }
 
-        private SyntaxNode[] CreateCloneExpression(SyntaxGenerator generator, SemanticModel semanticModel, INamedTypeSymbol type)
+        private SyntaxNode[] CreateCloneExpression(SyntaxGenerator generator, SemanticModel semanticModel, INamedTypeSymbol type, MappingContext mappingContext)
         {
             //TODO: If subtypes contains clone method use it, remember about casting
             var mappingEngine = new CloneMappingEngine(semanticModel, generator, type.ContainingAssembly);
-            var newExpression = mappingEngine.MapExpression((ExpressionSyntax)generator.ThisExpression(), type, type, new MappingContext());
+            var newExpression = mappingEngine.MapExpression((ExpressionSyntax)generator.ThisExpression(), type, type, mappingContext);
             return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };
         }
     }

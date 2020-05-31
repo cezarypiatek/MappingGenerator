@@ -93,7 +93,7 @@ namespace MappingGenerator.Features.Suggestions
             {
                 var contextAssembly = semanticModel.FindContextAssembly(invocation.SourceNode);
                 var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
-                var mappingContext = new MappingContext();
+                var mappingContext = new MappingContext(invocation.SourceNode, semanticModel);
                 var parametersMatch = MethodHelper.FindBestParametersMatch(mappingSourceFinder, overloadParameterSets, mappingContext);
                 if (parametersMatch != null)
                 {

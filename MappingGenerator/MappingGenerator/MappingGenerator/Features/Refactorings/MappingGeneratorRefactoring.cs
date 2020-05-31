@@ -79,7 +79,7 @@ namespace MappingGenerator.Features.Refactorings
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var methodSymbol = semanticModel.GetDeclaredSymbol(methodSyntax);
             var generator = SyntaxGenerator.GetGenerator(document);
-            var mappingContext = new MappingContext();
+            var mappingContext = new MappingContext(methodSyntax, semanticModel);
             var accessibilityHelper = new AccessibilityHelper(methodSymbol.ContainingType);
 
 

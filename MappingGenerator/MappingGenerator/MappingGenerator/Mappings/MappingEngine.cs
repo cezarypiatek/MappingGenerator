@@ -94,7 +94,7 @@ namespace MappingGenerator.Mappings
 
             if (IsUnwrappingNeeded(targetType, source))
             {
-                return TryToUnwrap(targetType, source);
+                return TryToUnwrap(targetType, source, mappingContext);
             }
 
             if (ShouldCreateConversionBetweenTypes(targetType, sourceType))
@@ -226,19 +226,19 @@ namespace MappingGenerator.Mappings
             return targetType.Equals(element.ExpressionType) == false && (ObjectHelper.IsSimpleType(targetType) || SymbolHelper.IsNullable(targetType, out _));
         }
 
-        private MappingElement TryToUnwrap(ITypeSymbol targetType, MappingElement element)
+        private MappingElement TryToUnwrap(ITypeSymbol targetType, MappingElement element, MappingContext mappingContext)
         {
             var sourceAccess = element.Expression as SyntaxNode;
             var conversion =  semanticModel.Compilation.ClassifyConversion(element.ExpressionType, targetType);
             if (conversion.Exists == false)
             {
-                var wrapper = GetWrappingInfo(element.ExpressionType, targetType);
-                if (wrapper.Type == WrapperInfoType.Property)
+                var wrapper = GetWrappingInfo(element.ExpressionType, targetType, mappingContext);
+                if (wrapper.Type == WrapperInfoType.ObjectField)
                 {
                     return new MappingElement()
                     {
-                        Expression = (ExpressionSyntax) syntaxGenerator.MemberAccessExpression(sourceAccess, wrapper.UnwrappingProperty.Name),
-                        ExpressionType = wrapper.UnwrappingProperty.Type
+                        Expression = (ExpressionSyntax) syntaxGenerator.MemberAccessExpression(sourceAccess, wrapper.UnwrappingObjectField.Name),
+                        ExpressionType = wrapper.UnwrappingObjectField.Type
                     };
                 }
                 if (wrapper.Type == WrapperInfoType.Method)
@@ -293,10 +293,10 @@ namespace MappingGenerator.Mappings
             return element;
         }
 
-        private static WrapperInfo GetWrappingInfo(ITypeSymbol wrapperType, ITypeSymbol wrappedType)
+        private static WrapperInfo GetWrappingInfo(ITypeSymbol wrapperType, ITypeSymbol wrappedType, MappingContext mappingContext)
         {
-            var unwrappingProperties = GetUnwrappingProperties(wrapperType, wrappedType).ToList();
-            var unwrappingMethods = ObjectHelper.GetUnwrappingMethods(wrapperType, wrappedType).ToList();
+            var unwrappingProperties = GetUnwrappingProperties(wrapperType, wrappedType, mappingContext).ToList();
+            var unwrappingMethods = GetUnwrappingMethods(wrapperType, wrappedType, mappingContext).ToList();
             if (unwrappingMethods.Count + unwrappingProperties.Count == 1)
             {
                 if (unwrappingMethods.Count == 1)
@@ -309,23 +309,14 @@ namespace MappingGenerator.Mappings
             return new WrapperInfo();
         }
 
-        private static IEnumerable<IPropertySymbol> GetUnwrappingProperties(ITypeSymbol wrapperType, ITypeSymbol wrappedType)
+        private static IEnumerable<IMethodSymbol> GetUnwrappingMethods(ITypeSymbol wrapperType, ITypeSymbol wrappedType, MappingContext mappingContext)
         {
-            return GetPublicPropertySymbols(wrapperType).Where(x => x.GetMethod.DeclaredAccessibility == Accessibility.Public && x.Type == wrappedType);
+            return ObjectHelper.GetWithGetPrefixMethods(wrapperType).Where(x => x.ReturnType == wrappedType && mappingContext.AccessibilityHelper.IsSymbolAccessible(x, wrappedType));
         }
 
-        private static IEnumerable<IPropertySymbol> GetPublicPropertySymbols(ITypeSymbol source)
+        private static IEnumerable<IObjectField> GetUnwrappingProperties(ITypeSymbol wrapperType, ITypeSymbol wrappedType, MappingContext mappingContext)
         {
-            return source.GetBaseTypesAndThis().SelectMany(x => x.GetMembers()).OfType<IPropertySymbol>().Where(IsPublicPropertySymbol);
-        }
-
-        private static bool IsPublicPropertySymbol(IPropertySymbol x)
-        {
-            if (x.IsStatic || x.IsIndexer || x.DeclaredAccessibility != Accessibility.Public)
-            {
-                return false;
-            }
-            return true;
+            return wrapperType.GetObjectFields().Where(x =>  x.Type == wrappedType && x.CanBeGet(wrappedType, mappingContext));
         }
 
         private SyntaxNode MapCollections(SyntaxNode sourceAccess, ITypeSymbol sourceListType,
@@ -405,8 +396,6 @@ namespace MappingGenerator.Mappings
         {
             return (ExpressionSyntax) syntaxGenerator.DefaultExpression(typeSymbol);
         }
-
-
     }
 
     public class MappingPath

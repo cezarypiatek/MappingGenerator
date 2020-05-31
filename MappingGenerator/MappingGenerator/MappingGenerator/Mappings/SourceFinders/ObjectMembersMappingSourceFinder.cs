@@ -100,7 +100,7 @@ namespace MappingGenerator.Mappings.SourceFinders
             }
 
             //Flattening with function eg. t.Total = s.GetTotal()
-            var matchedSourceMethod = sourceMethods.Value.FirstOrDefault(x => x.Name.EndsWith(targetName, StringComparison.OrdinalIgnoreCase));
+            var matchedSourceMethod = sourceMethods.Value.Where((x => x.Name.EndsWith(targetName, StringComparison.OrdinalIgnoreCase))).FirstOrDefault(m => mappingContext.AccessibilityHelper.IsSymbolAccessible(m, accessedVia));
             if (matchedSourceMethod != null)
             {
                 var sourceMethodAccessor = generator.MemberAccessExpression(sourceGlobalAccessor, matchedSourceMethod.Name);
@@ -117,13 +117,15 @@ namespace MappingGenerator.Mappings.SourceFinders
                 var acronym = GetAcronym(targetName).ToLowerInvariant();
                 if (acronym.StartsWith(potentialPrefix))
                 {
-                    var rest = Regex.Split(targetName, @"(?<!^)(?=[A-Z])").Skip(potentialPrefix.Length);
+                    var rest =  acronymPattern.Split(targetName).Skip(potentialPrefix.Length);
                     var newTarget = $"{potentialPrefix}{string.Join("", rest)}";
                     return TryFindSource(newTarget, mappingContext, accessedVia);
                 }
             }
             return null;
         }
+
+        private readonly Regex acronymPattern = new Regex(@"(?<!^)(?=[A-Z])", RegexOptions.Compiled);
 
         private string GetAcronym(string targetName)
         {

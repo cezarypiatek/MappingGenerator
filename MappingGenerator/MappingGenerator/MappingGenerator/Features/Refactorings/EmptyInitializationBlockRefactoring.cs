@@ -58,17 +58,19 @@ namespace MappingGenerator.Features.Refactorings
         {
             var localSymbols = semanticModel.GetLocalSymbols(objectInitializer);
 
-            var queryExpression = objectInitializer.FindContainer<QueryExpressionSyntax>();
-            if (queryExpression != null)
-            {
-                yield return GetMappingSourceFindersForQueryExpression(semanticModel, syntaxGenerator, queryExpression, localSymbols);
-                yield break;
-            }
+            var container = objectInitializer.FindNearestContainer<QueryExpressionSyntax, VariableDeclaratorSyntax>();
 
-            if (objectInitializer.FindContainer<VariableDeclaratorSyntax>() is { } vds)
+            switch (container)
             {
-                var leftSymbol = semanticModel.GetDeclaredSymbol(vds);
-                localSymbols = localSymbols.Where(ls => ls != leftSymbol).ToList();
+                case QueryExpressionSyntax queryExpression:
+                    yield return GetMappingSourceFindersForQueryExpression(semanticModel, syntaxGenerator, queryExpression, localSymbols);
+                    yield break;
+                case VariableDeclaratorSyntax vds:
+                {
+                    var leftSymbol = semanticModel.GetDeclaredSymbol(vds);
+                    localSymbols = localSymbols.Where(ls => ls != leftSymbol).ToList();
+                    break;
+                }
             }
 
             yield return new LocalScopeMappingSourceFinder(semanticModel, localSymbols);
@@ -134,7 +136,7 @@ namespace MappingGenerator.Features.Refactorings
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
-            var mappingSourceFinder = new ScaffoldingSourceFinder(syntaxGenerator, document, semanticModel.FindContextAssembly(objectInitializer));
+            var mappingSourceFinder = new ScaffoldingSourceFinder(syntaxGenerator, document);
             return await ReplaceEmptyInitializationBlock(document, objectInitializer, semanticModel, new SingleSourceMatcher(mappingSourceFinder), cancellationToken);
         }
 
@@ -144,7 +146,7 @@ namespace MappingGenerator.Features.Refactorings
         {
             var oldObjCreation = objectInitializer.FindContainer<ObjectCreationExpressionSyntax>();
             var createdObjectType = ModelExtensions.GetTypeInfo(semanticModel, oldObjCreation).Type;
-            var mappingEngine = await MappingEngine.Create(document, cancellationToken, semanticModel.FindContextAssembly(objectInitializer));
+            var mappingEngine = await MappingEngine.Create(document, cancellationToken);
             
             var newObjectCreation = mappingEngine.AddInitializerWithMapping(oldObjCreation, mappingMatcher, createdObjectType, new MappingContext(objectInitializer, semanticModel ));
             return await document.ReplaceNodes(oldObjCreation, newObjectCreation, cancellationToken);

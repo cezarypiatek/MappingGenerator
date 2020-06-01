@@ -46,8 +46,7 @@ namespace MappingGenerator.Features.CodeFixes
         {
             var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var contextAssembly = semanticModel.FindContextAssembly(invocation.SourceNode);
-            var mappingSourceFinder = new ScaffoldingSourceFinder(syntaxGenerator,document, contextAssembly);
+            var mappingSourceFinder = new ScaffoldingSourceFinder(syntaxGenerator,document);
             return await CodeFixHelper.FixInvocationWithParameters(document, invocation, namedArguments, semanticModel, mappingSourceFinder, cancellationToken);
         }
 

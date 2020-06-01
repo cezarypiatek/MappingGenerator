@@ -69,8 +69,7 @@ namespace MappingGenerator.Features.CodeFixes
             if (overloadParameterSets != null)
             {
                 var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
-                var contextAssembly = semanticModel.FindContextAssembly(invocation.SourceNode);
-                var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
+                var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator);
                 var invalidArgumentList = invocation.Arguments;
                 var mappingContext = new MappingContext(invocation.SourceNode, semanticModel);
                 var parametersMatch = FindParametersMatch(invalidArgumentList, overloadParameterSets, semanticModel, syntaxGenerator, mappingContext);

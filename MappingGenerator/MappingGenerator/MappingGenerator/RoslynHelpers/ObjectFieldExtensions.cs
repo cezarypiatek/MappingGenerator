@@ -8,7 +8,14 @@ namespace MappingGenerator.RoslynHelpers
     {
         public static IEnumerable<IObjectField> GetObjectFields(this ITypeSymbol type)
         {
-            foreach (var symbol in type.GetBaseTypesAndThis().SelectMany(x => x.GetMembers()))
+            var allMembers = type.GetAllMembers();;
+            foreach (var objectField in GetObjectFields(allMembers))
+                yield return objectField;
+        }
+
+        public static IEnumerable<IObjectField> GetObjectFields(IEnumerable<ISymbol> allMembers)
+        {
+            foreach (var symbol in allMembers)
             {
                 if (symbol.IsStatic)
                 {
@@ -21,6 +28,7 @@ namespace MappingGenerator.RoslynHelpers
                     {
                         yield return new ObjectProperty(property);
                     }
+
                     continue;
                 }
 
@@ -33,5 +41,7 @@ namespace MappingGenerator.RoslynHelpers
                 }
             }
         }
+
+       
     } 
 }

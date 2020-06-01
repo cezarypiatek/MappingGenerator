@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 
@@ -31,8 +32,9 @@ namespace MappingGenerator.Mappings.SourceFinders
             this.sourceGlobalAccessor = sourceGlobalAccessor;
             this.generator = generator;
             this.potentialPrefix = NameHelper.ToLocalVariableName(sourceGlobalAccessor.ToFullString());
-            this.sourceProperties = new Lazy<IReadOnlyList<IObjectField>>(() => sourceType.GetObjectFields().ToList());
-            this.sourceMethods = new Lazy<IReadOnlyList<IMethodSymbol>>(()=> ObjectHelper.GetWithGetPrefixMethods(sourceType).ToList());
+            var sourceAllMembers = sourceType.GetAllMembers();
+            this.sourceProperties = new Lazy<IReadOnlyList<IObjectField>>(() =>ObjectFieldExtensions.GetObjectFields(sourceAllMembers).ToList());
+            this.sourceMethods = new Lazy<IReadOnlyList<IMethodSymbol>>(()=> ObjectHelper.GetWithGetPrefixMethods(sourceAllMembers).ToList());
             this.isSourceTypeEnumerable = new Lazy<bool>(() => sourceType.Interfaces.Any(x => x.ToDisplayString().StartsWith("System.Collections.Generic.IEnumerable<")));
         }
 
@@ -63,7 +65,7 @@ namespace MappingGenerator.Mappings.SourceFinders
 
         private MappingElement CreateMappingElementFromExtensionMethod(ITypeSymbol targetType, string methodName)
         {
-            var sourceMethodAccessor = generator.MemberAccessExpression(sourceGlobalAccessor, methodName);
+            var sourceMethodAccessor = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, (ExpressionSyntax)sourceGlobalAccessor, SyntaxFactory.IdentifierName(methodName));
             return new MappingElement()
             {
                 Expression = (ExpressionSyntax) generator.InvocationExpression(sourceMethodAccessor),
@@ -82,7 +84,7 @@ namespace MappingGenerator.Mappings.SourceFinders
             {
                 return new MappingElement()
                 {
-                    Expression = (ExpressionSyntax) generator.MemberAccessExpression(sourceGlobalAccessor, matchedSourceProperty.Name),
+                    Expression = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, (ExpressionSyntax)sourceGlobalAccessor, SyntaxFactory.IdentifierName(matchedSourceProperty.Name)),
                     ExpressionType = matchedSourceProperty.Type
                 };
             }
@@ -98,7 +100,9 @@ namespace MappingGenerator.Mappings.SourceFinders
             var matchedSourceMethod = sourceMethods.Value.Where((x => x.Name.EndsWith(targetName, StringComparison.OrdinalIgnoreCase))).FirstOrDefault(m => mappingContext.AccessibilityHelper.IsSymbolAccessible(m, accessedVia));
             if (matchedSourceMethod != null)
             {
-                var sourceMethodAccessor = generator.MemberAccessExpression(sourceGlobalAccessor, matchedSourceMethod.Name);
+                
+
+                var sourceMethodAccessor = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, (ExpressionSyntax)sourceGlobalAccessor, SyntaxFactory.IdentifierName(matchedSourceMethod.Name));
                 return new MappingElement()
                 {
                     Expression = (ExpressionSyntax) generator.InvocationExpression(sourceMethodAccessor),

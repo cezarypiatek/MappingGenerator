@@ -15,12 +15,10 @@ namespace MappingGenerator.Mappings
         {
             return IsCollection(targetClassSymbol) && IsCollection(sourceClassSymbol);
         }
-
+        
         public static bool IsCollection(ITypeSymbol typeSymbol)
         {
-            return ObjectHelper.HasInterface(typeSymbol, "System.Collections.ICollection") || 
-                   ObjectHelper.HasInterface(typeSymbol, "System.Collections.IEnumerable") || 
-                   typeSymbol.Kind == SymbolKind.ArrayType;
+            return typeSymbol.Kind == SymbolKind.ArrayType  || ObjectHelper.HasInterface(typeSymbol, "System.Collections.IEnumerable");
         }
 
         public static ITypeSymbol GetElementType(ITypeSymbol collectionType)

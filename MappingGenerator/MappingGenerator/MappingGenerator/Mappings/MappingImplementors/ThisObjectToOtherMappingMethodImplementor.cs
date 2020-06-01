@@ -20,7 +20,7 @@ namespace MappingGenerator.Mappings.MappingImplementors
         public IEnumerable<SyntaxNode> GenerateImplementation(IMethodSymbol methodSymbol, SyntaxGenerator generator,
             SemanticModel semanticModel, MappingContext mappingContext)
         {
-            var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
+            var mappingEngine = new MappingEngine(semanticModel, generator);
             var targetType = methodSymbol.ReturnType;
             var newExpression = mappingEngine.MapExpression((ExpressionSyntax)generator.ThisExpression(), methodSymbol.ContainingType, targetType, mappingContext);
             return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };

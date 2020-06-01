@@ -91,8 +91,7 @@ namespace MappingGenerator.Features.Suggestions
             var overloadParameterSets = invocation.GetOverloadParameterSets(semanticModel);
             if (overloadParameterSets != null)
             {
-                var contextAssembly = semanticModel.FindContextAssembly(invocation.SourceNode);
-                var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
+                var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator);
                 var mappingContext = new MappingContext(invocation.SourceNode, semanticModel);
                 var parametersMatch = MethodHelper.FindBestParametersMatch(mappingSourceFinder, overloadParameterSets, mappingContext);
                 if (parametersMatch != null)

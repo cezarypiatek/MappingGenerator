@@ -21,10 +21,10 @@ namespace MappingGenerator.Mappings.MappingImplementors
         public IEnumerable<SyntaxNode> GenerateImplementation(IMethodSymbol methodSymbol, SyntaxGenerator generator,
             SemanticModel semanticModel, MappingContext mappingContext)
         {
-            var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
+            var mappingEngine = new MappingEngine(semanticModel, generator);
             var source = methodSymbol.Parameters[0];
             var target = methodSymbol.Parameters[1];
-            var targets = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(target.Type, methodSymbol.ContainingAssembly, mappingContext);
+            var targets = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(target.Type, mappingContext);
             var sourceFinder = new ObjectMembersMappingSourceFinder(source.Type, generator.IdentifierName(source.Name), generator);
             return mappingEngine.MapUsingSimpleAssignment(targets, new SingleSourceMatcher(sourceFinder), mappingContext, globalTargetAccessor: generator.IdentifierName(target.Name));
         }

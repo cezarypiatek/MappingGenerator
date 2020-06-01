@@ -111,7 +111,7 @@ namespace MappingGenerator.Features.Refactorings
         private SyntaxNode[] CreateCloneExpression(SyntaxGenerator generator, SemanticModel semanticModel, INamedTypeSymbol type, MappingContext mappingContext)
         {
             //TODO: If subtypes contains clone method use it, remember about casting
-            var mappingEngine = new CloneMappingEngine(semanticModel, generator, type.ContainingAssembly);
+            var mappingEngine = new CloneMappingEngine(semanticModel, generator);
             var newExpression = mappingEngine.MapExpression((ExpressionSyntax)generator.ThisExpression(), type, type, mappingContext);
             return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };
         }

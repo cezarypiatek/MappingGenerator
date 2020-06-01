@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using MappingGenerator.Mappings.MappingImplementors;
 using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -11,8 +10,8 @@ namespace MappingGenerator.Mappings
 {
     public class CloneMappingEngine: MappingEngine
     {
-        public CloneMappingEngine(SemanticModel semanticModel, SyntaxGenerator syntaxGenerator, IAssemblySymbol contextAssembly) 
-            : base(semanticModel, syntaxGenerator, contextAssembly)
+        public CloneMappingEngine(SemanticModel semanticModel, SyntaxGenerator syntaxGenerator) 
+            : base(semanticModel, syntaxGenerator)
         {
         }
 
@@ -35,7 +34,7 @@ namespace MappingGenerator.Mappings
             {
 
                 var invokeClone = syntaxGenerator.InvocationExpression(syntaxGenerator.MemberAccessExpression(source.Expression, "Clone"));
-                var cloneMethods = targetType.GetMembers("Clone");
+                var cloneMethods = targetType.GetMembers("Clone").OfType<IMethodSymbol>().Where(m => mappingContext.AccessibilityHelper.IsSymbolAccessible(m, targetType)).ToList();
                 if (cloneMethods.Any(IsGenericCloneMethod))
                 {
                     return new MappingElement()
@@ -45,20 +44,15 @@ namespace MappingGenerator.Mappings
                     };
                 }
 
-                var objectClone = cloneMethods.FirstOrDefault(x => x is IMethodSymbol md && md.Parameters.Length == 0);
+                var objectClone = cloneMethods.FirstOrDefault(x => x.Parameters.Length == 0);
 
                 if (objectClone != null)
                 {
-                    var objectCLoneMethod = (IMethodSymbol) objectClone;
-
-                    if(CanBeAccessedInCurrentContext(objectCLoneMethod) )
+                    return new MappingElement()
                     {
-                        return new MappingElement()
-                        {
-                            ExpressionType = targetType,
-                            Expression = syntaxGenerator.TryCastExpression(invokeClone, targetType) as ExpressionSyntax
-                        };
-                    }
+                        ExpressionType = targetType,
+                        Expression = syntaxGenerator.TryCastExpression(invokeClone, targetType) as ExpressionSyntax
+                    };
                 }
 
                 var implicitClone = targetType.GetMembers("System.ICloneable.Clone").FirstOrDefault();
@@ -80,15 +74,8 @@ namespace MappingGenerator.Mappings
         private bool IsGenericCloneMethod(ISymbol x)
         {
             return x is IMethodSymbol md &&
-                   md.ReturnType.ToString().Equals("object", StringComparison.OrdinalIgnoreCase) == false &&
                    md.Parameters.Length == 0 &&
-                   CanBeAccessedInCurrentContext(md);
-        }
-
-        private bool CanBeAccessedInCurrentContext(IMethodSymbol objectCLoneMethod)
-        {
-            return objectCLoneMethod.DeclaredAccessibility == Accessibility.Public || 
-                   (objectCLoneMethod.DeclaredAccessibility == Accessibility.Internal && objectCLoneMethod.ContainingAssembly.IsSameAssemblyOrHasFriendAccessTo(contextAssembly));
+                   md.ReturnType.ToString().Equals("object", StringComparison.OrdinalIgnoreCase) == false;
         }
     }
 }

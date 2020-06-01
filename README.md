@@ -25,6 +25,17 @@ If you find this extension useful (you feel it helps you on the daily basis) you
 ### Contributing
 Before you start any contributing work, please read the [contribution guidline](/docs/CONTRIBUTING.md)
 
+### Supported IDE
+
+#### VisualStudio.
+Install as VSIX from [Market place](https://marketplace.visualstudio.com/items?itemName=54748ff9-45fc-43c2-8ec5-cf7912bc3b84.mappinggenerator) or as a [NuGet package](https://www.nuget.org/packages/MappingGenerator/). Verify your Roslyn integration option in case you are using R#.
+
+#### Support JetBrains Rider
+Install as a [NuGet package](https://www.nuget.org/packages/MappingGenerator/)
+
+#### Support for VSCode
+Install as a [NuGet package](https://www.nuget.org/packages/MappingGenerator/) or use [this instruction](https://www.strathweb.com/2017/05/using-roslyn-refactorings-with-omnisharp-and-visual-studio-code/) to install from [VSIX](https://marketplace.visualstudio.com/items?itemName=54748ff9-45fc-43c2-8ec5-cf7912bc3b84.mappinggenerator)
+
 ### Using along with Resharper
 
 If you are not able to open Roslyn refactoring menu (`ctr + .`) please verify your Resharper settings related to `Visual Studio Integration` or `Visual Studio code analysis` (depends on the R# version). For more information please check [#50](https://github.com/cezarypiatek/MappingGenerator/issues/50)

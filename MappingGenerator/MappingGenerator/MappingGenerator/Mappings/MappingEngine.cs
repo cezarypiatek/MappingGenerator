@@ -17,14 +17,12 @@ namespace MappingGenerator.Mappings
     {
         protected readonly SemanticModel semanticModel;
         protected readonly SyntaxGenerator syntaxGenerator;
-        protected readonly IAssemblySymbol contextAssembly;
 
 
-        public MappingEngine(SemanticModel semanticModel, SyntaxGenerator syntaxGenerator, IAssemblySymbol contextAssembly)
+        public MappingEngine(SemanticModel semanticModel, SyntaxGenerator syntaxGenerator)
         {
             this.semanticModel = semanticModel;
             this.syntaxGenerator = syntaxGenerator;
-            this.contextAssembly = contextAssembly;
         }
 
         public TypeInfo GetExpressionTypeInfo(SyntaxNode expression)
@@ -32,11 +30,11 @@ namespace MappingGenerator.Mappings
             return semanticModel.GetTypeInfo(expression);
         }
 
-        public static async Task<MappingEngine> Create(Document document, CancellationToken cancellationToken, IAssemblySymbol contextAssembly)
+        public static async Task<MappingEngine> Create(Document document, CancellationToken cancellationToken)
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
-            return new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
+            return new MappingEngine(semanticModel, syntaxGenerator);
         }
 
         public ExpressionSyntax MapExpression(ExpressionSyntax sourceExpression, ITypeSymbol sourceType,
@@ -182,7 +180,7 @@ namespace MappingGenerator.Mappings
             MappingContext mappingContext,
             MappingPath mappingPath = null)
         {
-            var propertiesToSet = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(createdObjectTyp, contextAssembly, mappingContext);
+            var propertiesToSet = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(createdObjectTyp, mappingContext);
             var assignments = MapUsingSimpleAssignment(propertiesToSet, mappingMatcher, mappingContext, mappingPath).ToList();
             if (assignments.Count == 0)
             {
@@ -192,7 +190,7 @@ namespace MappingGenerator.Mappings
             return objectCreationExpression.WithInitializer(initializerExpressionSyntax);
         }
 
-        public IEnumerable<ExpressionSyntax> MapUsingSimpleAssignment(IEnumerable<IObjectField> targets,
+        public IEnumerable<ExpressionSyntax> MapUsingSimpleAssignment(IReadOnlyCollection<IObjectField> targets,
             IMappingMatcher mappingMatcher,
             MappingContext mappingContext,
             MappingPath mappingPath = null, SyntaxNode globalTargetAccessor = null)

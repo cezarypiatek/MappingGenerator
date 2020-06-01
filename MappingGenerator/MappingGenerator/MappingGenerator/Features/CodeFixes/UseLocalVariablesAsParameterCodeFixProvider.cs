@@ -31,8 +31,7 @@ namespace MappingGenerator.Features.CodeFixes
             if (overloadParameterSets != null)
             {
                 var mappingContext = new MappingContext(invocation.SourceNode, semanticModel);
-                var contextAssembly = semanticModel.FindContextAssembly(invocation.SourceNode);
-                var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
+                var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator);
                 var parametersMatch = MethodHelper.FindBestParametersMatch(mappingSourceFinder, overloadParameterSets, mappingContext);
                 if (parametersMatch != null)
                 {
@@ -133,9 +132,8 @@ namespace MappingGenerator.Features.CodeFixes
             {
                 return document;
             }
-
-            var contextAssembly = semanticModel.FindContextAssembly(invocation);
-            var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator, contextAssembly);
+            
+            var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator);
             var mappingLambda = mappingEngine.CreateMappingLambda("x", sourceElementType, targetElementType, new MappingPath(), new MappingContext(invocation, semanticModel));
             return await document.ReplaceNodes(invocation, invocation.WithArgumentList(SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument((ExpressionSyntax)mappingLambda))), cancellationToken);
         }

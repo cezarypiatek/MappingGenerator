@@ -10,12 +10,23 @@ namespace MappingGenerator.RoslynHelpers
     {
         public static IEnumerable<IMethodSymbol> GetWithGetPrefixMethods(ITypeSymbol source)
         {
-            return GetBaseTypesAndThis(source).SelectMany(x=> x.GetMembers()).OfType<IMethodSymbol>().Where(mSymbol =>
-                                                                                                                 mSymbol.ReturnsVoid == false
-                                                                                                                 && mSymbol.IsStatic == false 
-                                                                                                                 && mSymbol.IsImplicitlyDeclared == false
-                                                                                                                 && mSymbol.Parameters.Length == 0
-                                                                                                                 && mSymbol.MethodKind == MethodKind.Ordinary);
+            var allMembers = source.GetAllMembers();
+            return GetWithGetPrefixMethods(allMembers);
+        }
+
+        public static IEnumerable<IMethodSymbol> GetWithGetPrefixMethods(IEnumerable<ISymbol> allMembers)
+        {
+            return allMembers.OfType<IMethodSymbol>().Where(mSymbol =>
+                mSymbol.ReturnsVoid == false
+                && mSymbol.IsStatic == false
+                && mSymbol.IsImplicitlyDeclared == false
+                && mSymbol.Parameters.Length == 0
+                && mSymbol.MethodKind == MethodKind.Ordinary);
+        }
+
+        public static IReadOnlyCollection<ISymbol> GetAllMembers(this ITypeSymbol type)
+        {
+            return type.GetBaseTypesAndThis().SelectMany(x => x.GetMembers()).ToList();
         }
 
         public static IEnumerable<ITypeSymbol> GetBaseTypesAndThis(this ITypeSymbol type)
@@ -81,26 +92,6 @@ namespace MappingGenerator.RoslynHelpers
             return xt.OriginalDefinition.AllInterfaces.Any(x => x.ToDisplayString() == interfaceName);
         }
 
-        public static bool IsSameAssemblyOrHasFriendAccessTo(this IAssemblySymbol assembly, IAssemblySymbol toAssembly)
-        {
-            var areEquals = assembly.Equals(toAssembly);
-            if (areEquals  == false  &&  toAssembly == null)
-            {
-                return false;
-            }
-
-            return
-                areEquals ||
-                (assembly.IsInteractive && toAssembly.IsInteractive) ||
-                toAssembly.GivesAccessTo(assembly);
-        }
-
-        public static IAssemblySymbol FindContextAssembly(this SemanticModel semanticModel, SyntaxNode node )
-        {
-            var type = node.FindNearestContainer<ClassDeclarationSyntax, StructDeclarationSyntax>();
-            var symbol = semanticModel.GetDeclaredSymbol(type);
-            return symbol.ContainingAssembly;
-        }
     }
 
     public interface IObjectField

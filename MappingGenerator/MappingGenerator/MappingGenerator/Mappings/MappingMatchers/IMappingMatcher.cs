@@ -7,7 +7,7 @@ namespace MappingGenerator.Mappings.MappingMatchers
 {
     public interface IMappingMatcher
     {
-        IReadOnlyList<MappingMatch> MatchAll(IEnumerable<IObjectField> targets, SyntaxGenerator syntaxGenerator,
+        IReadOnlyList<MappingMatch> MatchAll(IReadOnlyCollection<IObjectField> targets, SyntaxGenerator syntaxGenerator,
             MappingContext mappingContext, SyntaxNode globalTargetAccessor = null);
     }
 }

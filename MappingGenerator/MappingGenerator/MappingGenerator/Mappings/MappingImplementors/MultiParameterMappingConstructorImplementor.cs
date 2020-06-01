@@ -17,7 +17,7 @@ namespace MappingGenerator.Mappings.MappingImplementors
         public IEnumerable<SyntaxNode> GenerateImplementation(IMethodSymbol methodSymbol, SyntaxGenerator generator,
             SemanticModel semanticModel, MappingContext mappingContext)
         {
-            var mappingEngine = new MappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
+            var mappingEngine = new MappingEngine(semanticModel, generator);
             var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol.Parameters);
             var targets = MappingTargetHelper.GetFieldsThaCanBeSetFromConstructor(methodSymbol.ContainingType, mappingContext);
             return mappingEngine.MapUsingSimpleAssignment(targets, new SingleSourceMatcher(sourceFinder), mappingContext);

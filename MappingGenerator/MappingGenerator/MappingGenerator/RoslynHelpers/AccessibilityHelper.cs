@@ -20,9 +20,14 @@ namespace MappingGenerator.RoslynHelpers
                 return true;
             }
 
+
+            if (x.DeclaredAccessibility == Accessibility.Public)
+            {
+                return true;
+            }
+
             return (x.DeclaredAccessibility, IsSameAssembly(x), GetClassLocation(x)) switch
             {
-                (Accessibility.Public, _, _) => true,
                 (Accessibility.Private, _, ClassLocation.Declared) => true,
                 (Accessibility.Protected, true, ClassLocation.Declared) => true,
                 (Accessibility.Protected, true, ClassLocation.Derived) => InheritFrom(via, _contextSymbol.Value),
@@ -57,7 +62,7 @@ namespace MappingGenerator.RoslynHelpers
             var key = (type, from);
             if (_inheritanceCache.ContainsKey(key) == false)
             {
-                _inheritanceCache[key] = GetBaseTypesAndThis(type).Any(t => t.Equals(from));
+                _inheritanceCache[key] = GetBaseTypesAndThis(type).Contains(from);
             }
             return _inheritanceCache[key];
         }
@@ -76,18 +81,37 @@ namespace MappingGenerator.RoslynHelpers
                 }
                 else
                 {
-                    _assemblyRelationCache[key] = x.ContainingAssembly.GetAttributes()
-                        .Any(x => x.AttributeClass.Name == "InternalsVisibleToAttribute" &&
-                                  x.ConstructorArguments[0].Value.ToString()
-                                      .StartsWith(_contextSymbol.Value.ContainingAssembly.Name)
-                        );
+                    if (assemblyInternalVisibleToCache.ContainsKey(x.ContainingAssembly) == false)
+                    {
+                        assemblyInternalVisibleToCache[x.ContainingAssembly] = x.ContainingAssembly.GetAttributes()
+                            .Where(x => x.AttributeClass.Name == "InternalsVisibleToAttribute")
+                            .Select(x => x.ConstructorArguments[0].Value.ToString()).ToList();
+                    }
+                    
+                    _assemblyRelationCache[key] = assemblyInternalVisibleToCache[x.ContainingAssembly]
+                        .Any(x => x.StartsWith(_contextSymbol.Value.ContainingAssembly.Name));
                 }
 
             }
             return _assemblyRelationCache[key];
         }
 
-        private static IEnumerable<ITypeSymbol> GetBaseTypesAndThis(ITypeSymbol type)
+        private readonly Dictionary<IAssemblySymbol, List<string>> assemblyInternalVisibleToCache = new Dictionary<IAssemblySymbol, List<string>>();
+
+
+        private readonly Dictionary<ITypeSymbol, HashSet<ITypeSymbol>> baseClassCache = new Dictionary<ITypeSymbol, HashSet<ITypeSymbol>>();
+
+        private  HashSet<ITypeSymbol> GetBaseTypesAndThis(ITypeSymbol type)
+        {
+            if (baseClassCache.ContainsKey(type) == false)
+            {
+                baseClassCache[type] = new HashSet<ITypeSymbol>(EnumerateThroughtHierarchy(type));
+            }
+
+            return baseClassCache[type];
+        }
+
+        private static IEnumerable<ITypeSymbol> EnumerateThroughtHierarchy(ITypeSymbol type)
         {
             foreach (var unwrapped in UnwrapGeneric(type))
             {
@@ -99,6 +123,7 @@ namespace MappingGenerator.RoslynHelpers
                 }
             }
         }
+
         private static IEnumerable<ITypeSymbol> UnwrapGeneric(ITypeSymbol typeSymbol)
         {
             if (typeSymbol.TypeKind == TypeKind.TypeParameter && typeSymbol is ITypeParameterSymbol namedType && namedType.Kind != SymbolKind.ErrorType)

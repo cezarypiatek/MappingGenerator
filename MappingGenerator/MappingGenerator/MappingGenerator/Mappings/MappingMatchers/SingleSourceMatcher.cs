@@ -18,7 +18,7 @@ namespace MappingGenerator.Mappings.MappingMatchers
             this.sourceFinder = sourceFinder;
         }
 
-        public IReadOnlyList<MappingMatch> MatchAll(IEnumerable<IObjectField> targets,
+        public IReadOnlyList<MappingMatch> MatchAll(IReadOnlyCollection<IObjectField> targets,
             SyntaxGenerator syntaxGenerator, MappingContext mappingContext, SyntaxNode globalTargetAccessor = null)
         {
             return targets.Select(property => new MappingMatch

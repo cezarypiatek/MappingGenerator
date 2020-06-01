@@ -12,13 +12,11 @@ namespace MappingGenerator.Mappings.SourceFinders
     {
         private readonly SyntaxGenerator syntaxGenerator;
         private readonly Document _document;
-        private readonly IAssemblySymbol _contextAssembly;
 
-        public ScaffoldingSourceFinder(SyntaxGenerator syntaxGenerator, Document document, IAssemblySymbol contextAssembly)
+        public ScaffoldingSourceFinder(SyntaxGenerator syntaxGenerator, Document document)
         {
             this.syntaxGenerator = syntaxGenerator;
             _document = document;
-            _contextAssembly = contextAssembly;
         }
 
         public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType, MappingContext mappingContext)
@@ -146,12 +144,7 @@ namespace MappingGenerator.Mappings.SourceFinders
                         }
                     }
 
-                    var publicConstructors = nt.Constructors.Where(x =>
-                        x.DeclaredAccessibility == Accessibility.Public ||
-                        (x.DeclaredAccessibility == Accessibility.Internal &&
-                         x.ContainingAssembly.IsSameAssemblyOrHasFriendAccessTo(_contextAssembly))).ToList();
-
-
+                    var publicConstructors = nt.Constructors.Where(x => mappingContext.AccessibilityHelper.IsSymbolAccessible(x, nt)).ToList();
                     var hasDefaultConstructor = publicConstructors.Any(x => x.Parameters.Length == 0);
                     if (hasDefaultConstructor == false && publicConstructors.Count > 0)
                     {
@@ -160,7 +153,7 @@ namespace MappingGenerator.Mappings.SourceFinders
                         objectCreationExpression = (ObjectCreationExpressionSyntax)syntaxGenerator.ObjectCreationExpression(nt, constructorArguments);
                     }
 
-                    var fields = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(nt, _contextAssembly, mappingContext);
+                    var fields = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(nt, mappingContext);
                     var assignments = fields.Select(x =>
                     {
                         var identifier = (ExpressionSyntax)(SyntaxFactory.IdentifierName(x.Name));

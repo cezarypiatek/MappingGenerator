@@ -16,7 +16,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
 
         public Product ToProduct()
         {
-            return new Product(name: Name, price: Price, category: Category, tags: Tags);
+            return new Product(name: this.Name, price: this.Price, category: this.Category, tags: this.Tags);
         }
     }
 

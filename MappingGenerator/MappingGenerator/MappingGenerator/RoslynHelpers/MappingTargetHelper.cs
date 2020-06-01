@@ -7,19 +7,20 @@ namespace MappingGenerator.RoslynHelpers
 {
     public static class MappingTargetHelper
     {
-        public static IEnumerable<IObjectField> GetFieldsThaCanBeSetFromConstructor(ITypeSymbol type, MappingContext mappingContext)
+        public static IReadOnlyCollection<IObjectField> GetFieldsThaCanBeSetFromConstructor(ITypeSymbol type, MappingContext mappingContext)
         {
-            return type.GetObjectFields().Where(x=>x.CanBeSetInConstructor(type, mappingContext));
+            return type.GetObjectFields().Where(x=>x.CanBeSetInConstructor(type, mappingContext)).ToList();
         }
 
-        public static IEnumerable<IObjectField> GetFieldsThaCanBeSetPublicly(ITypeSymbol type, IAssemblySymbol contextAssembly, MappingContext mappingContext)
+        public static IReadOnlyCollection<IObjectField> GetFieldsThaCanBeSetPublicly(ITypeSymbol type,
+            MappingContext mappingContext)
         {
-            return type.GetObjectFields().Where(x => x.CanBeSet(type, mappingContext));
+            return type.GetObjectFields().Where(x => x.CanBeSet(type, mappingContext)).ToList();
         }
 
-        public static IEnumerable<IObjectField> GetFieldsThaCanBeSetPrivately(ITypeSymbol type, MappingContext mappingContext)
+        public static IReadOnlyCollection<IObjectField> GetFieldsThaCanBeSetPrivately(ITypeSymbol type, MappingContext mappingContext)
         {
-            return type.GetObjectFields().Where(x => x.CanBeSet(type, mappingContext));
+            return type.GetObjectFields().Where(x => x.CanBeSet(type, mappingContext)).ToList();
         }
     }
 }

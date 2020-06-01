@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MappingGenerator.Mappings;
-using MappingGenerator.Mappings.MappingImplementors;
 using MappingGenerator.Mappings.MappingMatchers;
 using MappingGenerator.Mappings.SourceFinders;
 using MappingGenerator.RoslynHelpers;
@@ -67,10 +66,9 @@ namespace MappingGenerator.Features.Refactorings
         {
             var methodSymbol = (IMethodSymbol)semanticModel.GetSymbolInfo(lambda).Symbol;
             var createdObjectType = methodSymbol.Parameters.First().Type;
-            var contextAssembly = semanticModel.FindContextAssembly(lambda);
-            var mappingEngine = await MappingEngine.Create(document, cancellationToken, contextAssembly);
+            var mappingEngine = await MappingEngine.Create(document, cancellationToken);
             var mappingContext = new MappingContext(lambda, semanticModel);
-            var propertiesToSet = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(createdObjectType, contextAssembly, mappingContext);
+            var propertiesToSet = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(createdObjectType, mappingContext);
             var statements = mappingEngine.MapUsingSimpleAssignment(propertiesToSet, mappingMatcher, mappingContext, globalTargetAccessor: SyntaxFactory.IdentifierName(GetParameterIdentifier(lambda)))
                 .Select(x=>x.AsStatement().WithTrailingTrivia(SyntaxFactory.EndOfLine("\r\n")));
             

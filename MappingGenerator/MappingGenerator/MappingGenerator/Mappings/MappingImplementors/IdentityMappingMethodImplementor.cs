@@ -13,10 +13,9 @@ namespace MappingGenerator.Mappings.MappingImplementors
             return methodSymbol.Parameters.Length == 1 && methodSymbol.ReturnType.Equals(methodSymbol.Parameters[0].Type);
         }
 
-        public IEnumerable<SyntaxNode> GenerateImplementation(IMethodSymbol methodSymbol, SyntaxGenerator generator,
-            SemanticModel semanticModel, MappingContext mappingContext)
+        public IEnumerable<SyntaxNode> GenerateImplementation(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel, MappingContext mappingContext)
         {
-            var cloneMappingEngine = new CloneMappingEngine(semanticModel, generator, methodSymbol.ContainingAssembly);
+            var cloneMappingEngine = new CloneMappingEngine(semanticModel, generator);
             var source = methodSymbol.Parameters[0];
             var targetType = methodSymbol.ReturnType;
             var newExpression = cloneMappingEngine.MapExpression((ExpressionSyntax)generator.IdentifierName(source.Name),

@@ -66,8 +66,7 @@ namespace MappingGenerator.Features.CodeFixes
         private static async Task<(MappingEngine, SemanticModel)> CreateMappingEngine(Document document, SyntaxNode node, CancellationToken cancellationToken)
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var contextAssembly = semanticModel.FindContextAssembly(node);
-            var mappingEngine = await MappingEngine.Create(document, cancellationToken, contextAssembly);
+            var mappingEngine = await MappingEngine.Create(document, cancellationToken);
             return (mappingEngine, semanticModel);
         }
 

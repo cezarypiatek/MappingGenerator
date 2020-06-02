@@ -16,7 +16,7 @@ You can download it as Visual Studio Extension from [Visual Studio Marketplace](
 [The reasons behind why I don't use AutoMapper](https://cezarypiatek.github.io/post/why-i-dont-use-automapper/)
 
 ## Further Development
-If you find this extension useful (you feel it helps you on the daily basis) you can support further development by buying me a coffee (it's simple, just click the button below). Sometimes it's hard to stay awake till midnight implementing new features, coffee helps me with that. I'm really appreciate for your support.
+If you find this extension useful (you feel it helps you on the daily basis) you can support further development by buying me a coffee (it's simple, just click the button below). Sometimes it's hard to stay awake till midnight implementing new features, coffee helps me with that. . I really appreciate your support in any form.
 
 [![](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/tmAJLYvWy)
 

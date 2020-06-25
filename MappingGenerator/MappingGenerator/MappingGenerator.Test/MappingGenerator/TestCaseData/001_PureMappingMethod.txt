@@ -14,8 +14,15 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         }
     }
 
-    public class UserDTO
+    public class BaseDTO
     {
+        public virtual int Id {get; set;}
+        public int Version {get; set;}
+    }
+
+    public class UserDTO: BaseDTO
+    {
+        public override int Id {get; set;}
         public string FirstName { get;  }
         public string LastName { get; private set; }
         public int Age { get; set; }
@@ -71,8 +78,15 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
 
     //---- Entities
 
-    public class UserEntity
+    public class BaseEntity
     {
+        public int Id {get; set;}
+        public virtual int Version {get; set;}
+    }
+
+    public class UserEntity: BaseEntity
+    {
+        public override int Version {get; set;}
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public int Age { get; set; }

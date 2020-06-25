@@ -12,6 +12,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         {
             return new UserDTO()
             {
+                Id = entity.Id,
                 Age = entity.Age,
                 Debs = entity.Debs.ConvertAll(entityDeb => new AccountDTO()
                 {
@@ -57,13 +58,21 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                 SecondAuthentication = entity.SecondAuthentication.ToString(),
                 ThirdAuthentication = (AuthenticationKind)Enum.Parse(typeof(AuthenticationKind), entity.ThirdAuthentication, true),
                 FourthAuthentication = (int?)entity.FourthAuthentication,
-                FifthAuthentication = (AuthenticationKind?)entity.FifthAuthentication
+                FifthAuthentication = (AuthenticationKind?)entity.FifthAuthentication,
+                Version = entity.Version
             };
         }
     }
 
-    public class UserDTO
+    public class BaseDTO
     {
+        public virtual int Id {get; set;}
+        public int Version {get; set;}
+    }
+
+    public class UserDTO: BaseDTO
+    {
+        public override int Id {get; set;}
         public string FirstName { get;  }
         public string LastName { get; private set; }
         public int Age { get; set; }
@@ -119,8 +128,15 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
 
     //---- Entities
 
-    public class UserEntity
+    public class BaseEntity
     {
+        public int Id {get; set;}
+        public virtual int Version {get; set;}
+    }
+
+    public class UserEntity: BaseEntity
+    {
+        public override int Version {get; set;}
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public int Age { get; set; }

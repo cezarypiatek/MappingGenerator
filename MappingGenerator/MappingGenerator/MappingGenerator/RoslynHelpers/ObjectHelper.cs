@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using MappingGenerator.Mappings;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace MappingGenerator.RoslynHelpers
 {
@@ -54,7 +53,7 @@ namespace MappingGenerator.RoslynHelpers
 
         public static bool IsSimpleType(ITypeSymbol type)
         {
-
+            
             switch (type.SpecialType)
             {
                 case SpecialType.System_Boolean:
@@ -83,6 +82,12 @@ namespace MappingGenerator.RoslynHelpers
                 case TypeKind.Enum:
                     return true;
             }
+
+            if (type.ToDisplayString() == "System.Guid")
+            {
+                return true;
+            }
+
 
             return false;
         }

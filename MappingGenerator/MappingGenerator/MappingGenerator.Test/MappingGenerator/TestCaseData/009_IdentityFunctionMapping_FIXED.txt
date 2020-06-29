@@ -34,7 +34,8 @@ namespace TestAutoMapper.Identity
                     FlatNo = oldAddress.FlatNo,
                     BuildingNo = oldAddress.BuildingNo
                 }).ToList().AsReadOnly(),
-                UnitId = old.UnitId
+                UnitId = old.UnitId,
+                UniqueKey = old.UniqueKey
             };
         }
     }
@@ -55,6 +56,7 @@ namespace TestAutoMapper.Identity
         public AddressDTO MainAddress { get; set; }
         public ReadOnlyCollection<AddressDTO> Addresses { get; set; }
         public int UnitId { get; set; }
+        public Guid UniqueKey { get; set;}
     }
 
     public class UserSourceDTO

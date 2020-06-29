@@ -59,6 +59,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                 ThirdAuthentication = (AuthenticationKind)Enum.Parse(typeof(AuthenticationKind), entity.ThirdAuthentication, true),
                 FourthAuthentication = (int?)entity.FourthAuthentication,
                 FifthAuthentication = (AuthenticationKind?)entity.FifthAuthentication,
+                UniqueKey = entity.UniqueKey,
                 Version = entity.Version
             };
         }
@@ -96,6 +97,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public AuthenticationKind ThirdAuthentication { get; set;}
         public int? FourthAuthentication { get; set;}
         public AuthenticationKind? FifthAuthentication { get; set;}
+        public Guid UniqueKey { get; set;}
     }
 
     public class UserSourceDTO
@@ -167,6 +169,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public string ThirdAuthentication { get; set;}
         public AuthenticationKind? FourthAuthentication { get; set;}
         public int? FifthAuthentication { get; set;}
+        public Guid UniqueKey { get; set;}
     }
 
     public class AddressEntity

@@ -46,6 +46,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public AuthenticationKind ThirdAuthentication { get; set;}
         public int? FourthAuthentication { get; set;}
         public AuthenticationKind? FifthAuthentication { get; set;}
+        public Guid UniqueKey { get; set;}
     }
 
     public class UserSourceDTO
@@ -117,6 +118,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public string ThirdAuthentication { get; set;}
         public AuthenticationKind? FourthAuthentication { get; set;}
         public int? FifthAuthentication { get; set;}
+        public Guid UniqueKey { get; set;}
     }
 
     public class AddressEntity

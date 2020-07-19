@@ -47,7 +47,7 @@ namespace MappingGenerator.Features.Refactorings
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
             var methodSymbol =  semanticModel.GetDeclaredSymbol(methodDeclaration);
             var mappingContext = new MappingContext(methodSymbol.ContainingType);
-            var cloneExpression = CreateCloneExpression(generator, semanticModel, methodSymbol.ReturnType as INamedTypeSymbol, mappingContext);
+            var cloneExpression = CreateCloneExpression(generator, semanticModel, new AnnotatedType(methodSymbol.ReturnType), mappingContext);
             return await document.ReplaceNodes(methodDeclaration.Body, ((BaseMethodDeclarationSyntax) generator.MethodDeclaration(methodSymbol, cloneExpression)).Body, cancellationToken);
         }
 
@@ -87,7 +87,7 @@ namespace MappingGenerator.Features.Refactorings
         {
             var typeSymbol = semanticModel.GetDeclaredSymbol(typeDeclaration);
             var mappingContext = new MappingContext(typeDeclaration, semanticModel);
-            var cloneExpression = CreateCloneExpression(generator, semanticModel, typeSymbol, mappingContext);
+            var cloneExpression = CreateCloneExpression(generator, semanticModel, new AnnotatedType(typeSymbol), mappingContext);
             return generator.MethodDeclaration("Clone", 
                 accessibility: Accessibility.Public,
                 statements:cloneExpression,
@@ -108,7 +108,7 @@ namespace MappingGenerator.Features.Refactorings
             
         }
 
-        private SyntaxNode[] CreateCloneExpression(SyntaxGenerator generator, SemanticModel semanticModel, INamedTypeSymbol type, MappingContext mappingContext)
+        private SyntaxNode[] CreateCloneExpression(SyntaxGenerator generator, SemanticModel semanticModel, AnnotatedType type, MappingContext mappingContext)
         {
             //TODO: If subtypes contains clone method use it, remember about casting
             var mappingEngine = new CloneMappingEngine(semanticModel, generator);

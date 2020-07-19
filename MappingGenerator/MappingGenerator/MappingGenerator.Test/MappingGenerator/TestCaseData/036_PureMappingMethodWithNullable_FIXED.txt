@@ -1,0 +1,70 @@
+﻿#nullable enable
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Collections.ObjectModel;
+using System.Collections.Immutable;
+
+namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+{
+    public class TestMapper
+    {
+        public static UserDTO Map(UserEntity entity)
+        {
+            return new UserDTO()
+            {
+                Id = entity.Id,
+                FirstName = entity.FirstName,
+                MiddleName = entity.MiddleName,
+                LastName = entity.LastName,
+                Age = entity.Age,
+                Account = new AccountDTO()
+                {
+                    BankName = entity.Account.BankName,
+                    Number = entity.Account.Number
+                },
+                Debs = entity.Debs.ConvertAll(entityDeb => new AccountDTO()
+                {
+                    BankName = entityDeb.BankName,
+                    Number = entityDeb.Number
+                })
+            };
+        }
+    }
+
+    public class UserDTO
+    {
+        public int Id {get; set;}
+        public string FirstName { get; set; }
+        public string? MiddleName { get; set; }
+        public string LastName { get; set; }
+        public int Age { get; set; }
+        public AccountDTO Account { get; set; }
+        public List<AccountDTO?> Debs { get; set; }
+    }
+
+    public class AccountDTO
+    {
+        public string BankName { get; set; }
+        public string Number { get; set; }
+    }
+
+    //---- Entities
+
+    public class UserEntity
+    {
+        public int Id {get; set;}
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string? MiddleName { get; set; }
+        public int Age { get; set; }
+        public AccountEntity Account { get; set; }
+        public List<AccountEntity> Debs { get; set; }
+    }
+
+    public class AccountEntity
+    {
+        public string BankName { get; set; }
+        public string Number { get; set; }
+    }
+}

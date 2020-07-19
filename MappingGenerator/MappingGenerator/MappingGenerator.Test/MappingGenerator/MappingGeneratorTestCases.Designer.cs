@@ -77,10 +77,12 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///        }
         ///    }
         ///
-        ///    public class UserDTO
+        ///    public class BaseDTO
         ///    {
-        ///        public string FirstName { get;  }
-        ///        public string LastName { get; private s [rest of string was truncated]&quot;;.
+        ///        public virtual int Id {get; set;}
+        ///        public int Version {get; set;}
+        ///    }
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _001_PureMappingMethod {
             get {
@@ -103,10 +105,10 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///        {
         ///            return new UserDTO()
         ///            {
+        ///                Id = entity.Id,
         ///                Age = entity.Age,
         ///                Debs = entity.Debs.ConvertAll(entityDeb =&gt; new AccountDTO()
-        ///                {
-        ///                  [rest of string was truncated]&quot;;.
+        ///    [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _001_PureMappingMethod_FIXED {
             get {
@@ -1492,8 +1494,7 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///        public Product ToProduct()
         ///        {
-        ///            return new Product(name: Name, price: Price, category: Category, tags: Tags);
-        ///    [rest of string was truncated]&quot;;.
+        ///            return new Product(name: this.Name, price: this.Price, category: this.Category, ta [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _025_ThisObjectToOtherMapping_FIXED {
             get {
@@ -1975,6 +1976,61 @@ namespace MappingGenerator.Test.MappingGenerator {
         internal static string _035_ConstructorInitializeFIelds_FIXED {
             get {
                 return ResourceManager.GetString("_035_ConstructorInitializeFIelds_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #nullable enable
+        ///using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///using System.Collections.Immutable;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO [|Map|](UserEntity entity)
+        ///        {
+        ///            throw new NotImplementedException();
+        ///        }
+        ///    }
+        ///
+        ///    public class UserDTO
+        ///    {
+        ///        public override int Id {get; set;}
+        ///        public string FirstN [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _036_PureMappingMethodWithNullable {
+            get {
+                return ResourceManager.GetString("_036_PureMappingMethodWithNullable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #nullable enable
+        ///using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///using System.Collections.Immutable;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO [|Map|](UserEntity entity)
+        ///        {
+        ///            return new UserDTO()
+        ///            {
+        ///                Id = entity.Id,
+        ///                FirstName = entity.FirstName,
+        ///                MiddleName = entity.MiddleName [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _036_PureMappingMethodWithNullable_FIXED {
+            get {
+                return ResourceManager.GetString("_036_PureMappingMethodWithNullable_FIXED", resourceCulture);
             }
         }
     }

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Microsoft.CodeAnalysis;
 
 namespace MappingGenerator.Mappings.SourceFinders
 {
@@ -12,8 +11,7 @@ namespace MappingGenerator.Mappings.SourceFinders
             this.sourceFinders = sourceFinders;
         }
 
-        public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType,
-            MappingContext mappingContext)
+        public MappingElement FindMappingSource(string targetName, AnnotatedType targetType, MappingContext mappingContext)
         {
             foreach (var sourceFinder in sourceFinders)
             {

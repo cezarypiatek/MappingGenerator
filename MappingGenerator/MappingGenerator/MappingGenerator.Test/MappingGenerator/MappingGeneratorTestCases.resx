@@ -334,4 +334,10 @@
   <data name="_035_ConstructorInitializeFIelds_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>TestCaseData\035_ConstructorInitializeFIelds_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="_036_PureMappingMethodWithNullable" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\036_PureMappingMethodWithNullable.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_036_PureMappingMethodWithNullable_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\036_PureMappingMethodWithNullable_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

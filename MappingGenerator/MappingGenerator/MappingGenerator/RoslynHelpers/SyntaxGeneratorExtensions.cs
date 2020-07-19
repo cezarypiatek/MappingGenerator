@@ -27,7 +27,7 @@ namespace MappingGenerator.RoslynHelpers
         public static async Task<Document> ReplaceNodes(this Document document, SyntaxNode oldNode, SyntaxNode newNode, CancellationToken cancellationToken)
         {
             var root = await document.GetSyntaxRootAsync(cancellationToken);
-            var newRoot = root.ReplaceNode(oldNode, newNode);
+            var newRoot = root!.ReplaceNode(oldNode, newNode);
             return document.WithSyntaxRoot(newRoot);
         }
     }

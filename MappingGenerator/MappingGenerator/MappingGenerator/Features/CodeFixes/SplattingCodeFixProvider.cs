@@ -97,8 +97,8 @@ namespace MappingGenerator.Features.CodeFixes
         private static ObjectMembersMappingSourceFinder CreateSourceFinderBasedOnInvalidArgument(ArgumentListSyntax invalidArgumentList, SemanticModel semanticModel, SyntaxGenerator syntaxGenerator)
         {
             var invalidArgument = invalidArgumentList.Arguments.First();
-            var sourceType = semanticModel.GetTypeInfo(invalidArgument.Expression).Type;
-            return new ObjectMembersMappingSourceFinder(sourceType, invalidArgument.Expression, syntaxGenerator);
+            var sourceType = semanticModel.GetTypeInfo(invalidArgument.Expression).GetAnnotatedType();
+            return new ObjectMembersMappingSourceFinder(new AnnotatedType(sourceType.Type), invalidArgument.Expression, syntaxGenerator);
         }
     }
 }

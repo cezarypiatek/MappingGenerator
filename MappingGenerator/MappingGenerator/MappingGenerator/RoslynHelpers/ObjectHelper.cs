@@ -102,7 +102,8 @@ namespace MappingGenerator.RoslynHelpers
     public interface IObjectField
     {
         string Name { get; }
-        ITypeSymbol Type { get; }
+        AnnotatedType Type { get; }
+
 
         bool CanBeSet(ITypeSymbol via, MappingContext mappingContext);
         bool CanBeSetInConstructor(ITypeSymbol via, MappingContext mappingContext);

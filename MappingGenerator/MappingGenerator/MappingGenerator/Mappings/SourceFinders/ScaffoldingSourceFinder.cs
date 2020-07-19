@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
@@ -19,17 +20,17 @@ namespace MappingGenerator.Mappings.SourceFinders
             _document = document;
         }
 
-        public MappingElement FindMappingSource(string targetName, ITypeSymbol targetType, MappingContext mappingContext)
+        public MappingElement FindMappingSource(string targetName, AnnotatedType targetType, MappingContext mappingContext)
         {
             return FindMappingSource(targetType, mappingContext, new MappingPath());
         }
 
-        private MappingElement FindMappingSource(ITypeSymbol targetType, MappingContext mappingContext, MappingPath mappingPath)
+        private MappingElement FindMappingSource(AnnotatedType targetType, MappingContext mappingContext, MappingPath mappingPath)
         {
             return new MappingElement
             {
                 ExpressionType = targetType,
-                Expression = (ExpressionSyntax) GetDefaultExpression(targetType, mappingContext, mappingPath)
+                Expression = (ExpressionSyntax) GetDefaultExpression(targetType.Type, mappingContext, mappingPath)
             };  
         }
 
@@ -59,7 +60,6 @@ namespace MappingGenerator.Mappings.SourceFinders
 
             if (type.SpecialType == SpecialType.None)
             {
-                
 
                 var objectCreationExpression = (ObjectCreationExpressionSyntax)syntaxGenerator.ObjectCreationExpression(type);
                 
@@ -83,13 +83,13 @@ namespace MappingGenerator.Mappings.SourceFinders
                         }
                         else
                         {
-                            var newType = SyntaxFactory.ParseTypeName("ArrayList");
+                            var newType = SyntaxFactory. ParseTypeName("ArrayList");
                             objectCreationExpression = SyntaxFactory.ObjectCreationExpression(newType, SyntaxFactory.ArgumentList(), default(InitializerExpressionSyntax));
                         }
                     }
                     var subType = MappingHelper.GetElementType(type);
                     var initializationBlockExpressions = new SeparatedSyntaxList<ExpressionSyntax>();
-                    var subTypeDefault = (ExpressionSyntax)GetDefaultExpression(subType, mappingContext, mappingPath.Clone());
+                    var subTypeDefault = (ExpressionSyntax)GetDefaultExpression(subType.Type, mappingContext, mappingPath.Clone());
                     if (subTypeDefault != null)
                     {
                         initializationBlockExpressions = initializationBlockExpressions.Add(subTypeDefault);
@@ -109,7 +109,7 @@ namespace MappingGenerator.Mappings.SourceFinders
                         var genericTypeConstraints = type.UnwrapGeneric().ToList();
                         if (genericTypeConstraints.Any() == false)
                         {
-                            return GetDefaultForUnknown(type, SyntaxFactory.ParseTypeName("object"));
+                            return GetDefaultForUnknown(type, ObjectType);
                         }
                         nt =  genericTypeConstraints.FirstOrDefault(x=>x.TypeKind == TypeKind.Class) as INamedTypeSymbol ??
                               genericTypeConstraints.FirstOrDefault(x => x.TypeKind == TypeKind.Interface) as INamedTypeSymbol;
@@ -157,7 +157,8 @@ namespace MappingGenerator.Mappings.SourceFinders
                     var assignments = fields.Select(x =>
                     {
                         var identifier = (ExpressionSyntax)(SyntaxFactory.IdentifierName(x.Name));
-                        return (ExpressionSyntax)syntaxGenerator.AssignmentStatement(identifier, this.FindMappingSource(x.Type, mappingContext, mappingPath.Clone()).Expression);
+                        var mappingSource = this.FindMappingSource(x.Type, mappingContext, mappingPath.Clone());
+                        return (ExpressionSyntax)syntaxGenerator.AssignmentStatement(identifier, mappingSource.Expression);
                     }).ToList();
 
                     if (assignments.Count == 0)
@@ -167,55 +168,37 @@ namespace MappingGenerator.Mappings.SourceFinders
                     var initializerExpressionSyntax = SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression, new SeparatedSyntaxList<ExpressionSyntax>().AddRange(assignments)).FixInitializerExpressionFormatting(objectCreationExpression);
                     return objectCreationExpression.WithInitializer(initializerExpressionSyntax);
                 }
-
-                
             }
 
 
             return GetDefaultForSpecialType(type);
         }
 
-        private SyntaxNode GetDefaultForSpecialType(ITypeSymbol type)
+
+        private static readonly SyntaxNode UnknownDefault = SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal("/*TODO: provide value*/"));
+        private static readonly PredefinedTypeSyntax ObjectType = SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.ObjectKeyword));
+
+        private static readonly Dictionary<SpecialType, SyntaxNode> WellKnowDefaults = new Dictionary<SpecialType, SyntaxNode>()
         {
-            switch (type.SpecialType)
-            {
-                case SpecialType.System_Boolean:
-                    return syntaxGenerator.LiteralExpression(true);
-                case SpecialType.System_SByte:
-                    return syntaxGenerator.LiteralExpression(1);
-                case SpecialType.System_Int16:
-                    return  syntaxGenerator.LiteralExpression(16);
-                case SpecialType.System_Int32:
-                    return syntaxGenerator.LiteralExpression(32);
-                case SpecialType.System_Int64:
-                    return syntaxGenerator.LiteralExpression(64);
-                case SpecialType.System_Byte:
-                    return syntaxGenerator.LiteralExpression(1);
-                case SpecialType.System_UInt16:
-                    return syntaxGenerator.LiteralExpression(16u);
-                case SpecialType.System_UInt32:
-                    return syntaxGenerator.LiteralExpression(32u);
-                case SpecialType.System_UInt64:
-                    return syntaxGenerator.LiteralExpression(64u);
-                case SpecialType.System_Single:
-                    return syntaxGenerator.LiteralExpression(1.0f);
-                case SpecialType.System_Double:
-                    return syntaxGenerator.LiteralExpression(1.0);
-                case SpecialType.System_Char:
-                    return syntaxGenerator.LiteralExpression('a');
-                case SpecialType.System_String:
-                    return syntaxGenerator.LiteralExpression("lorem ipsum");
-                case SpecialType.System_Decimal:
-                    return syntaxGenerator.LiteralExpression(2.0m);
-                case SpecialType.System_DateTime:
-                    return syntaxGenerator.MemberAccessExpression(SyntaxFactory.IdentifierName("DateTime"), "Now");
-                case SpecialType.System_Object:
-                    return SyntaxFactory.ObjectCreationExpression((TypeSyntax) syntaxGenerator.TypeExpression(type),
-                        SyntaxFactory.ArgumentList(), default(InitializerExpressionSyntax));
-                default:
-                    return syntaxGenerator.LiteralExpression("/*TODO: provide value*/");
-            }
-        }
+                [SpecialType.System_Boolean] = SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression),
+                [SpecialType.System_SByte] = SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(1)),
+                [SpecialType.System_Int16] = SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(16)),
+                [SpecialType.System_Int32] = SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(32)),
+                [SpecialType.System_Int64] = SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(64)),
+                [SpecialType.System_Byte] = SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(1)),
+                [SpecialType.System_UInt16] = SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(16u)),
+                [SpecialType.System_UInt32] = SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(32u)),
+                [SpecialType.System_UInt64] = SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(64u)),
+                [SpecialType.System_Single] = SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(1.0f)),
+                [SpecialType.System_Double] = SyntaxFactory.LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(1.0)),
+                [SpecialType.System_Char] = SyntaxFactory.LiteralExpression(SyntaxKind.CharacterLiteralExpression, SyntaxFactory.Literal('a')),
+                [SpecialType.System_String] = SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal("lorem ipsum")),
+                [SpecialType.System_Decimal] = SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(2.0m)),
+                [SpecialType.System_DateTime] = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,SyntaxFactory.IdentifierName("DateTime"), SyntaxFactory.IdentifierName("Now")),
+                [SpecialType.System_Object] = SyntaxFactory.ObjectCreationExpression(ObjectType).WithArgumentList(SyntaxFactory.ArgumentList())
+        };
+
+        private SyntaxNode GetDefaultForSpecialType(ITypeSymbol type) => WellKnowDefaults.TryGetValue(type.SpecialType, out var res) ? res : UnknownDefault;
 
         private SyntaxNode GetDefaultForUnknownType(ITypeSymbol type)
         {

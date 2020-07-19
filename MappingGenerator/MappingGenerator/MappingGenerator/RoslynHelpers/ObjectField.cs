@@ -1,4 +1,6 @@
+using System;
 using MappingGenerator.Mappings;
+using MappingGenerator.Mappings.SourceFinders;
 using Microsoft.CodeAnalysis;
 
 namespace MappingGenerator.RoslynHelpers
@@ -10,11 +12,12 @@ namespace MappingGenerator.RoslynHelpers
         public ObjectField(IFieldSymbol fieldSymbol)
         {
             this.fieldSymbol = fieldSymbol;
+            this.Type = new AnnotatedType(fieldSymbol.Type);
         }
 
         public string Name => fieldSymbol.Name;
 
-        public ITypeSymbol Type => fieldSymbol.Type;
+        public AnnotatedType Type { get; }
 
         public bool CanBeSet(ITypeSymbol via, MappingContext mappingContext)
         {

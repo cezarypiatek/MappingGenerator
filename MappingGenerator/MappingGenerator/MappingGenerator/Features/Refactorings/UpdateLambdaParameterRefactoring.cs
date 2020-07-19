@@ -54,10 +54,12 @@ namespace MappingGenerator.Features.Refactorings
             yield return new LocalScopeMappingSourceFinder(semanticModel, localSymbols);
             foreach (var localSymbol in localSymbols)
             {
+                
                 var symbolType = semanticModel.GetTypeForSymbol(localSymbol);
+                
                 if (symbolType !=null && ObjectHelper.IsSimpleType(symbolType) == false)
                 {
-                    yield return new ObjectMembersMappingSourceFinder(symbolType, SyntaxFactory.IdentifierName(localSymbol.Name), syntaxGenerator);
+                    yield return new ObjectMembersMappingSourceFinder(new AnnotatedType(symbolType), SyntaxFactory.IdentifierName(localSymbol.Name), syntaxGenerator);
                 }
             }
         }

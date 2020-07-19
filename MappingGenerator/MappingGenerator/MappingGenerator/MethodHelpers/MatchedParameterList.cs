@@ -2,6 +2,7 @@
 using System.Linq;
 using MappingGenerator.Mappings;
 using MappingGenerator.Mappings.MappingImplementors;
+using MappingGenerator.Mappings.SourceFinders;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -55,8 +56,8 @@ namespace MappingGenerator.MethodHelpers
                     return list;
                 }
 
-                var parameterType = match.Parameter.Type;
-                var expression = mappingEngine.MapExpression(match.Source, parameterType, mappingContext)?.Expression ?? mappingEngine.CreateDefaultExpression(parameterType);
+                var parameterType =new AnnotatedType(match.Parameter.Type);
+                var expression = mappingEngine.MapExpression(match.Source, parameterType, mappingContext)?.Expression ?? mappingEngine.CreateDefaultExpression(parameterType.Type);
                 var argument = generateNamedParameters
                     ? SyntaxFactory.Argument(SyntaxFactory.NameColon(match.Parameter.Name), SyntaxFactory.Token(SyntaxKind.None), expression)
                     : SyntaxFactory.Argument(expression);

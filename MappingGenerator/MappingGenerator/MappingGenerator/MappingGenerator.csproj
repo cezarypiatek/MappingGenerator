@@ -30,6 +30,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="2.8.2" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Features" Version="2.0.0" PrivateAssets="all" />
     <PackageReference Include="Pluralize.NET" Version="0.1.84" PrivateAssets="all" />
+    <PackageReference Include="SmartAnalyzers.CSharpExtensions.Annotations" Version="2.5.65" />
     <PackageReference Update="NETStandard.Library" PrivateAssets="all" />
   </ItemGroup>
 

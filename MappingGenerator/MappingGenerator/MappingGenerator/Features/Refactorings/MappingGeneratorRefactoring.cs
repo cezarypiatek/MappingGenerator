@@ -38,7 +38,7 @@ namespace MappingGenerator.Features.Refactorings
             switch (node)
             {
                 case BaseMethodDeclarationSyntax methodDeclaration when IsMappingMethodCandidate(methodDeclaration):
-                    if (methodDeclaration.Parent.Kind() != SyntaxKind.InterfaceDeclaration )
+                    if (methodDeclaration.Parent?.Kind() != SyntaxKind.InterfaceDeclaration )
                     {
                         var semanticModel = await context.Document.GetSemanticModelAsync();
                         var methodSymbol = semanticModel.GetDeclaredSymbol(methodDeclaration);

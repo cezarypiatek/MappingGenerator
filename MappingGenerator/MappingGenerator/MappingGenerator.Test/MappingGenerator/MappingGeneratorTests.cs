@@ -225,6 +225,12 @@ namespace MappingGenerator.Test.Mapping
         {
             TestCodeRefactoring(_035_ConstructorInitializeFIelds, _035_ConstructorInitializeFIelds_FIXED, 1);
         }
+        
+        [Test]
+        public void should_handle_nullable_references()
+        {
+            TestCodeRefactoring(_036_PureMappingMethodWithNullable, _036_PureMappingMethodWithNullable_FIXED, 1);
+        }
 
         protected override string LanguageName => LanguageNames.CSharp;
 

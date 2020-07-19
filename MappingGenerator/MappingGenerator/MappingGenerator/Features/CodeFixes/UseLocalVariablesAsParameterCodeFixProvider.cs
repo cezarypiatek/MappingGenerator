@@ -126,7 +126,8 @@ namespace MappingGenerator.Features.CodeFixes
                 return document;
             }
 
-            var sourceElementType = ((INamedTypeSymbol)mappingOverload.Parameters[0].Type).TypeArguments[0];
+            var parameterType = ((INamedTypeSymbol)mappingOverload.Parameters[0].Type);
+            var sourceElementType = parameterType.TypeArguments[0];
             var targetElementType = GetExpressionType(semanticModel, invocation);
             if (targetElementType == null)
             {
@@ -134,7 +135,8 @@ namespace MappingGenerator.Features.CodeFixes
             }
             
             var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator);
-            var mappingLambda = mappingEngine.CreateMappingLambda("x", sourceElementType, targetElementType, new MappingPath(), new MappingContext(invocation, semanticModel));
+            var sourceListElementType = new AnnotatedType(sourceElementType);
+            var mappingLambda = mappingEngine.CreateMappingLambda("x", sourceListElementType, targetElementType, new MappingPath(), new MappingContext(invocation, semanticModel));
             return await document.ReplaceNodes(invocation, invocation.WithArgumentList(SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument((ExpressionSyntax)mappingLambda))), cancellationToken);
         }
 
@@ -153,7 +155,7 @@ namespace MappingGenerator.Features.CodeFixes
             return false;
         }
 
-        private static ITypeSymbol GetExpressionType(SemanticModel semanticModel, SyntaxNode sourceNodeParent)
+        private static AnnotatedType GetExpressionType(SemanticModel semanticModel, SyntaxNode sourceNodeParent)
         {
             if (sourceNodeParent == null)
             {
@@ -177,8 +179,10 @@ namespace MappingGenerator.Features.CodeFixes
             }
 
             var typeInfo = semanticModel.GetTypeInfo(sourceNodeParent);
-            if (typeInfo.ConvertedType != null && typeInfo.ConvertedType.Kind != SymbolKind.ErrorType && typeInfo.ConvertedType is INamedTypeSymbol nt && nt.TypeArguments.Length >0 && nt.TypeArguments[0] is INamedTypeSymbol)
-                return nt.TypeArguments[0];
+            if (typeInfo.ConvertedType != null && typeInfo.ConvertedType.Kind != SymbolKind.ErrorType && typeInfo.ConvertedType is INamedTypeSymbol nt && nt.TypeArguments.Length > 0 && nt.TypeArguments[0] is INamedTypeSymbol)
+            {
+                return new AnnotatedType(nt.TypeArguments[0]);
+            }
             return GetExpressionType(semanticModel, sourceNodeParent.Parent);
         }
 

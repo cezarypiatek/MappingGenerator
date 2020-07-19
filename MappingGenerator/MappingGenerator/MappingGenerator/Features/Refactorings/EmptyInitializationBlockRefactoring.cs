@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Composition;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using MappingGenerator.Mappings;
@@ -80,7 +81,7 @@ namespace MappingGenerator.Features.Refactorings
                 var symbolType = semanticModel.GetTypeForSymbol(localSymbol);
                 if (symbolType !=null && ObjectHelper.IsSimpleType(symbolType) == false)
                 {
-                    yield return new ObjectMembersMappingSourceFinder(symbolType, SyntaxFactory.IdentifierName(localSymbol.Name), syntaxGenerator);
+                    yield return new ObjectMembersMappingSourceFinder(new AnnotatedType(symbolType), SyntaxFactory.IdentifierName(localSymbol.Name), syntaxGenerator);
                 }
             }
         }
@@ -109,13 +110,13 @@ namespace MappingGenerator.Features.Refactorings
                         var accessor = syntaxGenerator.MemberAccessExpression(syntaxGenerator.IdentifierName(s.Name), syntaxGenerator.IdentifierName("Key"));
                         return (IMappingSourceFinder)new OrderedSourceFinder(new []
                         {
-                            new ObjectMembersMappingSourceFinder(type, syntaxGenerator.IdentifierName(s.Name), syntaxGenerator),
-                            new ObjectMembersMappingSourceFinder(keyType, accessor, syntaxGenerator)
+                            new ObjectMembersMappingSourceFinder(new AnnotatedType(type), syntaxGenerator.IdentifierName(s.Name), syntaxGenerator),
+                            new ObjectMembersMappingSourceFinder(new AnnotatedType(keyType), accessor, syntaxGenerator)
                         });
                     }
                 }
 
-                return new ObjectMembersMappingSourceFinder(type, syntaxGenerator.IdentifierName(s.Name), syntaxGenerator);
+                return new ObjectMembersMappingSourceFinder(new AnnotatedType(type), syntaxGenerator.IdentifierName(s.Name), syntaxGenerator);
             }).Where(x => x != null).ToList();
 
             return new OrderedSourceFinder(queryVariablesSourceFinders);
@@ -128,7 +129,7 @@ namespace MappingGenerator.Features.Refactorings
 
             var lambdaSymbol = semanticModel.GetSymbolInfo(lambdaSyntax).Symbol as IMethodSymbol;
             var firstArgument = lambdaSymbol.Parameters.First();
-            var mappingSourceFinder = new ObjectMembersMappingSourceFinder(firstArgument.Type, generator.IdentifierName(firstArgument.Name), generator);
+            var mappingSourceFinder = new ObjectMembersMappingSourceFinder(new AnnotatedType(firstArgument.Type), generator.IdentifierName(firstArgument.Name), generator);
             return await ReplaceEmptyInitializationBlock(document, objectInitializer, semanticModel, new SingleSourceMatcher(mappingSourceFinder), cancellationToken);
         }
 

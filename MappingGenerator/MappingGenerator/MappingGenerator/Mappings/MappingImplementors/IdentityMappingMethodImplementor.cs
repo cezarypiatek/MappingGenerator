@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using MappingGenerator.Mappings.SourceFinders;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
@@ -16,10 +17,10 @@ namespace MappingGenerator.Mappings.MappingImplementors
         public IEnumerable<SyntaxNode> GenerateImplementation(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel, MappingContext mappingContext)
         {
             var cloneMappingEngine = new CloneMappingEngine(semanticModel, generator);
-            var source = methodSymbol.Parameters[0];
-            var targetType = methodSymbol.ReturnType;
-            var newExpression = cloneMappingEngine.MapExpression((ExpressionSyntax)generator.IdentifierName(source.Name),
-                source.Type, targetType, mappingContext);
+            var sourceParameter = methodSymbol.Parameters[0];
+            var sourceType = new AnnotatedType(sourceParameter.Type);
+            var targetType = new AnnotatedType(methodSymbol.ReturnType);
+            var newExpression = cloneMappingEngine.MapExpression((ExpressionSyntax)generator.IdentifierName(sourceParameter.Name), sourceType, targetType, mappingContext);
             return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };
         }
     }

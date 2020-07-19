@@ -25,16 +25,16 @@ namespace MappingGenerator.Mappings
             return  ObjectHelper.IsSimpleType(targetType) == false && ObjectHelper.IsSimpleType(sourceType) == false;
         }
 
-        protected override MappingElement TryToCreateMappingExpression(MappingElement source, ITypeSymbol targetType,
+        protected override MappingElement TryToCreateMappingExpression(MappingElement source, AnnotatedType targetType,
             MappingPath mappingPath, MappingContext mappingContext)
         {
             //TODO: check if source is not null (conditional member access)
 
-            if (mappingPath.Length > 1 && source.ExpressionType.AllInterfaces.Any(x => x.Name == "ICloneable") && source.ExpressionType.SpecialType!=SpecialType.System_Array)
+            if (mappingPath.Length > 1 && source.ExpressionType.Type.AllInterfaces.Any(x => x.Name == "ICloneable") && source.ExpressionType.Type.SpecialType!=SpecialType.System_Array)
             {
 
                 var invokeClone = syntaxGenerator.InvocationExpression(syntaxGenerator.MemberAccessExpression(source.Expression, "Clone"));
-                var cloneMethods = targetType.GetMembers("Clone").OfType<IMethodSymbol>().Where(m => mappingContext.AccessibilityHelper.IsSymbolAccessible(m, targetType)).ToList();
+                var cloneMethods = targetType.Type.GetMembers("Clone").OfType<IMethodSymbol>().Where(m => mappingContext.AccessibilityHelper.IsSymbolAccessible(m, targetType.Type)).ToList();
                 if (cloneMethods.Any(IsGenericCloneMethod))
                 {
                     return new MappingElement()
@@ -51,18 +51,18 @@ namespace MappingGenerator.Mappings
                     return new MappingElement()
                     {
                         ExpressionType = targetType,
-                        Expression = syntaxGenerator.TryCastExpression(invokeClone, targetType) as ExpressionSyntax
+                        Expression = syntaxGenerator.TryCastExpression(invokeClone, targetType.Type) as ExpressionSyntax
                     };
                 }
 
-                var implicitClone = targetType.GetMembers("System.ICloneable.Clone").FirstOrDefault();
+                var implicitClone = targetType.Type.GetMembers("System.ICloneable.Clone").FirstOrDefault();
                 if (implicitClone!=null)
                 {
                     var castedOnICloneable = syntaxGenerator.CastExpression(SyntaxFactory.ParseTypeName("ICloneable"), source.Expression);
                     return new MappingElement()
                     {
                         ExpressionType = targetType,
-                        Expression = syntaxGenerator.TryCastExpression(syntaxGenerator.InvocationExpression(syntaxGenerator.MemberAccessExpression(castedOnICloneable, "Clone")), targetType) as ExpressionSyntax
+                        Expression = syntaxGenerator.TryCastExpression(syntaxGenerator.InvocationExpression(syntaxGenerator.MemberAccessExpression(castedOnICloneable, "Clone")), targetType.Type) as ExpressionSyntax
                     };
 
                 }

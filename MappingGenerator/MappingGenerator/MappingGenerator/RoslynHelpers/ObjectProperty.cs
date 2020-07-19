@@ -1,5 +1,7 @@
+using System;
 using System.Linq;
 using MappingGenerator.Mappings;
+using MappingGenerator.Mappings.SourceFinders;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -13,11 +15,12 @@ namespace MappingGenerator.RoslynHelpers
         public ObjectProperty(IPropertySymbol property)
         {
             this.property = property;
+            Type = new AnnotatedType(property.Type);
         }
 
         public string Name => property.Name;
 
-        public ITypeSymbol Type => property.Type;
+        public AnnotatedType Type { get; }
 
         public bool CanBeSet(ITypeSymbol via, MappingContext mappingContext)
         {

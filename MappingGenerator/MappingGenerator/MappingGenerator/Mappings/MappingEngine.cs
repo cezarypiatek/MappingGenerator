@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,7 +10,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
-using Microsoft.CodeAnalysis.Simplification;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 namespace MappingGenerator.Mappings
 {
@@ -160,7 +158,7 @@ namespace MappingGenerator.Mappings
             
             if (namedTargetType != null)
             {
-                var directlyMappingConstructor = namedTargetType.Constructors.FirstOrDefault(c => c.Parameters.Length == 1 && c.Parameters[0].Type.Equals(source.ExpressionType));
+                var directlyMappingConstructor = namedTargetType.Constructors.FirstOrDefault(c => c.Parameters.Length == 1 && c.Parameters[0].Type.Equals(source.ExpressionType.Type));
                 if (directlyMappingConstructor != null)
                 {
                     var constructorParameters = SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument(source.Expression));
@@ -302,7 +300,7 @@ namespace MappingGenerator.Mappings
 
         private bool IsUnwrappingNeeded(ITypeSymbol targetType, MappingElement element)
         {
-            return targetType.Equals(element.ExpressionType) == false && (ObjectHelper.IsSimpleType(targetType) || SymbolHelper.IsNullable(targetType, out _));
+            return targetType.Equals(element.ExpressionType.Type) == false && (ObjectHelper.IsSimpleType(targetType) || SymbolHelper.IsNullable(targetType, out _));
         }
 
         private MappingElement TryToUnwrap(AnnotatedType targetType, MappingElement source, MappingContext mappingContext)

@@ -22,8 +22,10 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public string? MiddleName { get; set; }
         public string LastName { get; set; }
         public int Age { get; set; }
-        public AccountDTO Account { get; set; }
-        public List<AccountDTO?> Debs { get; set; }
+        public AccountDTO? Account { get; set; }
+        public AccountDTO Account2 { get; set; }
+        public List<AccountDTO>? Debs { get; set; }
+        public List<AccountDTO> Debs2 { get; set; }
     }
 
     public class AccountDTO
@@ -41,8 +43,10 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public string LastName { get; set; }
         public string? MiddleName { get; set; }
         public int Age { get; set; }
-        public AccountEntity Account { get; set; }
-        public List<AccountEntity> Debs { get; set; }
+        public AccountEntity? Account { get; set; }
+        public AccountEntity? Account2 { get; set; }
+        public List<AccountEntity>? Debs { get; set; }
+        public List<AccountEntity>? Debs2 { get; set; }
     }
 
     public class AccountEntity

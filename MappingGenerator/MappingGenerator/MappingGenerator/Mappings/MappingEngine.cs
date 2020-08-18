@@ -11,7 +11,8 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
-
+using Microsoft.CodeAnalysis.Simplification;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 namespace MappingGenerator.Mappings
 {
 
@@ -30,6 +31,11 @@ namespace MappingGenerator.Mappings
         {
             Type = type;
             CanBeNull = canBeNull;
+        }
+
+        public AnnotatedType AsNotNull()
+        {
+            return new AnnotatedType(Type, false);
         }
     }
 
@@ -158,7 +164,7 @@ namespace MappingGenerator.Mappings
                 if (directlyMappingConstructor != null)
                 {
                     var constructorParameters = SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument(source.Expression));
-                    var creationExpression = syntaxGenerator.ObjectCreationExpression(targetType.Type, constructorParameters.Arguments);
+                    var creationExpression = CreateObject(targetType.Type, constructorParameters);
                     return new MappingElement()
                     {
                         ExpressionType = targetType,
@@ -169,14 +175,16 @@ namespace MappingGenerator.Mappings
 
             if (MappingHelper.IsMappingBetweenCollections(targetType.Type, source.ExpressionType.Type))
             {
+                var shouldHandleNullSafe = source.ExpressionType.CanBeNull ^ targetType.CanBeNull;
+                var collectionMapping = MapCollections(shouldHandleNullSafe? new MappingElement(){Expression = source.Expression, ExpressionType = source.ExpressionType.AsNotNull()}: source, targetType, mappingPath.Clone(), mappingContext) as ExpressionSyntax;
                 return new MappingElement()
                 {
                     ExpressionType = targetType,
-                    Expression = MapCollections(source, targetType, mappingPath.Clone(), mappingContext) as ExpressionSyntax,
+                    Expression = shouldHandleNullSafe ? HandleSafeNull(source, targetType, collectionMapping) : collectionMapping,
                 };
             }
 
-            var subMappingSourceFinder = new ObjectMembersMappingSourceFinder(source.ExpressionType, source.Expression, syntaxGenerator);
+            var subMappingSourceFinder = new ObjectMembersMappingSourceFinder(source.ExpressionType.AsNotNull(), source.Expression, syntaxGenerator);
 
             if (namedTargetType != null)
             {
@@ -186,7 +194,7 @@ namespace MappingGenerator.Mappings
 
                 if (matchedOverload != null)
                 {
-                    var creationExpression = ((ObjectCreationExpressionSyntax)syntaxGenerator.ObjectCreationExpression(targetType.Type, matchedOverload.ToArgumentListSyntax(this, mappingContext).Arguments));
+                    var creationExpression = CreateObject(targetType.Type, matchedOverload.ToArgumentListSyntax(this, mappingContext));
                     var matchedSources = matchedOverload.GetMatchedSources();
                     var restSourceFinder = new IgnorableMappingSourceFinder(subMappingSourceFinder,  foundElement =>
                         {
@@ -201,14 +209,49 @@ namespace MappingGenerator.Mappings
                 }
             }
 
-
-            var objectCreationExpressionSyntax = ((ObjectCreationExpressionSyntax) syntaxGenerator.ObjectCreationExpression(targetType.Type));
+            
+            var objectCreationExpressionSyntax = CreateObject(targetType.Type);
             var subMappingMatcher = new SingleSourceMatcher(subMappingSourceFinder);
+            var objectCreationWithInitializer = AddInitializerWithMapping(objectCreationExpressionSyntax, subMappingMatcher, targetType.Type, mappingContext, mappingPath);
             return new MappingElement()
             {
                 ExpressionType = new AnnotatedType(targetType.Type),
-                Expression = AddInitializerWithMapping(objectCreationExpressionSyntax, subMappingMatcher, targetType.Type, mappingContext, mappingPath),
+                Expression = HandleSafeNull(source, targetType, objectCreationWithInitializer)
             };
+        }
+
+        private ExpressionSyntax HandleSafeNull(MappingElement source, AnnotatedType targetType, ExpressionSyntax objectCreation)
+        {
+            if (source.ExpressionType.CanBeNull)
+            {
+                var condition = BinaryExpression(SyntaxKind.NotEqualsExpression, source.Expression, LiteralExpression(SyntaxKind.NullLiteralExpression));
+                var whenNull = targetType.CanBeNull ? (ExpressionSyntax) LiteralExpression(SyntaxKind.NullLiteralExpression) : ThrowNullArgumentException(source.Expression.ToFullString());
+                return ConditionalExpression(condition, objectCreation, whenNull);
+            }
+            return objectCreation;
+        }
+
+        private static ThrowExpressionSyntax ThrowNullArgumentException(string argumentName)
+        {
+            var argumentNameExpression = LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(argumentName));
+            var errorMessageExpression = LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal($"The value of '{argumentName}' should not be null"));
+            var exceptionTypeName = SyntaxFactory.IdentifierName("System.ArgumentNullException");
+            var exceptionParameters = ArgumentList(new SeparatedSyntaxList<ArgumentSyntax>().AddRange(new []{ Argument(argumentNameExpression) , Argument(errorMessageExpression)}));
+            var throwExpressionSyntax = SyntaxFactory.ThrowExpression(CreateObject(exceptionTypeName, exceptionParameters));
+            return throwExpressionSyntax;
+        }
+
+        private ObjectCreationExpressionSyntax CreateObject(ITypeSymbol type, ArgumentListSyntax argumentList = null)
+        {
+            //type.WithNullableAnnotation(NullableAnnotation.None);
+            var identifierNameSyntax = SyntaxFactory.IdentifierName(type.Name);
+            return CreateObject(identifierNameSyntax, argumentList);
+        }
+
+        private static ObjectCreationExpressionSyntax CreateObject(IdentifierNameSyntax identifierNameSyntax,
+            ArgumentListSyntax argumentList)
+        {
+            return ObjectCreationExpression(identifierNameSyntax).WithArgumentList(argumentList ?? ArgumentList());
         }
 
 
@@ -253,7 +296,7 @@ namespace MappingGenerator.Mappings
                         }
                     }
 
-                    return (ExpressionSyntax)syntaxGenerator.AssignmentStatement(match.Target.Expression, sourceExpression);
+                    return AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, match.Target.Expression, sourceExpression);
                 }).ToList();
         }
 
@@ -362,11 +405,11 @@ namespace MappingGenerator.Mappings
             if (ShouldCreateConversionBetweenTypes(targetListElementType.Type, sourceListElementType.Type))
             {
                 var useConvert = CanUseConvert(source.ExpressionType.Type);
-                var selectAccess =   SyntaxFactoryExtensions.CreateMemberAccessExpression(source.Expression, source.ExpressionType.CanBeNull, useConvert ? "ConvertAll": "Select");
+                var mapMethod = useConvert ? "ConvertAll": "Select";
                 var lambdaParameterName = NameHelper.CreateLambdaParameterName(source.Expression);
                 var mappingLambda = CreateMappingLambda(lambdaParameterName, sourceListElementType, targetListElementType, mappingPath, mappingContext);
-                var selectInvocation = syntaxGenerator.InvocationExpression(selectAccess, mappingLambda);
-                var toList = useConvert? selectInvocation: AddMaterializeCollectionInvocation(syntaxGenerator, selectInvocation, targetListType.Type, false);
+                var selectAccess =   SyntaxFactoryExtensions.CreateMethodAccessExpression(source.Expression, source.ExpressionType.CanBeNull, mapMethod, mappingLambda);
+                var toList = useConvert? selectAccess: AddMaterializeCollectionInvocation(syntaxGenerator, selectAccess, targetListType.Type, false);
                 return MappingHelper.WrapInReadonlyCollectionIfNecessary(toList, isReadonlyCollection, syntaxGenerator);
             }
 
@@ -379,7 +422,7 @@ namespace MappingGenerator.Mappings
             return sourceListType.Name == "List" && sourceListType.GetMembers("ConvertAll").Length != 0;
         }
 
-	    public SyntaxNode CreateMappingLambda(string lambdaParameterName, AnnotatedType sourceListElementType, AnnotatedType targetListElementType, MappingPath mappingPath, MappingContext mappingContext)
+	    public ExpressionSyntax CreateMappingLambda(string lambdaParameterName, AnnotatedType sourceListElementType, AnnotatedType targetListElementType, MappingPath mappingPath, MappingContext mappingContext)
         {
             var source = new MappingElement()
             {
@@ -389,7 +432,7 @@ namespace MappingGenerator.Mappings
             };
             var listElementMappingStm = MapExpression(source, targetListElementType, mappingContext, mappingPath);
 
-		    return syntaxGenerator.ValueReturningLambdaExpression(lambdaParameterName, listElementMappingStm.Expression);
+		    return (ExpressionSyntax) syntaxGenerator.ValueReturningLambdaExpression(lambdaParameterName, listElementMappingStm.Expression);
 	    }
 
         private static SyntaxNode AddMaterializeCollectionInvocation(SyntaxGenerator generator, SyntaxNode sourceAccess, ITypeSymbol targetListType, bool isSourceNullable)

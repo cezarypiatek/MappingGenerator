@@ -18,16 +18,26 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                 MiddleName = entity.MiddleName,
                 LastName = entity.LastName,
                 Age = entity.Age,
-                Account = new AccountDTO()
+                Account = entity.Account != null ? new AccountDTO()
                 {
                     BankName = entity.Account.BankName,
                     Number = entity.Account.Number
-                },
-                Debs = entity.Debs.ConvertAll(entityDeb => new AccountDTO()
+                } : null,
+                Account2 = entity.Account2 != null ? new AccountDTO()
+                {
+                    BankName = entity.Account2.BankName,
+                    Number = entity.Account2.Number
+                } : throw new System.ArgumentNullException("entity.Account2", "The value of 'entity.Account2' should not be null"),
+                Debs = entity.Debs?.ConvertAll(entityDeb => new AccountDTO()
                 {
                     BankName = entityDeb.BankName,
                     Number = entityDeb.Number
-                })
+                }),
+                Debs2 = entity.Debs2 != null ? entity.Debs2.ConvertAll(entityDebs2 => new AccountDTO()
+                {
+                    BankName = entityDebs2.BankName,
+                    Number = entityDebs2.Number
+                }) : throw new System.ArgumentNullException("entity.Debs2", "The value of 'entity.Debs2' should not be null")
             };
         }
     }
@@ -39,8 +49,10 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public string? MiddleName { get; set; }
         public string LastName { get; set; }
         public int Age { get; set; }
-        public AccountDTO Account { get; set; }
-        public List<AccountDTO?> Debs { get; set; }
+        public AccountDTO? Account { get; set; }
+        public AccountDTO Account2 { get; set; }
+        public List<AccountDTO>? Debs { get; set; }
+        public List<AccountDTO> Debs2 { get; set; }
     }
 
     public class AccountDTO
@@ -58,8 +70,10 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public string LastName { get; set; }
         public string? MiddleName { get; set; }
         public int Age { get; set; }
-        public AccountEntity Account { get; set; }
-        public List<AccountEntity> Debs { get; set; }
+        public AccountEntity? Account { get; set; }
+        public AccountEntity? Account2 { get; set; }
+        public List<AccountEntity>? Debs { get; set; }
+        public List<AccountEntity>? Debs2 { get; set; }
     }
 
     public class AccountEntity

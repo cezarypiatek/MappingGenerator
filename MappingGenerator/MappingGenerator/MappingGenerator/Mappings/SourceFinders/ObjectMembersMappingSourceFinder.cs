@@ -27,23 +27,23 @@ namespace MappingGenerator.Mappings.SourceFinders
 
             return MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, expressionSyntax, IdentifierName(memberName));
         }
-        public static ExpressionSyntax CreateMethodAccessExpression(ExpressionSyntax expressionSyntax, bool isExpressionNullable, string methodName, ExpressionSyntax argument = null)
+        public static ExpressionSyntax CreateMethodAccessExpression(ExpressionSyntax expressionSyntax, bool isExpressionNullable, string methodName, params ExpressionSyntax[] arguments)
         {
             if (isExpressionNullable)
             {
                 var invocationExpression = InvocationExpression(MemberBindingExpression(IdentifierName(methodName)));
-                if (argument != null)
+                if (arguments != null && arguments.Length >0)
                 {
-                    invocationExpression = invocationExpression.WithArgumentList(ArgumentList(SeparatedList(new[] {Argument(argument)})));
+                    invocationExpression = invocationExpression.WithArgumentList(ArgumentList(SeparatedList(arguments.Select(Argument))));
                 }
                 return ConditionalAccessExpression(expressionSyntax, invocationExpression);
             }
             else
             {
                 var invocationExpression = InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, expressionSyntax, IdentifierName(methodName)));
-                if (argument != null)
+                if (arguments != null && arguments.Length > 0)
                 {
-                    invocationExpression = invocationExpression.WithArgumentList(ArgumentList(SeparatedList(new[] { Argument(argument) })));
+                    invocationExpression = invocationExpression.WithArgumentList(ArgumentList(SeparatedList(arguments.Select(Argument))));
                 }
                 return invocationExpression;
             }

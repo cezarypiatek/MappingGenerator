@@ -58,7 +58,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                     BuildingNo = entityExtraAddress.BuildingNo
                 }).ToImmutableArray(),
                 UnitId = entity.Unit.Id,
-                ExtraSavings = entity.ExtraSavings.Value,
+                ExtraSavings = entity.ExtraSavings != null ? entity.ExtraSavings.Value : throw new System.ArgumentNullException(nameof(entity), "The value of 'entity.ExtraSavings' should not be null"),
                 Savings = entity.Savings,
                 Birthday = entity.Birthday,
                 Authentication = entity.Authentication,

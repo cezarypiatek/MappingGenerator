@@ -1,0 +1,141 @@
+﻿#nullable enable
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Collections.ObjectModel;
+using System.Collections.Immutable;
+
+namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+{
+    public class UserDTO
+    {
+        public UserDTO(UserEntity? entity)
+        {
+            Id = entity?.Id ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Id' should not be null");
+            FirstName = entity?.FirstName ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.FirstName' should not be null");
+            MiddleName = entity?.MiddleName;
+            LastName = entity?.LastName ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.LastName' should not be null");
+            Age = entity?.Age ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Age' should not be null");
+            Account = entity?.Account != null ? new AccountDTO()
+            {
+                BankName = entity?.Account.BankName,
+                Number = entity?.Account.Number
+            } : null;
+            Account2 = entity?.Account2 != null ? new AccountDTO()
+            {
+                BankName = entity?.Account2.BankName,
+                Number = entity?.Account2.Number
+            } : throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Account2' should not be null");
+            Debs = entity?.Debs?.ConvertAll(entityDeb => new AccountDTO()
+            {
+                BankName = entityDeb.BankName,
+                Number = entityDeb.Number
+            });
+            Debs2 = entity?.Debs2?.ConvertAll(entityDebs2 => new AccountDTO()
+            {
+                BankName = entityDebs2.BankName,
+                Number = entityDebs2.Number
+            }) ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Debs2' should not be null");
+            AddressCity = entity?.Address?.City ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Address?.City' should not be null");
+            AddressZipCode = entity?.Address?.ZipCode ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Address?.ZipCode' should not be null");
+            AddressStreet = entity?.Address?.Street ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Address?.Street' should not be null");
+            AddressFlatNo = entity?.Address?.FlatNo;
+            AddressBuildingNo = entity?.Address?.BuildingNo ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Address?.BuildingNo' should not be null");
+            Address1 = entity?.Address1 != null ? new AddressDTO(entity?.Address1) : throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Address1' should not be null");
+            Address2 = entity?.Address2 != null ? new AddressDTO(entity?.Address2) : null;
+            Address3 = entity?.Address3?.Where(entityAddress3 => entityAddress3 != null).Select(entityAddress3 => new AddressDTO(entityAddress3)).ToList() ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Address3' should not be null");
+            Address4 = entity?.Address4?.ConvertAll(entityAddress4 => entityAddress4 != null ? new AddressDTO(entityAddress4) : null) ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Address4' should not be null");
+            Address5 = entity?.Address5?.ConvertAll(entityAddress5 => entityAddress5 != null ? new AddressDTO(entityAddress5) : null) ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Address5' should not be null");
+            Address6 = entity?.Address6?.Where(entityAddress6 => entityAddress6 != null).Select(entityAddress6 => new AddressDTO(entityAddress6)).ToList() ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Address6' should not be null");
+            Total = entity?.GetTotal()?.Value ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.GetTotal()' should not be null");
+            UnitId = entity?.Unit?.Id ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Unit?.Id' should not be null");
+        }
+
+        public int Id {get; set;}
+        public string FirstName { get; set; }
+        public string? MiddleName { get; set; }
+        public string LastName { get; set; }
+        public int Age { get; set; }
+        public AccountDTO? Account { get; set; }
+        public AccountDTO Account2 { get; set; }
+        public List<AccountDTO>? Debs { get; set; }
+        public List<AccountDTO> Debs2 { get; set; }
+        public string AddressCity { get; set; }
+        public string AddressZipCode { get; set; }
+        public string AddressStreet { get; set; }
+        public string? AddressFlatNo { get; set; }
+        public string AddressBuildingNo { get; set; }
+        public AddressDTO Address1 { get; set; }
+        public AddressDTO? Address2 { get; set; }
+        public List<AddressDTO> Address3 { get; set; }
+        public List<AddressDTO?> Address4 { get; set; }
+        public List<AddressDTO?> Address5 { get; set; }
+        public List<AddressDTO> Address6 { get; set; }
+        public int Total { get; set; }
+        public int UnitId { get; set; }
+    }
+
+    public class AccountDTO
+    {
+        public string BankName { get; set; }
+        public string Number { get; set; }
+    }
+
+    public class AddressDTO
+    {
+        public string City { get; set; }
+        public string ZipCode { get; set; }
+        public string Street { get; set; }
+        public string FlatNo { get; set; }
+        public string BuildingNo { get; set; }
+
+        public AddressDTO(AddressEntity entity)
+        {
+        }
+    }
+
+    //---- Entities
+
+    public class UserEntity
+    {
+        public int Id {get; set;}
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string? MiddleName { get; set; }
+        public int Age { get; set; }
+        public AccountEntity? Account { get; set; }
+        public AccountEntity? Account2 { get; set; }
+        public List<AccountEntity>? Debs { get; set; }
+        public List<AccountEntity>? Debs2 { get; set; }
+        public AddressEntity? Address { get; set; }
+        public AddressEntity? Address1 { get; set; }
+        public AddressEntity? Address2 { get; set; }
+        public List<AddressEntity?> Address3 { get; set; }
+        public List<AddressEntity?> Address4 { get; set; }
+        public List<AddressEntity?>? Address5 { get; set; }
+        public List<AddressEntity?>? Address6 { get; set; }
+        public int? GetTotal() => throw new Exception();
+        public UnitEntity? Unit { get; set; }
+    }
+
+    public class AccountEntity
+    {
+        public string BankName { get; set; }
+        public string Number { get; set; }
+    }
+
+    public class AddressEntity
+    {
+        public string City { get; set; }
+        public string ZipCode { get; set; }
+        public string Street { get; set; }
+        public string FlatNo { get; set; }
+        public string BuildingNo { get; set; }
+    }
+
+    public class UnitEntity
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+}

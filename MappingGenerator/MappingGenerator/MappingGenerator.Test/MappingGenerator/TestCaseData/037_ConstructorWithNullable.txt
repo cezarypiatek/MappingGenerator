@@ -7,16 +7,13 @@ using System.Collections.Immutable;
 
 namespace MappingGenerator.Test.MappingGenerator.TestCaseData
 {
-    public class TestMapper
+    public class UserDTO
     {
-        public static UserDTO [|Map|](UserEntity? entity)
+        public [|UserDTO|](UserEntity? entity)
         {
             throw new NotImplementedException();
         }
-    }
 
-    public class UserDTO
-    {
         public int Id {get; set;}
         public string FirstName { get; set; }
         public string? MiddleName { get; set; }

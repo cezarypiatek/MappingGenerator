@@ -227,6 +227,12 @@ namespace MappingGenerator.Test.Mapping
         }
         
         [Test]
+        public void should_handle_nullable_references_in_constructor()
+        {
+            TestCodeRefactoring(_037_ConstructorWithNullable, _037_ConstructorWithNullable_FIXED, 1);
+        }
+        
+        [Test]
         public void should_handle_nullable_references()
         {
             TestCodeRefactoring(_036_PureMappingMethodWithNullable, _036_PureMappingMethodWithNullable_FIXED, 1);

@@ -340,4 +340,10 @@
   <data name="_036_PureMappingMethodWithNullable_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>TestCaseData\036_PureMappingMethodWithNullable_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="_037_ConstructorWithNullable" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\037_ConstructorWithNullable.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_037_ConstructorWithNullable_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\037_ConstructorWithNullable_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

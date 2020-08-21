@@ -1991,7 +1991,7 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///{
         ///    public class TestMapper
         ///    {
-        ///        public static UserDTO [|Map|](UserEntity entity)
+        ///        public static UserDTO [|Map|](UserEntity? entity)
         ///        {
         ///            throw new NotImplementedException();
         ///        }
@@ -1999,8 +1999,8 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///
         ///    public class UserDTO
         ///    {
-        ///        public override int Id {get; set;}
-        ///        public string FirstN [rest of string was truncated]&quot;;.
+        ///        public int Id {get; set;}
+        ///        public string FirstName { ge [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _036_PureMappingMethodWithNullable {
             get {
@@ -2020,17 +2020,70 @@ namespace MappingGenerator.Test.MappingGenerator {
         ///{
         ///    public class TestMapper
         ///    {
-        ///        public static UserDTO [|Map|](UserEntity entity)
+        ///        public static UserDTO Map(UserEntity? entity)
         ///        {
-        ///            return new UserDTO()
+        ///            return entity != null ? new UserDTO()
         ///            {
         ///                Id = entity.Id,
         ///                FirstName = entity.FirstName,
-        ///                MiddleName = entity.MiddleName [rest of string was truncated]&quot;;.
+        ///                MiddleName = ent [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _036_PureMappingMethodWithNullable_FIXED {
             get {
                 return ResourceManager.GetString("_036_PureMappingMethodWithNullable_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #nullable enable
+        ///using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///using System.Collections.Immutable;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class UserDTO
+        ///    {
+        ///        public [|UserDTO|](UserEntity? entity)
+        ///        {
+        ///            throw new NotImplementedException();
+        ///        }
+        ///
+        ///        public int Id {get; set;}
+        ///        public string FirstName { get; set; }
+        ///        public string? MiddleName { get; se [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _037_ConstructorWithNullable {
+            get {
+                return ResourceManager.GetString("_037_ConstructorWithNullable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #nullable enable
+        ///using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///using System.Collections.Immutable;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class UserDTO
+        ///    {
+        ///        public UserDTO(UserEntity? entity)
+        ///        {
+        ///            Id = entity?.Id,
+        ///            FirstName = entity?.FirstName,
+        ///            MiddleName = entity?.MiddleName,
+        ///            LastName = entity?.LastName,
+        ///            Age = entity?.Age, [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _037_ConstructorWithNullable_FIXED {
+            get {
+                return ResourceManager.GetString("_037_ConstructorWithNullable_FIXED", resourceCulture);
             }
         }
     }

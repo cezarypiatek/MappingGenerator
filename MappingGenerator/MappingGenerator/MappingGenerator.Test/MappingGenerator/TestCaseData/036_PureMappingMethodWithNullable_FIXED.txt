@@ -27,29 +27,31 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                 {
                     BankName = entity.Account2.BankName,
                     Number = entity.Account2.Number
-                } : throw new System.ArgumentNullException(nameof(entity), "The value of 'entity.Account2' should not be null"),
+                } : throw new ArgumentNullException(nameof(entity), "The value of 'entity.Account2' should not be null"),
                 Debs = entity.Debs?.ConvertAll(entityDeb => new AccountDTO()
                 {
                     BankName = entityDeb.BankName,
                     Number = entityDeb.Number
                 }),
-                Debs2 = entity.Debs2 != null ? entity.Debs2.ConvertAll(entityDebs2 => new AccountDTO()
+                Debs2 = entity.Debs2?.ConvertAll(entityDebs2 => new AccountDTO()
                 {
                     BankName = entityDebs2.BankName,
                     Number = entityDebs2.Number
-                }) : throw new System.ArgumentNullException(nameof(entity), "The value of 'entity.Debs2' should not be null"),
-                AddressCity = entity.Address?.City != null ? entity.Address?.City : throw new System.ArgumentNullException(nameof(entity), "The value of 'entity.Address?.City' should not be null"),
-                AddressZipCode = entity.Address?.ZipCode != null ? entity.Address?.ZipCode : throw new System.ArgumentNullException(nameof(entity), "The value of 'entity.Address?.ZipCode' should not be null"),
-                AddressStreet = entity.Address?.Street != null ? entity.Address?.Street : throw new System.ArgumentNullException(nameof(entity), "The value of 'entity.Address?.Street' should not be null"),
+                }) ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.Debs2' should not be null"),
+                AddressCity = entity.Address?.City ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.Address?.City' should not be null"),
+                AddressZipCode = entity.Address?.ZipCode ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.Address?.ZipCode' should not be null"),
+                AddressStreet = entity.Address?.Street ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.Address?.Street' should not be null"),
                 AddressFlatNo = entity.Address?.FlatNo,
-                AddressBuildingNo = entity.Address?.BuildingNo != null ? entity.Address?.BuildingNo : throw new System.ArgumentNullException(nameof(entity), "The value of 'entity.Address?.BuildingNo' should not be null"),
-                Address1 = entity.Address1 != null ? new AddressDTO(entity.Address1) : throw new System.ArgumentNullException(nameof(entity), "The value of 'entity.Address1' should not be null"),
+                AddressBuildingNo = entity.Address?.BuildingNo ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.Address?.BuildingNo' should not be null"),
+                Address1 = entity.Address1 != null ? new AddressDTO(entity.Address1) : throw new ArgumentNullException(nameof(entity), "The value of 'entity.Address1' should not be null"),
                 Address2 = entity.Address2 != null ? new AddressDTO(entity.Address2) : null,
                 Address3 = entity.Address3.Where(entityAddress3 => entityAddress3 != null).Select(entityAddress3 => new AddressDTO(entityAddress3)).ToList(),
                 Address4 = entity.Address4.ConvertAll(entityAddress4 => entityAddress4 != null ? new AddressDTO(entityAddress4) : null),
-                Address5 = entity.Address5 != null ? entity.Address5.ConvertAll(entityAddress5 => entityAddress5 != null ? new AddressDTO(entityAddress5) : null) : throw new System.ArgumentNullException(nameof(entity), "The value of 'entity.Address5' should not be null"),
-                Address6 = entity.Address6 != null ? entity.Address6.Where(entityAddress6 => entityAddress6 != null).Select(entityAddress6 => new AddressDTO(entityAddress6)).ToList() : throw new System.ArgumentNullException(nameof(entity), "The value of 'entity.Address6' should not be null")
-            } : throw new System.ArgumentNullException(nameof(entity), "The value of 'entity' should not be null");
+                Address5 = entity.Address5?.ConvertAll(entityAddress5 => entityAddress5 != null ? new AddressDTO(entityAddress5) : null) ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.Address5' should not be null"),
+                Address6 = entity.Address6?.Where(entityAddress6 => entityAddress6 != null).Select(entityAddress6 => new AddressDTO(entityAddress6)).ToList() ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.Address6' should not be null"),
+                Total = entity.GetTotal()?.Value ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.GetTotal()' should not be null"),
+                UnitId = entity.Unit?.Id ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.Unit?.Id' should not be null")
+            } : throw new ArgumentNullException(nameof(entity), "The value of 'entity' should not be null");
         }
     }
 
@@ -75,6 +77,8 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public List<AddressDTO?> Address4 { get; set; }
         public List<AddressDTO?> Address5 { get; set; }
         public List<AddressDTO> Address6 { get; set; }
+        public int Total { get; set; }
+        public int UnitId { get; set; }
     }
 
     public class AccountDTO
@@ -116,6 +120,8 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public List<AddressEntity?> Address4 { get; set; }
         public List<AddressEntity?>? Address5 { get; set; }
         public List<AddressEntity?>? Address6 { get; set; }
+        public int? GetTotal() => throw new Exception();
+        public UnitEntity? Unit { get; set; }
     }
 
     public class AccountEntity
@@ -131,5 +137,11 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public string Street { get; set; }
         public string FlatNo { get; set; }
         public string BuildingNo { get; set; }
+    }
+
+    public class UnitEntity
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
     }
 }

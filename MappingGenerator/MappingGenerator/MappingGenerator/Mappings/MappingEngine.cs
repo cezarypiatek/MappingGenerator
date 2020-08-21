@@ -108,16 +108,25 @@ namespace MappingGenerator.Mappings
 
             if (ObjectHelper.IsSimpleType(targetType.Type) && SymbolHelper.IsNullable(sourceType.Type, out var underlyingType) )
             {
-                source = new MappingElement
+                return new MappingElement
                 {
-                    Expression =  HandleSafeNull(source, targetType, (ExpressionSyntax)syntaxGenerator.MemberAccessExpression(source.Expression, "Value")),
+                    Expression =  OrFailWhenNull(SyntaxFactoryExtensions.CreateMemberAccessExpression(source.Expression, true, "Value"), source.Expression.ToFullString()),
                     ExpressionType = new AnnotatedType(underlyingType, false)
                 };
             }
 
-            if (IsUnwrappingNeeded(targetType.Type, source))
+            if (IsConversionToSimpleTypeNeeded(targetType.Type, source.ExpressionType.Type))
             {
-                return TryToUnwrap(targetType, source, mappingContext);
+                var conversion = ConvertToSimpleType(targetType, source, mappingContext);
+                if (targetType.CanBeNull == false && conversion.ExpressionType.CanBeNull)
+                {
+                    return new MappingElement
+                    {
+                        ExpressionType = conversion.ExpressionType.AsNotNull(),
+                        Expression = OrFailWhenNull(conversion.Expression)
+                    };
+                }
+                return conversion;
             }
 
             if (ShouldCreateConversionBetweenTypes(targetType.Type, sourceType.Type))
@@ -128,13 +137,18 @@ namespace MappingGenerator.Mappings
 
             if (source.ExpressionType.Type.Equals(targetType.Type) && source.ExpressionType.CanBeNull && targetType.CanBeNull == false)
             {
-                return new MappingElement()
+                return new MappingElement
                 {
-                    Expression = HandleSafeNull(source, targetType, source.Expression),
+                    Expression = OrFailWhenNull(source.Expression),
                     ExpressionType = source.ExpressionType.AsNotNull()
                 };
             }
             return source;
+        }
+
+        private static BinaryExpressionSyntax OrFailWhenNull(ExpressionSyntax expression, string messageExpression = null)
+        {
+            return BinaryExpression(SyntaxKind.CoalesceExpression, expression, ThrowNullArgumentException(messageExpression ?? expression.ToFullString()));
         }
 
         protected virtual bool ShouldCreateConversionBetweenTypes(ITypeSymbol targetType, ITypeSymbol sourceType)
@@ -154,10 +168,10 @@ namespace MappingGenerator.Mappings
                 {
                     var creationExpression = CreateObject(targetType.Type, SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument(source.Expression)));
                     var shouldProtectAgainstNull = directlyMappingConstructor.Parameters[0].Type.CanBeNull() == false && source.ExpressionType.CanBeNull;
-                    return new MappingElement()
+                    return new MappingElement
                     {
                         ExpressionType = targetType,
-                        Expression = shouldProtectAgainstNull? HandleSafeNull(source, targetType, creationExpression): creationExpression
+                        Expression = shouldProtectAgainstNull ? HandleSafeNull(source, targetType, creationExpression) : creationExpression
                     };
                 }
             }
@@ -165,11 +179,11 @@ namespace MappingGenerator.Mappings
             if (MappingHelper.IsMappingBetweenCollections(targetType.Type, source.ExpressionType.Type))
             {
                 var shouldProtectAgainstNull = source.ExpressionType.CanBeNull && targetType.CanBeNull == false;
-                var collectionMapping = MapCollections(shouldProtectAgainstNull? new MappingElement(){Expression = source.Expression, ExpressionType = source.ExpressionType.AsNotNull()}: source, targetType, mappingPath.Clone(), mappingContext) as ExpressionSyntax;
-                return new MappingElement()
+                var collectionMapping = MapCollections(source, targetType, mappingPath.Clone(), mappingContext) as ExpressionSyntax;
+                return new MappingElement
                 {
                     ExpressionType = targetType,
-                    Expression = shouldProtectAgainstNull ? HandleSafeNull(source, targetType, collectionMapping) : collectionMapping,
+                    Expression = shouldProtectAgainstNull ? OrFailWhenNull(collectionMapping, source.Expression.ToFullString()) : collectionMapping,
                 };
             }
 
@@ -222,10 +236,10 @@ namespace MappingGenerator.Mappings
 
         private static ThrowExpressionSyntax ThrowNullArgumentException(string expressionText)
         {
-            var methodArgumentName = expressionText.Contains(".")?  expressionText.Substring(0, expressionText.IndexOf('.')): expressionText;
+            var methodArgumentName = (expressionText.Contains(".")?  expressionText.Substring(0, expressionText.IndexOf('.')): expressionText).TrimEnd('?');
             var nameofInvocation=  InvocationExpression(IdentifierName("nameof")).WithArgumentList(ArgumentList(SingletonSeparatedList<ArgumentSyntax>(Argument(IdentifierName(methodArgumentName)))));
             var errorMessageExpression = LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal($"The value of '{expressionText}' should not be null"));
-            var exceptionTypeName = SyntaxFactory.IdentifierName("System.ArgumentNullException");
+            var exceptionTypeName = SyntaxFactory.IdentifierName("ArgumentNullException");
             var exceptionParameters = ArgumentList(new SeparatedSyntaxList<ArgumentSyntax>().AddRange(new []{ Argument(nameofInvocation) , Argument(errorMessageExpression)}));
             var throwExpressionSyntax = SyntaxFactory.ThrowExpression(CreateObject(exceptionTypeName, exceptionParameters));
             return throwExpressionSyntax;
@@ -290,12 +304,12 @@ namespace MappingGenerator.Mappings
                 }).ToList();
         }
 
-        private bool IsUnwrappingNeeded(ITypeSymbol targetType, MappingElement element)
+        private bool IsConversionToSimpleTypeNeeded(ITypeSymbol targetType, ITypeSymbol sourceType)
         {
-            return targetType.Equals(element.ExpressionType.Type) == false && (ObjectHelper.IsSimpleType(targetType) || SymbolHelper.IsNullable(targetType, out _));
+            return targetType.Equals(sourceType) == false && (ObjectHelper.IsSimpleType(targetType) || SymbolHelper.IsNullable(targetType, out _));
         }
 
-        private MappingElement TryToUnwrap(AnnotatedType targetType, MappingElement source, MappingContext mappingContext)
+        private MappingElement ConvertToSimpleType(AnnotatedType targetType, MappingElement source, MappingContext mappingContext)
         {
             var conversion = semanticModel.Compilation.ClassifyConversion(source.ExpressionType.Type, targetType.Type);
             if (conversion.Exists == false)
@@ -342,7 +356,7 @@ namespace MappingGenerator.Mappings
                     return new MappingElement()
                     {
                         Expression = (ExpressionSyntax) syntaxGenerator.CastExpression(enumType, parseInvocation),
-                        ExpressionType = targetType
+                        ExpressionType = targetType.AsNotNull()
                     };
                 }
 

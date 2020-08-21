@@ -7,7 +7,7 @@ namespace MappingGenerator.Mappings
 {
     public static class NameHelper
     {
-        private static readonly char[] ForbiddenSigns = new[] {'.', '[', ']', '(', ')'};
+        private static readonly char[] ForbiddenSigns = new[] {'.', '[', ']', '(', ')','?','!'};
         private static readonly Pluralizer Pluralizer = new Pluralizer();
 
         public static string CreateLambdaParameterName(SyntaxNode sourceList)

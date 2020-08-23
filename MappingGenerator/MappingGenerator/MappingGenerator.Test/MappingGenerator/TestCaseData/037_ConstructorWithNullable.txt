@@ -37,6 +37,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public List<AddressDTO> Address6 { get; set; }
         public int Total { get; set; }
         public int UnitId { get; set; }
+        public UserSourceDTO Source { get; set; }
     }
 
     public class AccountDTO
@@ -55,6 +56,20 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
 
         public AddressDTO(AddressEntity entity)
         {
+        }
+    }
+
+    public class UserSourceDTO
+    {
+        public string ProviderName { get; set; }
+        public string ProviderAddress { get; set; }
+        public bool IsActive {get; set;}
+
+        public UserSourceDTO(string providerName, string providerAddress, bool isActive)
+        {
+            ProviderName = providerName;
+            ProviderAddress = providerAddress;
+            IsActive = isActive;
         }
     }
 
@@ -80,6 +95,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public List<AddressEntity?>? Address6 { get; set; }
         public int? GetTotal() => throw new Exception();
         public UnitEntity? Unit { get; set; }
+        public UserSourceEntity Source { get; set; }
     }
 
     public class AccountEntity
@@ -101,5 +117,12 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
     {
         public int Id { get; set; }
         public string Name { get; set; }
+    }
+
+    public class UserSourceEntity
+    {
+        public string ProviderName { get; set; }
+        public string? ProviderAddress { get; set; }
+        public bool? IsActive {get; set;}
     }
 }

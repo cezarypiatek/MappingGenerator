@@ -10,6 +10,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
+using Microsoft.CodeAnalysis.Simplification;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 namespace MappingGenerator.Mappings
 {
@@ -247,13 +248,12 @@ namespace MappingGenerator.Mappings
 
         private ObjectCreationExpressionSyntax CreateObject(ITypeSymbol type, ArgumentListSyntax argumentList = null)
         {
-            //type.WithNullableAnnotation(NullableAnnotation.None);
-            var identifierNameSyntax = SyntaxFactory.IdentifierName(type.Name);
+            var typeWithoutNullable = type.StripNullability();
+            var identifierNameSyntax = (TypeSyntax) syntaxGenerator.TypeExpression(typeWithoutNullable);
             return CreateObject(identifierNameSyntax, argumentList);
         }
 
-        private static ObjectCreationExpressionSyntax CreateObject(IdentifierNameSyntax identifierNameSyntax,
-            ArgumentListSyntax argumentList)
+        private static ObjectCreationExpressionSyntax CreateObject(TypeSyntax identifierNameSyntax, ArgumentListSyntax argumentList)
         {
             return ObjectCreationExpression(identifierNameSyntax).WithArgumentList(argumentList ?? ArgumentList());
         }

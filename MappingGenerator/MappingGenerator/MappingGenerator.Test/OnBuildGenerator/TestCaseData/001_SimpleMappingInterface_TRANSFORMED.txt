@@ -22,10 +22,10 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
     {
         public virtual UserDTO Map(UserEntity entity)
         {
-            return new TestCaseData.UserDTO()
+            return new TestCaseData.UserDTO
             {
                 Age = entity.Age,
-                Debs = entity.Debs.ConvertAll(entityDeb => new TestCaseData.AccountDTO()
+                Debs = entity.Debs.ConvertAll(entityDeb => new TestCaseData.AccountDTO
                 {
                     BankName = entityDeb.BankName,
                     Number = entityDeb.Number
@@ -37,7 +37,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                 ImageData = entity.ImageData,
                 LuckyNumbers = entity.LuckyNumbers,
                 Total = entity.GetTotal(),
-                MainAddress = new TestCaseData.AddressDTO()
+                MainAddress = new TestCaseData.AddressDTO
                 {
                     City = entity.MainAddress.City,
                     ZipCode = entity.MainAddress.ZipCode,
@@ -45,7 +45,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                     FlatNo = entity.MainAddress.FlatNo,
                     BuildingNo = entity.MainAddress.BuildingNo
                 },
-                Addresses = entity.Addresses.ConvertAll(entityAddress => new TestCaseData.AddressDTO()
+                Addresses = entity.Addresses.ConvertAll(entityAddress => new TestCaseData.AddressDTO
                 {
                     City = entityAddress.City,
                     ZipCode = entityAddress.ZipCode,
@@ -54,7 +54,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                     BuildingNo = entityAddress.BuildingNo
                 }).AsReadOnly(),
                 UnitId = entity.Unit.Id,
-                ExtraSavings = entity.ExtraSavings.Value,
+                ExtraSavings = entity.ExtraSavings ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.ExtraSavings' should not be null"),
                 Savings = entity.Savings,
                 Birthday = entity.Birthday,
                 Authentication = entity.Authentication,

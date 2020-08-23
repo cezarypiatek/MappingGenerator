@@ -28,12 +28,12 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
             LastName = entity.LastName;
             Age = entity.Age;
             Cash = (int)entity.Cash;
-            Account = new AccountDTO()
+            Account = new AccountDTO
             {
                 BankName = entity.Account.BankName,
                 Number = entity.Account.Number
             };
-            Debs = entity.Debs.ConvertAll(entityDeb => new AccountDTO()
+            Debs = entity.Debs.ConvertAll(entityDeb => new AccountDTO
             {
                 BankName = entityDeb.BankName,
                 Number = entityDeb.Number
@@ -42,7 +42,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
             ImageData = entity.ImageData;
             LuckyNumbers = entity.LuckyNumbers;
             Total = entity.GetTotal();
-            MainAddress = new AddressDTO()
+            MainAddress = new AddressDTO
             {
                 City = entity.MainAddress.City,
                 ZipCode = entity.MainAddress.ZipCode,
@@ -50,7 +50,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                 FlatNo = entity.MainAddress.FlatNo,
                 BuildingNo = entity.MainAddress.BuildingNo
             };
-            Addresses = entity.Addresses.ConvertAll(entityAddress => new AddressDTO()
+            Addresses = entity.Addresses.ConvertAll(entityAddress => new AddressDTO
             {
                 City = entityAddress.City,
                 ZipCode = entityAddress.ZipCode,

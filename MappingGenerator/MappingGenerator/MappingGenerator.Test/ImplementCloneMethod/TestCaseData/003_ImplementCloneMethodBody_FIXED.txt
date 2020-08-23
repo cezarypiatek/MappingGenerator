@@ -9,7 +9,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
 
         public ClassX Clone()
         {
-            return new ClassX()
+            return new ClassX
             {
                 A = A,
                 B = B

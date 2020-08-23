@@ -47,7 +47,20 @@ namespace MappingGenerator.Mappings.SourceFinders
                 }
                 return invocationExpression;
             }
-        } 
+        }
+
+        public static ObjectCreationExpressionSyntax WithMembersInitialization(ObjectCreationExpressionSyntax objectCreationExpression, List<ExpressionSyntax> assignments)
+        {
+            if (assignments.Count == 0)
+            {
+                return objectCreationExpression;
+            }
+
+            var fixedBracketsObjectCreation = objectCreationExpression.ArgumentList?.Arguments.Count > 0 ?  objectCreationExpression : objectCreationExpression.WithArgumentList(null);
+            var initializerExpressionSyntax = SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression, new SeparatedSyntaxList<ExpressionSyntax>().AddRange(assignments))
+                .FixInitializerExpressionFormatting(fixedBracketsObjectCreation);
+            return fixedBracketsObjectCreation.WithInitializer(initializerExpressionSyntax);
+        }
     }
 
     public class ObjectMembersMappingSourceFinder : IMappingSourceFinder

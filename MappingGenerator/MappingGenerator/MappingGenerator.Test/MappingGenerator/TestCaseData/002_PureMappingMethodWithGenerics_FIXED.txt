@@ -9,10 +9,10 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
     {
         public static TDto Map<TDto, TEntity>(TEntity entity) where TDto: UserDTO, new() where TEntity: UserEntity
         {
-            return new TDto()
+            return new TDto
             {
                 Age = entity.Age,
-                Debs = entity.Debs.ConvertAll(entityDeb => new AccountDTO()
+                Debs = entity.Debs.ConvertAll(entityDeb => new AccountDTO
                 {
                     BankName = entityDeb.BankName,
                     Number = entityDeb.Number
@@ -21,7 +21,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                 ImageData = entity.ImageData,
                 LuckyNumbers = entity.LuckyNumbers,
                 Total = entity.GetTotal(),
-                MainAddress = new AddressDTO()
+                MainAddress = new AddressDTO
                 {
                     City = entity.MainAddress.City,
                     ZipCode = entity.MainAddress.ZipCode,
@@ -29,7 +29,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                     FlatNo = entity.MainAddress.FlatNo,
                     BuildingNo = entity.MainAddress.BuildingNo
                 },
-                Addresses = entity.Addresses.Select(entityAddress => new AddressDTO()
+                Addresses = entity.Addresses.Select(entityAddress => new AddressDTO
                 {
                     City = entityAddress.City,
                     ZipCode = entityAddress.ZipCode,

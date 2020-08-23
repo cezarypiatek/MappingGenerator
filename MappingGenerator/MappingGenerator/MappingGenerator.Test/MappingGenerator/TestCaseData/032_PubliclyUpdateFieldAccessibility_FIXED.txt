@@ -58,7 +58,7 @@
     {
         public ClassB Map(ClassA from)
         {
-            return new ClassB()
+            return new ClassB
             {
                 Property1 = from.Property1,
                 Property2 = from.Property2,

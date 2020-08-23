@@ -9,10 +9,10 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
     {
         public static UserDTO Map(UserEntity entity)
         {
-            return new UserDTO()
+            return new UserDTO
             {
                 Age = entity.Age,
-                Debs = entity.Debs.ConvertAll(entityDeb => new AccountDTO()
+                Debs = entity.Debs.ConvertAll(entityDeb => new AccountDTO
                 {
                     BankName = entityDeb.BankName,
                     Number = entityDeb.Number
@@ -28,7 +28,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                 MainAddress = MapAddress(entity.MainAddress),
                 Addresses = entity.Addresses.ConvertAll(entityAddress => MapAddress(entityAddress)).AsReadOnly(),
                 UnitId = entity.Unit.Id,
-                ExtraSavings = entity.ExtraSavings?.Value ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.ExtraSavings' should not be null"),
+                ExtraSavings = entity.ExtraSavings ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.ExtraSavings' should not be null"),
                 Savings = entity.Savings,
                 Birthday = entity.Birthday,
                 Authentication = entity.Authentication,
@@ -44,7 +44,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
     {
         protected static AddressDTO MapAddress(AddressEntity addressEntity)
         {
-            return new AddressDTO()
+            return new AddressDTO
             {
                 City = addressEntity.City,
                 ZipCode = addressEntity.ZipCode,

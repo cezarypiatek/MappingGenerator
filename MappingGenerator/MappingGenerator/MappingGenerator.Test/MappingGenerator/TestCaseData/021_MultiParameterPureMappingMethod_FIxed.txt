@@ -9,7 +9,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
     {
         public static UserDTO Map(string firstName, string lastName)
         {
-            return new UserDTO()
+            return new UserDTO
             {
                 FirstName = firstName,
                 LastName = lastName

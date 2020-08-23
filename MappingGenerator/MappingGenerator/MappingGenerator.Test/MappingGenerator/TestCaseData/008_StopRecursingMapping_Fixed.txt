@@ -10,10 +10,10 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
 
         public Model1Vm Map(Model1 src)
         {
-            return new Model1Vm()
+            return new Model1Vm
             {
                 Id = src.Id,
-                Model2s = src.Model2s.ConvertAll(srcModel2 => new Model2Vm()
+                Model2s = src.Model2s.ConvertAll(srcModel2 => new Model2Vm
                 {
                     Id = srcModel2.Id,
                     Model1 = srcModel2.Model1 /* Stop recursive mapping */,

@@ -50,6 +50,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
             Address6 = entity?.Address6?.OfType<AddressEntity>().Select(entityAddress6 => new AddressDTO(entityAddress6)).ToList() ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Address6' should not be null");
             Total = entity?.GetTotal() ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.GetTotal()' should not be null");
             UnitId = entity?.Unit?.Id ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Unit?.Id' should not be null");
+            Source = new UserSourceDTO(providerName: entity?.Source.ProviderName, providerAddress: entity?.Source.ProviderAddress ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Source.ProviderAddress' should not be null"), isActive: entity?.Source.IsActive ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Source.IsActive' should not be null"));
         }
 
         public int Id {get; set;}
@@ -74,6 +75,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public List<AddressDTO> Address6 { get; set; }
         public int Total { get; set; }
         public int UnitId { get; set; }
+        public UserSourceDTO Source { get; set; }
     }
 
     public class AccountDTO
@@ -92,6 +94,20 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
 
         public AddressDTO(AddressEntity entity)
         {
+        }
+    }
+
+    public class UserSourceDTO
+    {
+        public string ProviderName { get; set; }
+        public string ProviderAddress { get; set; }
+        public bool IsActive {get; set;}
+
+        public UserSourceDTO(string providerName, string providerAddress, bool isActive)
+        {
+            ProviderName = providerName;
+            ProviderAddress = providerAddress;
+            IsActive = isActive;
         }
     }
 
@@ -117,6 +133,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public List<AddressEntity?>? Address6 { get; set; }
         public int? GetTotal() => throw new Exception();
         public UnitEntity? Unit { get; set; }
+        public UserSourceEntity Source { get; set; }
     }
 
     public class AccountEntity
@@ -138,5 +155,12 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
     {
         public int Id { get; set; }
         public string Name { get; set; }
+    }
+
+    public class UserSourceEntity
+    {
+        public string ProviderName { get; set; }
+        public string? ProviderAddress { get; set; }
+        public bool? IsActive {get; set;}
     }
 }

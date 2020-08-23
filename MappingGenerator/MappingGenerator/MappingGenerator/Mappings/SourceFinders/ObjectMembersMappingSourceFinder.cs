@@ -167,17 +167,4 @@ namespace MappingGenerator.Mappings.SourceFinders
             return null;
         }
     }
-
-
-    public static class NullableExtensions
-    {
-        public static bool CanBeNull(this IMethodSymbol methodSymbol) => methodSymbol.ReturnType.CanBeNull();
-        public static bool CanBeNull(this IPropertySymbol propertySymbol) => propertySymbol.Type.CanBeNull();
-        public static bool CanBeNull(this IFieldSymbol fieldSymbol) => fieldSymbol.CanBeNull();
-        public static bool CanBeNull(this ITypeSymbol typeSymbol) => typeSymbol.NullableAnnotation == NullableAnnotation.Annotated;
-        public static AnnotatedType GetAnnotatedType(this TypeInfo typeInfo) => new AnnotatedType(typeInfo.Type);
-        public static AnnotatedType GetAnnotatedTypeForConverted(this TypeInfo typeInfo) => new AnnotatedType(typeInfo.ConvertedType);
-    }
-
-
 }

@@ -8,7 +8,7 @@ namespace MappingGenerator.Test.Splatting.TestCaseData
     {
         public void DoSomething()
         {
-            var user = new UserDTO();
+            var user = new UserDTO;
             [|ProceessUser(user)|];
         }
 

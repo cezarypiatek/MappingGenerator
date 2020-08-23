@@ -11,7 +11,7 @@ namespace ConsoleApp9
             var users = new List<User>();
             var query = from p in users
                 where p.FirstName !=""
-                select new UserDTO()
+                select new UserDTO
                 {
                     FirstName = p.FirstName,
                     LastName = p.LastName

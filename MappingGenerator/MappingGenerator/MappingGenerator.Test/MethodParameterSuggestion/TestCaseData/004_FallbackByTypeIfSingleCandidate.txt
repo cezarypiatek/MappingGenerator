@@ -9,7 +9,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
     {
         public static UserDTO Map(string firstName, string lastName, int age)
         {
-            var firstParent = new UserDTO();
+            var firstParent = new UserDTO;
             Map2([||]);
         }
 

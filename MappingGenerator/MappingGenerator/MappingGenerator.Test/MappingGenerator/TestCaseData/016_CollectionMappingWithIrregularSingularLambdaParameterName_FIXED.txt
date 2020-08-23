@@ -20,7 +20,7 @@ namespace TestAutoMapper.Identity.X
 
         public static List<YY> Map(List<XX> people)
         {
-            return people.ConvertAll(person => new YY()
+            return people.ConvertAll(person => new YY
             {
                 Id = person.Id,
                 Name = person.Name

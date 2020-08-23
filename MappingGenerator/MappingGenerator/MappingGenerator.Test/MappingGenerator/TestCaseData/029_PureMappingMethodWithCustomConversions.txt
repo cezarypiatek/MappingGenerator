@@ -14,7 +14,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
 
         private static AddressDTO MapAddress(AddressEntity addressEntity)
         {
-            return new AddressDTO()
+            return new AddressDTO
             {
                 City = addressEntity.City,
                 ZipCode = addressEntity.ZipCode,

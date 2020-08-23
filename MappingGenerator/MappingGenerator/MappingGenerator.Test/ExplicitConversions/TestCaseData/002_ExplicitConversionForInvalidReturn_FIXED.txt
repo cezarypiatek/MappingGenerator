@@ -11,7 +11,7 @@ namespace MappingGenerator.Test.ExplicitConversions.TestCaseData
 
         public ReadOnlyCollection<AddressDTO> DoSomething(IList<AddressEntity> addresses)
         {
-            return addresses.Select(address => new AddressDTO()
+            return addresses.Select(address => new AddressDTO
             {
                 FlatNo = address.FlatNo,
                 BuildtingNo = address.BuildtingNo,

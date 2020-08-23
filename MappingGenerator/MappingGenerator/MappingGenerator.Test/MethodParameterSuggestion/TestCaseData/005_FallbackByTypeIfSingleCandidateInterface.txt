@@ -7,7 +7,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
 {
     public class TestMapper
     {
-        IUserDTO firstParent = new UserDTO();
+        IUserDTO firstParent = new UserDTO;
 
         public static UserDTO Map(string firstName, string lastName, int age)
         {

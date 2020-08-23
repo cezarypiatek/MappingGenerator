@@ -10,11 +10,11 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
     {
         public static UserDTO Map(UserEntity entity)
         {
-            return new UserDTO()
+            return new UserDTO
             {
                 Id = entity.Id,
                 Age = entity.Age,
-                Debs = entity.Debs.ConvertAll(entityDeb => new AccountDTO()
+                Debs = entity.Debs.ConvertAll(entityDeb => new AccountDTO
                 {
                     BankName = entityDeb.BankName,
                     Number = entityDeb.Number
@@ -26,7 +26,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                 ImageData = entity.ImageData,
                 LuckyNumbers = entity.LuckyNumbers,
                 Total = entity.GetTotal(),
-                MainAddress = new AddressDTO()
+                MainAddress = new AddressDTO
                 {
                     City = entity.MainAddress.City,
                     ZipCode = entity.MainAddress.ZipCode,
@@ -34,7 +34,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                     FlatNo = entity.MainAddress.FlatNo,
                     BuildingNo = entity.MainAddress.BuildingNo
                 },
-                Addresses = entity.Addresses.ConvertAll(entityAddress => new AddressDTO()
+                Addresses = entity.Addresses.ConvertAll(entityAddress => new AddressDTO
                 {
                     City = entityAddress.City,
                     ZipCode = entityAddress.ZipCode,
@@ -42,7 +42,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                     FlatNo = entityAddress.FlatNo,
                     BuildingNo = entityAddress.BuildingNo
                 }).AsReadOnly(),
-                ExtraAddresses = entity.ExtraAddresses.Select(entityExtraAddress => new AddressDTO()
+                ExtraAddresses = entity.ExtraAddresses.Select(entityExtraAddress => new AddressDTO
                 {
                     City = entityExtraAddress.City,
                     ZipCode = entityExtraAddress.ZipCode,
@@ -51,7 +51,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                     BuildingNo = entityExtraAddress.BuildingNo
                 }).ToImmutableArray(),
                 UnitId = entity.Unit.Id,
-                ExtraSavings = entity.ExtraSavings?.Value ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.ExtraSavings' should not be null"),
+                ExtraSavings = entity.ExtraSavings ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.ExtraSavings' should not be null"),
                 Savings = entity.Savings,
                 Birthday = entity.Birthday,
                 Authentication = entity.Authentication,

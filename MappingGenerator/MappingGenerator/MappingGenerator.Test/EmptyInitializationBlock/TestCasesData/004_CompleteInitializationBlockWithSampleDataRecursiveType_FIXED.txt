@@ -14,13 +14,13 @@
             return new Tree
             {
                 Name = "lorem ipsum",
-                Left = new Tree()
+                Left = new Tree
                 {
                     Name = "lorem ipsum",
                     Left = null /* Stop recursive mapping */,
                     Right = null /* Stop recursive mapping */
                 },
-                Right = new Tree()
+                Right = new Tree
                 {
                     Name = "lorem ipsum",
                     Left = null /* Stop recursive mapping */,

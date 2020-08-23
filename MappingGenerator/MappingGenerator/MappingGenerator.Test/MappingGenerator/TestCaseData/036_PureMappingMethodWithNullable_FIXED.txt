@@ -11,29 +11,29 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
     {
         public static UserDTO Map(UserEntity? entity)
         {
-            return entity != null ? new UserDTO()
+            return entity != null ? new UserDTO
             {
                 Id = entity.Id,
                 FirstName = entity.FirstName,
                 MiddleName = entity.MiddleName,
                 LastName = entity.LastName,
                 Age = entity.Age,
-                Account = entity.Account != null ? new AccountDTO()
+                Account = entity.Account != null ? new AccountDTO
                 {
                     BankName = entity.Account.BankName,
                     Number = entity.Account.Number
                 } : null,
-                Account2 = entity.Account2 != null ? new AccountDTO()
+                Account2 = entity.Account2 != null ? new AccountDTO
                 {
                     BankName = entity.Account2.BankName,
                     Number = entity.Account2.Number
                 } : throw new ArgumentNullException(nameof(entity), "The value of 'entity.Account2' should not be null"),
-                Debs = entity.Debs?.ConvertAll(entityDeb => new AccountDTO()
+                Debs = entity.Debs?.ConvertAll(entityDeb => new AccountDTO
                 {
                     BankName = entityDeb.BankName,
                     Number = entityDeb.Number
                 }),
-                Debs2 = entity.Debs2?.ConvertAll(entityDebs2 => new AccountDTO()
+                Debs2 = entity.Debs2?.ConvertAll(entityDebs2 => new AccountDTO
                 {
                     BankName = entityDebs2.BankName,
                     Number = entityDebs2.Number
@@ -49,7 +49,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                 Address4 = entity.Address4.ConvertAll(entityAddress4 => entityAddress4 != null ? new AddressDTO(entityAddress4) : null),
                 Address5 = entity.Address5?.ConvertAll(entityAddress5 => entityAddress5 != null ? new AddressDTO(entityAddress5) : null) ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.Address5' should not be null"),
                 Address6 = entity.Address6?.Where(entityAddress6 => entityAddress6 != null).Select(entityAddress6 => new AddressDTO(entityAddress6)).ToList() ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.Address6' should not be null"),
-                Total = entity.GetTotal()?.Value ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.GetTotal()' should not be null"),
+                Total = entity.GetTotal() ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.GetTotal()' should not be null"),
                 UnitId = entity.Unit?.Id ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.Unit?.Id' should not be null")
             } : throw new ArgumentNullException(nameof(entity), "The value of 'entity' should not be null");
         }

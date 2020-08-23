@@ -7,7 +7,7 @@ namespace TestAutoMapper
     {
         public static ApplicationUserEntity ToEntity(this UserModel model)
         {
-            return new ApplicationUserEntity()
+            return new ApplicationUserEntity
             {
                 NewProperty1 = model.NewProperty1,
                 NewProperty2 = model.NewProperty2,

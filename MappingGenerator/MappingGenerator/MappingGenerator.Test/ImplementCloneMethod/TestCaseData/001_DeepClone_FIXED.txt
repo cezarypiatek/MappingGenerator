@@ -30,16 +30,16 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
 
         public UserDTO Clone()
         {
-            return new UserDTO()
+            return new UserDTO
             {
                 LastName = LastName,
                 Age = Age,
-                Account = new AccountDTO()
+                Account = new AccountDTO
                 {
                     BankName = Account.BankName,
                     Number = Account.Number
                 },
-                Debs = Debs.ConvertAll(thisDeb => new AccountDTO()
+                Debs = Debs.ConvertAll(thisDeb => new AccountDTO
                 {
                     BankName = thisDeb.BankName,
                     Number = thisDeb.Number
@@ -49,7 +49,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                 ImageData = ImageData.ToArray(),
                 LuckyNumbers = LuckyNumbers.ToList(),
                 Total = Total,
-                MainAddress = new AddressDTO()
+                MainAddress = new AddressDTO
                 {
                     City = MainAddress.City,
                     ZipCode = MainAddress.ZipCode,
@@ -57,7 +57,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                     FlatNo = MainAddress.FlatNo,
                     BuildingNo = MainAddress.BuildingNo
                 },
-                Addresses = Addresses.Select(thisAddress => new AddressDTO()
+                Addresses = Addresses.Select(thisAddress => new AddressDTO
                 {
                     City = thisAddress.City,
                     ZipCode = thisAddress.ZipCode,

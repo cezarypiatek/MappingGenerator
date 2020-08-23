@@ -110,7 +110,7 @@ namespace MappingGenerator.Mappings
             {
                 return new MappingElement
                 {
-                    Expression =  OrFailWhenNull(SyntaxFactoryExtensions.CreateMemberAccessExpression(source.Expression, true, "Value"), source.Expression.ToFullString()),
+                    Expression =  OrFailWhenNull(source.Expression),
                     ExpressionType = new AnnotatedType(underlyingType, false)
                 };
             }
@@ -267,13 +267,10 @@ namespace MappingGenerator.Mappings
         {
             var propertiesToSet = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(createdObjectTyp, mappingContext);
             var assignments = MapUsingSimpleAssignment(propertiesToSet, mappingMatcher, mappingContext, mappingPath).ToList();
-            if (assignments.Count == 0)
-            {
-                return objectCreationExpression;
-            }
-            var initializerExpressionSyntax = SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression, new SeparatedSyntaxList<ExpressionSyntax>().AddRange(assignments)).FixInitializerExpressionFormatting(objectCreationExpression);
-            return objectCreationExpression.WithInitializer(initializerExpressionSyntax);
+            return SyntaxFactoryExtensions.WithMembersInitialization(objectCreationExpression, assignments);
         }
+
+
 
         public IEnumerable<ExpressionSyntax> MapUsingSimpleAssignment(IReadOnlyCollection<IObjectField> targets,
             IMappingMatcher mappingMatcher,

@@ -27,13 +27,13 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
             FirstName = firstName;
             LastName = lastName;
             Age = age;
-            Debs = debs.Select(deb => new AccountDTO()
+            Debs = debs.Select(deb => new AccountDTO
             {
                 BankName = deb.BankName,
                 Number = deb.Number
             }).ToList();
             Source = new UserSourceDTO(providerName: source.ProviderName, providerAddress: source.ProviderAddress);
-            MainAddress = new AddressDTO()
+            MainAddress = new AddressDTO
             {
                 City = mainAddress.City,
                 ZipCode = mainAddress.ZipCode,

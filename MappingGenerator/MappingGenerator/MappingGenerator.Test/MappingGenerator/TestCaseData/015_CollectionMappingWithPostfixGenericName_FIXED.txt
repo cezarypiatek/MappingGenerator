@@ -21,7 +21,7 @@ namespace TestAutoMapper.Identity.X
 
         public static List<ZZ> MapNew(List<XX> usersList)
         {
-            return usersList.ConvertAll(user => new ZZ()
+            return usersList.ConvertAll(user => new ZZ
             {
                 Id = user.Id,
                 Name = user.Name

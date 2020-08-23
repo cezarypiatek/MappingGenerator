@@ -94,7 +94,7 @@ namespace TestAutoMapper
                 MyProperty6 = 'a',
                 MyProperty7 = CustomEnum.Opt1,
                 DecimalProperty = 2.0M,
-                Inner = new InnerDefaultObject()
+                Inner = new InnerDefaultObject
                 {
                     MyProperty = "lorem ipsum",
                     MyProperty1 = 32,
@@ -102,12 +102,12 @@ namespace TestAutoMapper
                     {
                         32
                     },
-                    FieldWithInterface = new OtherObject()
+                    FieldWithInterface = new OtherObject
                     {
                         Field1 = "lorem ipsum",
                         Field2 = "lorem ipsum"
                     },
-                    PropertyWithConstructor = new YetAnotherObject("lorem ipsum", new OtherObject()
+                    PropertyWithConstructor = new YetAnotherObject("lorem ipsum", new OtherObject
                     {
                         Field1 = "lorem ipsum",
                         Field2 = "lorem ipsum"
@@ -115,7 +115,7 @@ namespace TestAutoMapper
                 },
                 GenericInners = new List<InnerDefaultObject>()
                 {
-                    new InnerDefaultObject()
+                    new InnerDefaultObject
                     {
                         MyProperty = "lorem ipsum",
                         MyProperty1 = 32,
@@ -123,12 +123,12 @@ namespace TestAutoMapper
                         {
                             32
                         },
-                        FieldWithInterface = new OtherObject()
+                        FieldWithInterface = new OtherObject
                         {
                             Field1 = "lorem ipsum",
                             Field2 = "lorem ipsum"
                         },
-                        PropertyWithConstructor = new YetAnotherObject("lorem ipsum", new OtherObject()
+                        PropertyWithConstructor = new YetAnotherObject("lorem ipsum", new OtherObject
                         {
                             Field1 = "lorem ipsum",
                             Field2 = "lorem ipsum"
@@ -137,7 +137,7 @@ namespace TestAutoMapper
                 },
                 InnersReadonly = new List<InnerDefaultObject>()
                 {
-                    new InnerDefaultObject()
+                    new InnerDefaultObject
                     {
                         MyProperty = "lorem ipsum",
                         MyProperty1 = 32,
@@ -145,12 +145,12 @@ namespace TestAutoMapper
                         {
                             32
                         },
-                        FieldWithInterface = new OtherObject()
+                        FieldWithInterface = new OtherObject
                         {
                             Field1 = "lorem ipsum",
                             Field2 = "lorem ipsum"
                         },
-                        PropertyWithConstructor = new YetAnotherObject("lorem ipsum", new OtherObject()
+                        PropertyWithConstructor = new YetAnotherObject("lorem ipsum", new OtherObject
                         {
                             Field1 = "lorem ipsum",
                             Field2 = "lorem ipsum"

@@ -161,12 +161,8 @@ namespace MappingGenerator.Mappings.SourceFinders
                         return (ExpressionSyntax)syntaxGenerator.AssignmentStatement(identifier, mappingSource.Expression);
                     }).ToList();
 
-                    if (assignments.Count == 0)
-                    {
-                        return objectCreationExpression;
-                    }
-                    var initializerExpressionSyntax = SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression, new SeparatedSyntaxList<ExpressionSyntax>().AddRange(assignments)).FixInitializerExpressionFormatting(objectCreationExpression);
-                    return objectCreationExpression.WithInitializer(initializerExpressionSyntax);
+
+                    return SyntaxFactoryExtensions.WithMembersInitialization(objectCreationExpression, assignments);
                 }
             }
 

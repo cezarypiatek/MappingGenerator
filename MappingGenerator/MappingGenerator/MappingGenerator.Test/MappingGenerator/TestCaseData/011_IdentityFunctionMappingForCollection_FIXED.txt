@@ -9,7 +9,7 @@ namespace TestAutoMapper.Identity
     {
         public static List<UserDTO> Map(List<UserDTO> old)
         {
-            return old.ConvertAll(oldElement => new UserDTO()
+            return old.ConvertAll(oldElement => new UserDTO
             {
                 Age = oldElement.Age,
                 Debs = oldElement.Debs.ConvertAll(oldElementDeb => oldElementDeb.Clone() as AccountDTO),
@@ -18,7 +18,7 @@ namespace TestAutoMapper.Identity
                 ImageData = oldElement.ImageData.ToArray(),
                 LuckyNumbers = oldElement.LuckyNumbers.ToList(),
                 Total = oldElement.Total,
-                MainAddress = new AddressDTO()
+                MainAddress = new AddressDTO
                 {
                     City = oldElement.MainAddress.City,
                     ZipCode = oldElement.MainAddress.ZipCode,
@@ -26,7 +26,7 @@ namespace TestAutoMapper.Identity
                     FlatNo = oldElement.MainAddress.FlatNo,
                     BuildingNo = oldElement.MainAddress.BuildingNo
                 },
-                Addresses = oldElement.Addresses.Select(oldElementAddress => new AddressDTO()
+                Addresses = oldElement.Addresses.Select(oldElementAddress => new AddressDTO
                 {
                     City = oldElementAddress.City,
                     ZipCode = oldElementAddress.ZipCode,

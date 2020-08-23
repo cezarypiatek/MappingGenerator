@@ -11,7 +11,7 @@ namespace MappingGenerator.Test.ExplicitConversions.TestCaseData
         public void DoSomething()
         {
             var addressEntity = new AddressEntity();
-            this.Address = new AddressDTO()
+            this.Address = new AddressDTO
             {
                 FlatNo = addressEntity.FlatNo,
                 BuildtingNo = addressEntity.BuildtingNo,

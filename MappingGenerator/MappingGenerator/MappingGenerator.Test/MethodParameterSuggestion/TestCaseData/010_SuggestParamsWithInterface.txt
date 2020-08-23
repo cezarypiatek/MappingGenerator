@@ -10,7 +10,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
 
         public static UserDTO Map(string firstName, string lastName, IdentityProvider  provider)
         {
-            var user = new UserDTO();
+            var user = new UserDTO;
             user.Update([||]);
             return user;
         }

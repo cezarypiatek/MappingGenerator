@@ -19,7 +19,7 @@ namespace MappingGenerator.Test.EmptyInitializationBlock.TestCasesData
 
     public class Mapper
     {
-        public Expression<Func<UserEntity, UserDTO>> Map = (UserEntity entity) => new UserDTO()
+        public Expression<Func<UserEntity, UserDTO>> Map = (UserEntity entity) => new UserDTO
         {
             FirstName = entity.FirstName,
             LastName = entity.LastName,

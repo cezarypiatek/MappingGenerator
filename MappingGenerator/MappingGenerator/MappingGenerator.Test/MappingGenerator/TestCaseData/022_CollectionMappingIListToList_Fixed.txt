@@ -20,7 +20,7 @@ namespace TestAutoMapper.Identity.X
 
         public static List<YY> Map(IList<XX> categories)
         {
-            return categories.Select(category => new YY()
+            return categories.Select(category => new YY
             {
                 Id = category.Id,
                 Name = category.Name

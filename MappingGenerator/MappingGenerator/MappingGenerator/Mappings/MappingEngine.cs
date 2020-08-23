@@ -402,9 +402,8 @@ namespace MappingGenerator.Mappings
             var targetListElementType = MappingHelper.GetElementType(targetListType.Type);
             if (sourceListElementType.CanBeNull && targetListElementType.CanBeNull == false)
             {
+                var whereFilter = SyntaxFactoryExtensions.CreateMethodAccessExpression(source.Expression, source.ExpressionType.CanBeNull, $"OfType<{sourceListElementType.Type.Name}>");
                 var lambdaParameterName = NameHelper.CreateLambdaParameterName(source.Expression);
-                var whereLambda = (ExpressionSyntax) syntaxGenerator.ValueReturningLambdaExpression(lambdaParameterName, BinaryExpression(SyntaxKind.NotEqualsExpression, IdentifierName(lambdaParameterName), LiteralExpression(SyntaxKind.NullLiteralExpression)));
-                var whereFilter = SyntaxFactoryExtensions.CreateMethodAccessExpression(source.Expression, source.ExpressionType.CanBeNull, "Where", whereLambda);
                 var mappingLambda = CreateMappingLambda(lambdaParameterName, sourceListElementType.AsNotNull(), targetListElementType, mappingPath, mappingContext);
                 var selectExpression = SyntaxFactoryExtensions.CreateMethodAccessExpression(whereFilter, false, "Select", mappingLambda);
                 var toList = AddMaterializeCollectionInvocation(syntaxGenerator, selectExpression, targetListType.Type, false);

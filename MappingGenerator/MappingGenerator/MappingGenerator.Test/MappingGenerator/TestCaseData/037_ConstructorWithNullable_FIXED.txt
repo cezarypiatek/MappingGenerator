@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections.ObjectModel;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace MappingGenerator.Test.MappingGenerator.TestCaseData
 {
@@ -43,10 +44,10 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
             AddressBuildingNo = entity?.Address?.BuildingNo ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Address?.BuildingNo' should not be null");
             Address1 = entity?.Address1 != null ? new AddressDTO(entity?.Address1) : throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Address1' should not be null");
             Address2 = entity?.Address2 != null ? new AddressDTO(entity?.Address2) : null;
-            Address3 = entity?.Address3?.Where(entityAddress3 => entityAddress3 != null).Select(entityAddress3 => new AddressDTO(entityAddress3)).ToList() ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Address3' should not be null");
+            Address3 = entity?.Address3?.OfType<AddressEntity>().Select(entityAddress3 => new AddressDTO(entityAddress3)).ToList() ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Address3' should not be null");
             Address4 = entity?.Address4?.ConvertAll(entityAddress4 => entityAddress4 != null ? new AddressDTO(entityAddress4) : null) ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Address4' should not be null");
             Address5 = entity?.Address5?.ConvertAll(entityAddress5 => entityAddress5 != null ? new AddressDTO(entityAddress5) : null) ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Address5' should not be null");
-            Address6 = entity?.Address6?.Where(entityAddress6 => entityAddress6 != null).Select(entityAddress6 => new AddressDTO(entityAddress6)).ToList() ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Address6' should not be null");
+            Address6 = entity?.Address6?.OfType<AddressEntity>().Select(entityAddress6 => new AddressDTO(entityAddress6)).ToList() ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Address6' should not be null");
             Total = entity?.GetTotal() ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.GetTotal()' should not be null");
             UnitId = entity?.Unit?.Id ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity?.Unit?.Id' should not be null");
         }

@@ -21,7 +21,7 @@ namespace MappingGenerator.Mappings.MappingImplementors
             var mappingEngine = new MappingEngine(semanticModel, generator);
             var targetType = methodSymbol.ReturnType;
             var sourceFinder = new LocalScopeMappingSourceFinder(semanticModel, methodSymbol);
-            var objectCreationExpressionSyntax = (ObjectCreationExpressionSyntax)generator.ObjectCreationExpression(targetType);
+            var objectCreationExpressionSyntax = (ObjectCreationExpressionSyntax)generator.ObjectCreationExpression(targetType.StripNullability());
             var newExpression = mappingEngine.AddInitializerWithMapping(objectCreationExpressionSyntax, new SingleSourceMatcher(sourceFinder), targetType, mappingContext);
             return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };
         }

@@ -1,0 +1,132 @@
+﻿#nullable enable
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Collections.ObjectModel;
+using System.Linq;
+
+namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+{
+    public class TestMapper
+    {
+        public static UserDTO Map(UserEntity? entity)
+        {
+            return entity != null ? new UserDTO
+            [|{
+            }|] : throw new ArgumentNullException(nameof(entity), "The value of 'entity' should not be null");
+        }
+    }
+
+    public class UserDTO
+    {
+        public int Id {get; set;}
+        public string FirstName { get; set; }
+        public string? MiddleName { get; set; }
+        public string LastName { get; set; }
+        public int Age { get; set; }
+        public AccountDTO? Account { get; set; }
+        public AccountDTO Account2 { get; set; }
+        public List<AccountDTO>? Debs { get; set; }
+        public List<AccountDTO> Debs2 { get; set; }
+        public string AddressCity { get; set; }
+        public string AddressZipCode { get; set; }
+        public string AddressStreet { get; set; }
+        public string? AddressFlatNo { get; set; }
+        public string AddressBuildingNo { get; set; }
+        public AddressDTO Address1 { get; set; }
+        public AddressDTO? Address2 { get; set; }
+        public List<AddressDTO> Address3 { get; set; }
+        public List<AddressDTO?> Address4 { get; set; }
+        public List<AddressDTO?> Address5 { get; set; }
+        public List<AddressDTO> Address6 { get; set; }
+        public int Total { get; set; }
+        public int UnitId { get; set; }
+        public UserSourceDTO Source { get; set; }
+    }
+
+    public class AccountDTO
+    {
+        public string BankName { get; set; }
+        public string Number { get; set; }
+    }
+
+    public class AddressDTO
+    {
+        public string City { get; set; }
+        public string ZipCode { get; set; }
+        public string Street { get; set; }
+        public string FlatNo { get; set; }
+        public string BuildingNo { get; set; }
+
+        public AddressDTO(AddressEntity entity)
+        {
+        }
+    }
+
+    public class UserSourceDTO
+    {
+        public string ProviderName { get; set; }
+        public string ProviderAddress { get; set; }
+        public bool IsActive {get; set;}
+
+        public UserSourceDTO(string providerName, string providerAddress, bool isActive)
+        {
+            ProviderName = providerName;
+            ProviderAddress = providerAddress;
+            IsActive = isActive;
+        }
+    }
+
+    //---- Entities
+
+    public class UserEntity
+    {
+        public int Id {get; set;}
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string? MiddleName { get; set; }
+        public int Age { get; set; }
+        public AccountEntity? Account { get; set; }
+        public AccountEntity? Account2 { get; set; }
+        public List<AccountEntity>? Debs { get; set; }
+        public List<AccountEntity>? Debs2 { get; set; }
+        public AddressEntity? Address { get; set; }
+        public AddressEntity? Address1 { get; set; }
+        public AddressEntity? Address2 { get; set; }
+        public List<AddressEntity?> Address3 { get; set; }
+        public List<AddressEntity?> Address4 { get; set; }
+        public List<AddressEntity?>? Address5 { get; set; }
+        public List<AddressEntity?>? Address6 { get; set; }
+        public int? GetTotal() => throw new Exception();
+        public UnitEntity? Unit { get; set; }
+        public UserSourceEntity Source { get; set; }
+    }
+
+    public class AccountEntity
+    {
+        public string BankName { get; set; }
+        public string Number { get; set; }
+    }
+
+    public class AddressEntity
+    {
+        public string City { get; set; }
+        public string ZipCode { get; set; }
+        public string Street { get; set; }
+        public string FlatNo { get; set; }
+        public string BuildingNo { get; set; }
+    }
+
+    public class UnitEntity
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class UserSourceEntity
+    {
+        public string ProviderName { get; set; }
+        public string? ProviderAddress { get; set; }
+        public bool? IsActive {get; set;}
+    }
+}

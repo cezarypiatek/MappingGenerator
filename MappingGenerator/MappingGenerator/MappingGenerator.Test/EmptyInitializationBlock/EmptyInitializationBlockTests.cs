@@ -98,6 +98,15 @@ namespace MappingGenerator.Test
             var fixedCode = EmptyInitializationBlockTestCases._011_CompleteInitializationBlockWithLocals_FIXED;
             TestCodeRefactoring(test, fixedCode, 0);
         }
+        
+        
+        [Test]
+        public void should_scaffold_init_block_with_non_nullable_references()
+        {
+            var test = EmptyInitializationBlockTestCases._012_ScaffoldingWithNonNullable;
+            var fixedCode = EmptyInitializationBlockTestCases._012_ScaffoldingWithNonNullable_FIXED;
+            TestCodeRefactoring(test, fixedCode, 1);
+        }
       
         protected override string LanguageName => LanguageNames.CSharp;
         protected override CodeRefactoringProvider CreateProvider()

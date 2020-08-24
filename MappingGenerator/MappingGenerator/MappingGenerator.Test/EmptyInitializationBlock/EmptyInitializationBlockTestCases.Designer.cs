@@ -81,10 +81,10 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
         ///            var firstName = &quot;Cezary&quot;;
         ///            var lastName = &quot;Piatek&quot;;
         ///
-        ///            var x = new UserDTO()
+        ///            var x = new UserDTO
         ///            [|{
         ///
-        ///            [rest of string was truncated]&quot;;.
+        ///            } [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _001_CompleteInitializationBlockWithLocals {
             get {
@@ -113,9 +113,9 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
         ///            var firstName = &quot;Cezary&quot;;
         ///            var lastName = &quot;Piatek&quot;;
         ///
-        ///            var x = new UserDTO()
+        ///            var x = new UserDTO
         ///            {
-        ///                [rest of string was truncated]&quot;;.
+        ///                F [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _001_CompleteInitializationBlockWithLocals_FIXED {
             get {
@@ -195,14 +195,14 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
         ///    {
         ///        public IList&lt;UserDTO&gt; Map(IList&lt;UserEntity&gt; entities)
         ///        {
-        ///            return entities.Select((UserEntity x) =&gt; new UserDTO() [|{ }|]).ToList();
+        ///            return entities.Select((UserEntity x) =&gt; new UserDTO [|{ }|]).ToList();
         ///        }
         ///    }
         ///
         ///    public class UserDTO
         ///    {
         ///        public string FirstName { get; set; }
-        ///        public string LastName { get; se [rest of string was truncated]&quot;;.
+        ///        public string LastName { get; set; [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _003_CompleteInitializationBlockWithSompleLambdaParameter {
             get {
@@ -222,13 +222,13 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
         ///    {
         ///        public IList&lt;UserDTO&gt; Map(IList&lt;UserEntity&gt; entities)
         ///        {
-        ///            return entities.Select((UserEntity x) =&gt; new UserDTO()
+        ///            return entities.Select((UserEntity x) =&gt; new UserDTO
         ///            {
         ///                FirstName = x.FirstName,
         ///                LastName = x.LastName,
         ///                Age = x.Age
         ///            }).ToList();
-        ///        [rest of string was truncated]&quot;;.
+        ///        } [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _003_CompleteInitializationBlockWithSompleLambdaParameter_FIXED {
             get {
@@ -280,10 +280,10 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
         ///            return new Tree
         ///            {
         ///                Name = &quot;lorem ipsum&quot;,
-        ///                Left = new Tree()
+        ///                Left = new Tree
         ///                {
         ///                    Name = &quot;lorem ipsum&quot;,
-        ///                    Left = null /* Stop recursive mappin [rest of string was truncated]&quot;;.
+        ///                    Left = null /* Stop recursive mapping  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _004_CompleteInitializationBlockWithSampleDataRecursiveType_FIXED {
             get {
@@ -365,7 +365,7 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
         ///            var users = new List&lt;User&gt;();
         ///            var query = from p in users
         ///                where p.FirstName !=&quot;&quot;
-        ///                select new UserDTO()
+        ///                select new UserDTO
         ///                {
         ///                    [||]
         ///                };
@@ -376,7 +376,7 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
         ///    class User
         ///    {
         ///        public string FirstName { get; set; }
-        ///        public st [rest of string was truncated]&quot;;.
+        ///        public stri [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _006_SelectInSimpleLinq {
             get {
@@ -398,7 +398,7 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
         ///            var users = new List&lt;User&gt;();
         ///            var query = from p in users
         ///                where p.FirstName !=&quot;&quot;
-        ///                select new UserDTO()
+        ///                select new UserDTO
         ///                {
         ///                    FirstName = p.FirstName,
         ///                    LastName = p.LastName
@@ -409,7 +409,7 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
         ///
         ///    class User
         ///    {
-        ///  [rest of string was truncated]&quot;;.
+        ///    [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _006_SelectInSimpleLinqFixed {
             get {
@@ -718,10 +718,10 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
         ///            var firstName = &quot;Cezary&quot;;
         ///            var lastName = &quot;Piatek&quot;;
         ///
-        ///            var user = new UserDTO()
+        ///            var user = new UserDTO
         ///            [|{
         ///
-        ///            }|] [rest of string was truncated]&quot;;.
+        ///            }|];        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _011_CompleteInitializationBlockWithLocals {
             get {
@@ -750,13 +750,63 @@ namespace MappingGenerator.Test.EmptyInitializationBlock {
         ///            var firstName = &quot;Cezary&quot;;
         ///            var lastName = &quot;Piatek&quot;;
         ///
-        ///            var user = new UserDTO()
+        ///            var user = new UserDTO
         ///            {
-        ///                Fir [rest of string was truncated]&quot;;.
+        ///                First [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _011_CompleteInitializationBlockWithLocals_FIXED {
             get {
                 return ResourceManager.GetString("_011_CompleteInitializationBlockWithLocals_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #nullable enable
+        ///using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///using System.Collections.Immutable;
+        ///using System.Linq;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO Map(UserEntity? entity)
+        ///        {
+        ///            return entity != null ? new UserDTO
+        ///            [|{
+        ///            }|] : throw new ArgumentNullException(nameof(entity), &quot;The value of &apos;entity&apos; sho [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _012_ScaffoldingWithNonNullable {
+            get {
+                return ResourceManager.GetString("_012_ScaffoldingWithNonNullable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to #nullable enable
+        ///using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///using System.Collections.ObjectModel;
+        ///using System.Collections.Immutable;
+        ///using System.Linq;
+        ///
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static UserDTO Map(UserEntity? entity)
+        ///        {
+        ///            return entity != null ? new UserDTO
+        ///            [|{
+        ///            }|] : throw new ArgumentNullException(nameof(entity), &quot;The value of &apos;entity&apos; sho [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _012_ScaffoldingWithNonNullable_FIXED {
+            get {
+                return ResourceManager.GetString("_012_ScaffoldingWithNonNullable_FIXED", resourceCulture);
             }
         }
     }

@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http.Headers;
 using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -35,16 +37,44 @@ namespace MappingGenerator.Mappings
 
         public bool WrapInCustomConversion { get; set; }
 
-        public Dictionary<(ITypeSymbol fromType, ITypeSymbol toType), ExpressionSyntax> CustomConversions { get; }  = new Dictionary<(ITypeSymbol fromType, ITypeSymbol toType), ExpressionSyntax>();
+        public List<CustomConversion> CustomConversions { get; }  = new List<CustomConversion>();
 
-        public ExpressionSyntax? FindConversion(ITypeSymbol fromType, ITypeSymbol toType)
+        public CustomConversion? FindConversion(AnnotatedType fromType, AnnotatedType toType)
         {
-            if (CustomConversions.TryGetValue((fromType, toType), out var conversion))
+            if (CustomConversions.Count == 0)
             {
-                return conversion;
+                return null;
             }
 
-            return null;
+            var candidates = CustomConversions.Where(x => x.FromType.Type.Equals(fromType.Type) && x.ToType.Type.Equals(toType.Type)).ToList();
+            if (candidates.Count == 0)
+            {
+                return null;
+            }
+            if (candidates.Count == 1)
+            {
+                return candidates[0];
+            }
+            if (candidates.Count > 1)
+            {
+                var exactlyConversion = candidates.FirstOrDefault(x => x.FromType.CanBeNull == fromType.CanBeNull && x.ToType.CanBeNull == toType.CanBeNull);
+                if (exactlyConversion != null)
+                {
+                    return exactlyConversion;
+                }
+
+                return candidates.FirstOrDefault(x => x.FromType.CanBeNull == fromType.CanBeNull || x.ToType.CanBeNull == toType.CanBeNull);
+            }
+
+            return candidates.FirstOrDefault();
         }
+    }
+
+    public class CustomConversion
+    {
+        public AnnotatedType FromType { get; set; }
+        public AnnotatedType ToType { get; set; }
+
+        public ExpressionSyntax Conversion { get; set; }
     }
 }

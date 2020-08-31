@@ -92,7 +92,12 @@ namespace MappingGenerator.Features.Refactorings
                         continue;
                     }
 
-                    mappingContext.CustomConversions[(userDefinedConversion.Parameters.First().Type, userDefinedConversion.ReturnType)] = (ExpressionSyntax) generator.IdentifierName(userDefinedConversion.Name);
+                    mappingContext.CustomConversions.Add(new CustomConversion()
+                    {
+                        FromType = new AnnotatedType(userDefinedConversion.Parameters.First().Type),
+                        ToType = new AnnotatedType(userDefinedConversion.ReturnType),
+                        Conversion = SyntaxFactory.IdentifierName(userDefinedConversion.Name)
+                    });
                 }
             }
             var blockSyntax = MappingImplementorEngine.GenerateMappingBlock(methodSymbol, generator, semanticModel, mappingContext);

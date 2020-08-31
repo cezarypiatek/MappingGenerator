@@ -29,7 +29,12 @@ namespace MappingGenerator.OnBuildGenerator
             {
                 if (x.IsStatic && accessibilityHelper.IsSymbolAccessible(x, interfaceSymbol))
                 {
-                    mappingContext.CustomConversions[(x.Parameters[0].Type, x.ReturnType)] = (ExpressionSyntax)syntaxGenerator.MemberAccessExpression((ExpressionSyntax)syntaxGenerator.IdentifierName(x.ContainingType.ToDisplayString()), x.Name);
+                    mappingContext.CustomConversions.Add(new CustomConversion()
+                    {
+                        FromType = new AnnotatedType(x.Parameters[0].Type),
+                        ToType = new AnnotatedType(x.ReturnType),
+                        Conversion = (ExpressionSyntax)syntaxGenerator.MemberAccessExpression((ExpressionSyntax)syntaxGenerator.IdentifierName(x.ContainingType.ToDisplayString()), x.Name)
+                    }); 
                 }
             }
             

@@ -10,34 +10,9 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
-using Microsoft.CodeAnalysis.Simplification;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 namespace MappingGenerator.Mappings
 {
-
-    public class AnnotatedType
-    {
-        public ITypeSymbol Type { get; }
-        public bool CanBeNull { get; }
-
-        public AnnotatedType(ITypeSymbol type)
-        {
-            Type = type;
-            CanBeNull = type.CanBeNull();
-        }
-
-        public AnnotatedType(ITypeSymbol type, bool canBeNull)
-        {
-            Type = type;
-            CanBeNull = canBeNull;
-        }
-
-        public AnnotatedType AsNotNull()
-        {
-            return new AnnotatedType(Type, false);
-        }
-    }
-
     public class MappingEngine
     {
         protected readonly SemanticModel semanticModel;
@@ -94,15 +69,16 @@ namespace MappingGenerator.Mappings
                 };
             }
 
-            if (mappingContext.FindConversion(sourceType.Type, targetType.Type) is {} userDefinedConversion)
+            if (mappingContext.FindConversion(sourceType, targetType) is {} userDefinedConversion)
             {
                 //TODO: Check if conversion accept nullable type
-                //TODO: Check if the result of the conversion is nullable-compatible
-                var invocationExpression = (ExpressionSyntax)syntaxGenerator.InvocationExpression(userDefinedConversion, source.Expression);
-                return new MappingElement()
+                var invocationExpression = (ExpressionSyntax)syntaxGenerator.InvocationExpression(userDefinedConversion.Conversion, source.Expression);
+                var protectResultFromNull = targetType.CanBeNull == false && userDefinedConversion.ToType.CanBeNull;
+                var conversionExpression = protectResultFromNull ? OrFailWhenExpressionNull(invocationExpression) : invocationExpression;
+                return new MappingElement
                 {
                     ExpressionType = targetType,
-                    Expression = HandleSafeNull(source, targetType,  invocationExpression),
+                    Expression = HandleSafeNull(source, userDefinedConversion.FromType, conversionExpression)
                 };
             }
 
@@ -111,7 +87,7 @@ namespace MappingGenerator.Mappings
             {
                 return new MappingElement
                 {
-                    Expression =  OrFailWhenNull(source.Expression),
+                    Expression =  OrFailWhenArgumentNull(source.Expression),
                     ExpressionType = new AnnotatedType(underlyingType, false)
                 };
             }
@@ -124,7 +100,7 @@ namespace MappingGenerator.Mappings
                     return new MappingElement
                     {
                         ExpressionType = conversion.ExpressionType.AsNotNull(),
-                        Expression = OrFailWhenNull(conversion.Expression)
+                        Expression = OrFailWhenArgumentNull(conversion.Expression)
                     };
                 }
                 return conversion;
@@ -140,17 +116,21 @@ namespace MappingGenerator.Mappings
             {
                 return new MappingElement
                 {
-                    Expression = OrFailWhenNull(source.Expression),
+                    Expression = OrFailWhenArgumentNull(source.Expression),
                     ExpressionType = source.ExpressionType.AsNotNull()
                 };
             }
             return source;
         }
 
-        private static BinaryExpressionSyntax OrFailWhenNull(ExpressionSyntax expression, string messageExpression = null)
+        private static BinaryExpressionSyntax OrFailWhenArgumentNull(ExpressionSyntax expression, string messageExpression = null)
         {
             return BinaryExpression(SyntaxKind.CoalesceExpression, expression, ThrowNullArgumentException(messageExpression ?? expression.ToFullString()));
         }
+       private static BinaryExpressionSyntax OrFailWhenExpressionNull(ExpressionSyntax expression)
+       {
+            return BinaryExpression(SyntaxKind.CoalesceExpression, expression, ThrowNullReferenceException(expression.ToFullString()));
+       }
 
         protected virtual bool ShouldCreateConversionBetweenTypes(ITypeSymbol targetType, ITypeSymbol sourceType)
         {
@@ -184,7 +164,7 @@ namespace MappingGenerator.Mappings
                 return new MappingElement
                 {
                     ExpressionType = targetType,
-                    Expression = shouldProtectAgainstNull ? OrFailWhenNull(collectionMapping, source.Expression.ToFullString()) : collectionMapping,
+                    Expression = shouldProtectAgainstNull ? OrFailWhenArgumentNull(collectionMapping, source.Expression.ToFullString()) : collectionMapping,
                 };
             }
 
@@ -242,6 +222,15 @@ namespace MappingGenerator.Mappings
             var errorMessageExpression = LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal($"The value of '{expressionText}' should not be null"));
             var exceptionTypeName = SyntaxFactory.IdentifierName("ArgumentNullException");
             var exceptionParameters = ArgumentList(new SeparatedSyntaxList<ArgumentSyntax>().AddRange(new []{ Argument(nameofInvocation) , Argument(errorMessageExpression)}));
+            var throwExpressionSyntax = SyntaxFactory.ThrowExpression(CreateObject(exceptionTypeName, exceptionParameters));
+            return throwExpressionSyntax;
+        }
+        
+        private static ThrowExpressionSyntax ThrowNullReferenceException(string expressionText)
+        {
+            var errorMessageExpression = LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal($"The value of '{expressionText}' should not be null"));
+            var exceptionTypeName = SyntaxFactory.IdentifierName("NullReferenceException");
+            var exceptionParameters = ArgumentList(new SeparatedSyntaxList<ArgumentSyntax>().AddRange(new []{ Argument(errorMessageExpression)}));
             var throwExpressionSyntax = SyntaxFactory.ThrowExpression(CreateObject(exceptionTypeName, exceptionParameters));
             return throwExpressionSyntax;
         }

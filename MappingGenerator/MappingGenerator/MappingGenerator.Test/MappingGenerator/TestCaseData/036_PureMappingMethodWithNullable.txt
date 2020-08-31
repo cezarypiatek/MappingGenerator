@@ -14,6 +14,11 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         {
             throw new NotImplementedException();
         }
+
+        private static CategoryDTO? MapCategory(CategoryEntity category)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class UserDTO
@@ -41,6 +46,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public int Total { get; set; }
         public int UnitId { get; set; }
         public UserSourceDTO Source { get; set; }
+        public CategoryDTO Category{ get; set; }
     }
 
     public class AccountDTO
@@ -76,6 +82,10 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         }
     }
 
+    public class CategoryDTO
+    {
+    }
+
     //---- Entities
 
     public class UserEntity
@@ -99,6 +109,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public int? GetTotal() => throw new Exception();
         public UnitEntity? Unit { get; set; }
         public UserSourceEntity Source { get; set; }
+        public CategoryEntity? Category{ get; set; }
     }
 
     public class AccountEntity
@@ -127,5 +138,9 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public string ProviderName { get; set; }
         public string? ProviderAddress { get; set; }
         public bool? IsActive {get; set;}
+    }
+
+    public class CategoryEntity
+    {
     }
 }

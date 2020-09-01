@@ -21,24 +21,19 @@ namespace MappingGenerator.RoslynHelpers
             var symbolsToSelect = allowedSymbols ?? LocalSymbolKinds;
             return semanticModel.LookupSymbols(nodeFromScope.GetLocation().SourceSpan.Start).Where(x => symbolsToSelect.Contains(x.Kind)).ToList();
         }
-
-
+        
         public static ITypeSymbol GetTypeForSymbol(this SemanticModel semanticModel, ISymbol symbol)
         {
-            if (symbol is IRangeVariableSymbol rangeVariableSymbol)
+            return symbol switch
             {
-                return GetRangeVariableType(semanticModel, rangeVariableSymbol);
-            }
-
-            var syntaxType = GetSyntaxType(symbol);
-            if (syntaxType == null)
-            {
-                return null;
-            }
-
-            return semanticModel.GetTypeInfo(syntaxType).Type;
+                ILocalSymbol localSymbol => localSymbol.Type,
+                IFieldSymbol fieldSymbol => fieldSymbol.Type,
+                IPropertySymbol propertySymbol1 => propertySymbol1.Type,
+                IParameterSymbol parameterSymbol => parameterSymbol.Type,
+                IRangeVariableSymbol rangeVariableSymbol => GetRangeVariableType(semanticModel, rangeVariableSymbol),
+                _ => null
+            };
         }
-
 
         private static ITypeSymbol GetRangeVariableType(SemanticModel semanticModel, IRangeVariableSymbol symbol)
         {
@@ -85,25 +80,6 @@ namespace MappingGenerator.RoslynHelpers
                     continuation.Body,
                 _ => null
             };
-
-
-
-        private static SyntaxNode GetSyntaxType(ISymbol candidate)
-        {
-            var candidateSyntax = candidate.DeclaringSyntaxReferences.Select(x => x.GetSyntax()).FirstOrDefault();
-            if (candidateSyntax is VariableDeclaratorSyntax variableDeclarator)
-            {
-                var variableDeclaration = variableDeclarator.FindContainer<VariableDeclarationSyntax>();
-                return variableDeclaration.Type;
-            }
-            if (candidateSyntax is ParameterSyntax parameter)
-            {
-                return parameter.Type;
-            }
-
-           
-            return null;
-        }
 
         public static bool MatchType(this SemanticModel semanticModel, ISymbol source, ITypeSymbol targetType)
         {

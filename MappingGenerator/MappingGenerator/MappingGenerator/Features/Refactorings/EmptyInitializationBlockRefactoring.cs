@@ -97,7 +97,8 @@ namespace MappingGenerator.Features.Refactorings
             }).Select(s =>
             {
                 var type = semanticModel.GetTypeForSymbol(s);
-                if (ObjectHelper.IsSimpleType(type))
+                
+                if (type == null || ObjectHelper.IsSimpleType(type))
                 {
                     return null;
                 }

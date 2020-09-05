@@ -261,7 +261,7 @@ namespace MappingGenerator.Mappings
 
 
 
-        public IEnumerable<ExpressionSyntax> MapUsingSimpleAssignment(IReadOnlyCollection<IObjectField> targets,
+        public IEnumerable<AssignmentExpressionSyntax> MapUsingSimpleAssignment(IReadOnlyCollection<IObjectField> targets,
             IMappingMatcher mappingMatcher,
             MappingContext mappingContext,
             MappingPath mappingPath = null, SyntaxNode globalTargetAccessor = null)

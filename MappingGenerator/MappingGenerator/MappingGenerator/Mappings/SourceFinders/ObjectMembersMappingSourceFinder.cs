@@ -49,7 +49,7 @@ namespace MappingGenerator.Mappings.SourceFinders
             }
         }
 
-        public static ObjectCreationExpressionSyntax WithMembersInitialization(ObjectCreationExpressionSyntax objectCreationExpression, List<ExpressionSyntax> assignments)
+        public static ObjectCreationExpressionSyntax WithMembersInitialization(ObjectCreationExpressionSyntax objectCreationExpression, List<AssignmentExpressionSyntax> assignments)
         {
             if (assignments.Count == 0)
             {

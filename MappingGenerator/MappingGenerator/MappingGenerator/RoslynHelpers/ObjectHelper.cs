@@ -83,7 +83,7 @@ namespace MappingGenerator.RoslynHelpers
                     return true;
             }
 
-            if (type.ToDisplayString() == "System.Guid")
+            if (type.Name == "Guid" && type.ContainingNamespace.Name == "System")
             {
                 return true;
             }
@@ -91,12 +91,6 @@ namespace MappingGenerator.RoslynHelpers
 
             return false;
         }
-
-        public static bool HasInterface(ITypeSymbol xt, string interfaceName)
-        {
-            return xt.OriginalDefinition.AllInterfaces.Any(x => x.ToDisplayString() == interfaceName);
-        }
-
     }
 
     public interface IObjectField

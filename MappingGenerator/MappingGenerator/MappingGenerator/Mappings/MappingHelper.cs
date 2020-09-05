@@ -19,7 +19,7 @@ namespace MappingGenerator.Mappings
         
         public static bool IsCollection(ITypeSymbol typeSymbol)
         {
-            return typeSymbol.Kind == SymbolKind.ArrayType  || ObjectHelper.HasInterface(typeSymbol, "System.Collections.IEnumerable");
+            return typeSymbol.Kind == SymbolKind.ArrayType  || typeSymbol.OriginalDefinition.AllInterfaces.Any(x => x.Name == "IEnumerable" &&  x.ToDisplayString() == "System.Collections.IEnumerable");
         }
 
         public static AnnotatedType GetElementType(ITypeSymbol collectionType)

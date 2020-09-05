@@ -74,7 +74,10 @@ namespace MappingGenerator.Features.Refactorings
                 }
             }
 
-            yield return new LocalScopeMappingSourceFinder(semanticModel, localSymbols);
+            yield return new LocalScopeMappingSourceFinder(semanticModel, localSymbols)
+            {
+                AllowMatchOnlyByTypeWhenSingleCandidate = true
+            };
 
             foreach (var localSymbol in localSymbols)
             {

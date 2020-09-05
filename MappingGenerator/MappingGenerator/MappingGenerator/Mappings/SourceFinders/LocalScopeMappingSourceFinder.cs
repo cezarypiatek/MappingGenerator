@@ -40,7 +40,7 @@ namespace MappingGenerator.Mappings.SourceFinders
                 var type = semanticModel.GetTypeForSymbol(candidate);
                 if (type != null)
                 {
-                    return new MappingElement()
+                    return new MappingElement
                     {
                         ExpressionType = new AnnotatedType(type),
                         Expression = CreateIdentifierName(candidate)
@@ -50,7 +50,7 @@ namespace MappingGenerator.Mappings.SourceFinders
 
             if (AllowMatchOnlyByTypeWhenSingleCandidate)
             {
-                var byTypeCandidates = localSymbols.Where(x => semanticModel. MatchType(x, targetType.Type)).ToList();
+                var byTypeCandidates = localSymbols.Where(x => semanticModel.MatchType(x, targetType.Type)).ToList();
                 if (byTypeCandidates.Count == 1)
                 {
                     var byTypeCandidate = byTypeCandidates[0];

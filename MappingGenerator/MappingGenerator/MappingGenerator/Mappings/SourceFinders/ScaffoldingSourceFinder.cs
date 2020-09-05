@@ -38,7 +38,7 @@ namespace MappingGenerator.Mappings.SourceFinders
 
         private ConcurrentDictionary<string, SyntaxNode> cache = new ConcurrentDictionary<string, SyntaxNode>();
 
-        internal SyntaxNode GetDefaultExpression(ITypeSymbol type, MappingContext mappingContext, MappingPath mappingPath)
+        private SyntaxNode GetDefaultExpression(ITypeSymbol type, MappingContext mappingContext, MappingPath mappingPath)
         {
             if (mappingPath.AddToMapped(type) == false)
             {
@@ -57,10 +57,10 @@ namespace MappingGenerator.Mappings.SourceFinders
 
                 if (type.TypeKind == TypeKind.Enum && type is INamedTypeSymbol namedTypeSymbol)
                 {
-                    var enumOptions = namedTypeSymbol.MemberNames.Where(x => x != "value__" && x != ".ctor").OrderBy(x => x).ToList();
-                    if (enumOptions.Count > 0)
+                    var enumOption = namedTypeSymbol.MemberNames.Where(x => x != "value__" && x != ".ctor").OrderBy(x => x).FirstOrDefault();
+                    if (enumOption != null)
                     {
-                        return SyntaxFactoryExtensions.CreateMemberAccessExpression(SyntaxFactory.IdentifierName(namedTypeSymbol.Name), false, enumOptions[0]);
+                        return SyntaxFactoryExtensions.CreateMemberAccessExpression(SyntaxFactory.IdentifierName(namedTypeSymbol.Name), false, enumOption);
                     }
                     return syntaxGenerator.DefaultExpression(type);
                 }
@@ -127,7 +127,7 @@ namespace MappingGenerator.Mappings.SourceFinders
                             return GetDefaultForUnknownType(type);
                         }
 
-                        if (nt.TypeKind == TypeKind.Interface)
+                        if (nt.TypeKind == TypeKind.Interface )
                         {
                             var implementations = SymbolFinder.FindImplementationsAsync(type, this._document.Project.Solution).Result;
                             var firstImplementation = implementations.FirstOrDefault();
@@ -151,22 +151,25 @@ namespace MappingGenerator.Mappings.SourceFinders
                                 objectCreationExpression = CreateObject(nt);
                             }
                         }
-
-                        var publicConstructors = nt.Constructors.Where(x => mappingContext.AccessibilityHelper.IsSymbolAccessible(x, nt)).ToList();
-                        var hasDefaultConstructor = publicConstructors.Any(x => x.Parameters.Length == 0);
-                        if (hasDefaultConstructor == false && publicConstructors.Count > 0)
+                        else
                         {
-                            var randomConstructor = publicConstructors.First();
-                            var constructorArguments = randomConstructor.Parameters.Select(p => GetDefaultExpression(p.Type, mappingContext, mappingPath.Clone())).Select(x=> SyntaxFactory.Argument((ExpressionSyntax) x)) .ToList();
-                            objectCreationExpression = CreateObject(nt, constructorArguments);
+                            var publicConstructors = nt.Constructors.Where(x => mappingContext.AccessibilityHelper.IsSymbolAccessible(x, nt)).ToList();
+                            var hasDefaultConstructor = publicConstructors.Any(x => x.Parameters.Length == 0);
+                            if (hasDefaultConstructor == false && publicConstructors.Count > 0)
+                            {
+                                var randomConstructor = publicConstructors.First();
+                                var constructorArguments = randomConstructor.Parameters.Select(p => GetDefaultExpression(p.Type, mappingContext, mappingPath.Clone())).Select(x => SyntaxFactory.Argument((ExpressionSyntax)x)).ToList();
+                                objectCreationExpression = CreateObject(nt, constructorArguments);
+                            }
                         }
+
 
                         var fields = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(nt, mappingContext);
                         var assignments = fields.Select(x =>
                         {
                             var identifier = (ExpressionSyntax)(SyntaxFactory.IdentifierName(x.Name));
                             var mappingSource = this.FindMappingSource(x.Type, mappingContext, mappingPath.Clone());
-                            return (ExpressionSyntax)syntaxGenerator.AssignmentStatement(identifier, mappingSource.Expression);
+                            return  SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,identifier, mappingSource.Expression);
                         }).ToList();
 
                         if (objectCreationExpression == null)

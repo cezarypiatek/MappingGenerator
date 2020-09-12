@@ -17,8 +17,12 @@ namespace MappingGenerator.MethodHelpers
 
         public IEnumerable<ImmutableArray<IParameterSymbol>> GetOverloadParameterSets(SemanticModel semanticModel)
         {
-            var instantiatedType = (INamedTypeSymbol)semanticModel.GetSymbolInfo(creationExpression.Type).Symbol;
-            return instantiatedType.Constructors.Select(x => x.Parameters);
+            var symbolInfo = semanticModel.GetSymbolInfo(creationExpression.Type);
+            if (symbolInfo.Symbol is INamedTypeSymbol instantiatedType)
+            {
+                return instantiatedType.Constructors.Select(x => x.Parameters);
+            }
+            return null;
         }
 
         public SyntaxNode WithArgumentList(ArgumentListSyntax argumentListSyntax)

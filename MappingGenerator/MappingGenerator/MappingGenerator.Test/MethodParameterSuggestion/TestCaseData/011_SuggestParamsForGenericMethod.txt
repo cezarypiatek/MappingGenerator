@@ -1,0 +1,32 @@
+﻿
+namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+{
+    public class TestMapper
+    {
+        public static void DoSomething()
+        {
+            UserEntity entity = new UserEntity();
+            UserDTO dto = new UserDTO();
+            UpdateUser([||]);
+        }
+
+        private static void UpdateUser<T1, T2>(T1 entity, T2 dto) 
+            where T1 : UserEntity 
+            where T2 : class, IUserDTO
+        {
+
+        }
+    }
+
+    public interface IUserDTO { }
+
+    public class UserDTO: IUserDTO
+    {
+       
+    }
+
+    public class UserEntity
+    {
+       
+    }
+}

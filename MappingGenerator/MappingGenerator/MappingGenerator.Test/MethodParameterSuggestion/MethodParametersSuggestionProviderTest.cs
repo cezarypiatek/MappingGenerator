@@ -109,6 +109,16 @@ namespace MappingGenerator.Test.MethodParameterSuggestion
                 "firstName:firstName, lastName:lastName, other:provider"
             });
         }
+        
+        [Test]
+        public void should_be_able_to_get_completion_for_generic_method()
+        {
+            TestCompletion(MethodParameterSuggestionTestCases._011_SuggestParamsForGenericMethod, new[]
+            {
+                "entity, dto",
+                "entity:entity, dto:dto"
+            });
+        }
 
 
         protected override string LanguageName => LanguageNames.CSharp;

@@ -102,14 +102,15 @@ namespace MappingGenerator.Test.MethodParameterSuggestion {
         ///    {
         ///        public static UserDTO Map(string firstName, string lastName, int age)
         ///        {
-        ///            var parent = new UserDTO();
+        ///            var parent = new UserDTO;
         ///            Map2([||]);
         ///        }
         ///
         ///        public static UserDTO Map2(string firstName, string lastName, int age, UserDTO parent)
         ///        {
         ///            
-        ///        } [rest of string was truncated]&quot;;.
+        ///        }
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _002_SuggestOuterMethodParametersAndLocal {
             get {
@@ -127,7 +128,7 @@ namespace MappingGenerator.Test.MethodParameterSuggestion {
         ///{
         ///    public class TestMapper
         ///    {
-        ///        private readonly UserDTO parent = new UserDTO();
+        ///        private readonly UserDTO parent = new UserDTO;
         ///
         ///        public static UserDTO Map(string firstName, string lastName, int age)
         ///        {
@@ -136,7 +137,7 @@ namespace MappingGenerator.Test.MethodParameterSuggestion {
         ///
         ///        public static UserDTO Map2(string firstName, string lastName, int age, UserDTO parent)
         ///        {
-        ///     [rest of string was truncated]&quot;;.
+        ///       [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _003_SuggestOuterMethodParametersAndMembers {
             get {
@@ -156,14 +157,14 @@ namespace MappingGenerator.Test.MethodParameterSuggestion {
         ///    {
         ///        public static UserDTO Map(string firstName, string lastName, int age)
         ///        {
-        ///            var firstParent = new UserDTO();
+        ///            var firstParent = new UserDTO;
         ///            Map2([||]);
         ///        }
         ///
         ///        public static UserDTO Map2(string firstName, string lastName, int age, UserDTO parent)
         ///        {
         ///            
-        ///     [rest of string was truncated]&quot;;.
+        ///       [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _004_FallbackByTypeIfSingleCandidate {
             get {
@@ -181,7 +182,7 @@ namespace MappingGenerator.Test.MethodParameterSuggestion {
         ///{
         ///    public class TestMapper
         ///    {
-        ///        IUserDTO firstParent = new UserDTO();
+        ///        IUserDTO firstParent = new UserDTO;
         ///
         ///        public static UserDTO Map(string firstName, string lastName, int age)
         ///        {
@@ -191,7 +192,7 @@ namespace MappingGenerator.Test.MethodParameterSuggestion {
         ///        public static UserDTO Map2(string firstName, string lastName, int age, IUserDTO parent)
         ///        {
         ///            
-        /// [rest of string was truncated]&quot;;.
+        ///   [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _005_FallbackByTypeIfSingleCandidateInterface {
             get {
@@ -209,7 +210,7 @@ namespace MappingGenerator.Test.MethodParameterSuggestion {
         ///{
         ///    public class TestMapper
         ///    {
-        ///        EntityDTO firstParent = new UserDTO();
+        ///        EntityDTO firstParent = new UserDTO;
         ///
         ///        public static UserDTO Map(string firstName, string lastName, int age)
         ///        {
@@ -218,7 +219,8 @@ namespace MappingGenerator.Test.MethodParameterSuggestion {
         ///
         ///        public static UserDTO Map2(string firstName, string lastName, int age, EntityDTO parent)
         ///        {
-        ///             [rest of string was truncated]&quot;;.
+        ///            
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _006_FallbackByTypeIfSingleCandidateBaseClass {
             get {
@@ -236,7 +238,7 @@ namespace MappingGenerator.Test.MethodParameterSuggestion {
         ///{
         ///    public class TestMapper
         ///    {
-        ///        UserDTO firstParent = new UserDTO();
+        ///        UserDTO firstParent = new UserDTO;
         ///
         ///        public static UserDTO Map(string firstName, string lastName, int age)
         ///        {
@@ -246,7 +248,7 @@ namespace MappingGenerator.Test.MethodParameterSuggestion {
         ///        public static UserDTO Map2(string firstName, string lastName, int age, IUserDTO parent)
         ///        {
         ///            
-        ///  [rest of string was truncated]&quot;;.
+        ///    [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _007_FallbackByTypeIfSingleCandidateInterfaceInheritance {
             get {
@@ -264,7 +266,7 @@ namespace MappingGenerator.Test.MethodParameterSuggestion {
         ///{
         ///    public class TestMapper
         ///    {
-        ///        UserDTO firstParent = new UserDTO();
+        ///        UserDTO firstParent = new UserDTO;
         ///
         ///        public static UserDTO Map(string firstName, string lastName, int age)
         ///        {
@@ -274,7 +276,7 @@ namespace MappingGenerator.Test.MethodParameterSuggestion {
         ///        public static UserDTO Map2(string firstName, string lastName, int age, EntityDTO parent)
         ///        {
         ///            
-        /// [rest of string was truncated]&quot;;.
+        ///   [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _008_FallbackByTypeIfSingleCandidateBaseClassInheritance {
             get {
@@ -295,7 +297,7 @@ namespace MappingGenerator.Test.MethodParameterSuggestion {
         ///
         ///        public static UserDTO Map(string firstName, string lastName, int age)
         ///        {
-        ///            var user = new UserDTO();
+        ///            var user = new UserDTO;
         ///            user.Update([||]);
         ///            return user;
         ///        }
@@ -306,7 +308,8 @@ namespace MappingGenerator.Test.MethodParameterSuggestion {
         ///    
         ///    }
         ///
-        ///    public static class UserDTOExtensions        /// [rest of string was truncated]&quot;;.
+        ///    public static class UserDTOExtensions
+        ///  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _009_SuggestParamsForExtensionMethod {
             get {
@@ -325,9 +328,9 @@ namespace MappingGenerator.Test.MethodParameterSuggestion {
         ///    public class TestMapper
         ///    {
         ///
-        ///        public static UserDTO Map(string firstName, string lastName, IIdentityProvider  provider)
+        ///        public static UserDTO Map(string firstName, string lastName, IdentityProvider  provider)
         ///        {
-        ///            var user = new UserDTO();
+        ///            var user = new UserDTO;
         ///            user.Update([||]);
         ///            return user;
         ///        }
@@ -338,11 +341,42 @@ namespace MappingGenerator.Test.MethodParameterSuggestion {
         ///    
         ///    }
         ///
-        ///    public interface I [rest of string was truncated]&quot;;.
+        ///    public abstract class [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _010_SuggestParamsWithInterface {
             get {
                 return ResourceManager.GetString("_010_SuggestParamsWithInterface", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 
+        ///namespace MappingGenerator.Test.MappingGenerator.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public static void DoSomething()
+        ///        {
+        ///            UserEntity entity = new UserEntity();
+        ///            UserDTO dto = new UserDTO();
+        ///            UpdateUser([||]);
+        ///        }
+        ///
+        ///        private static void UpdateUser&lt;T1, T2&gt;(T1 entity, T2 dto) 
+        ///            where T1 : UserEntity 
+        ///            where T2 : class, IUserDTO
+        ///        {
+        ///
+        ///        }
+        ///    }
+        ///
+        ///    public interface IUserDTO { }
+        ///
+        ///     [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _011_SuggestParamsForGenericMethod {
+            get {
+                return ResourceManager.GetString("_011_SuggestParamsForGenericMethod", resourceCulture);
             }
         }
     }

@@ -94,6 +94,11 @@ namespace MappingGenerator.RoslynHelpers
 
         public static bool CanBeAssignedTo(this ITypeSymbol sourceSymbolType, ITypeSymbol targetType)
         {
+            if (targetType is ITypeParameterSymbol genericParameter)
+            {
+               return genericParameter.ConstraintTypes.Any(x => CanBeAssignedTo(sourceSymbolType, x));
+            }
+
             if (sourceSymbolType.GetBaseTypesAndThis().Any(t => t.Equals(targetType)))
             {
                 return true;

@@ -56,14 +56,14 @@ namespace MappingGenerator.Features.CodeFixes
 
         private async Task<Document> GenerateExplicitConversion(Document document, AssignmentExpressionSyntax assignmentExpression, CancellationToken cancellationToken)
         {
-            var (mappingEngine, semanticModel) = await CreateMappingEngine(document, assignmentExpression, cancellationToken).ConfigureAwait(false);
+            var (mappingEngine, semanticModel) = await CreateMappingEngine(document, cancellationToken).ConfigureAwait(false);
             var sourceType = mappingEngine.GetExpressionTypeInfo(assignmentExpression.Right).GetAnnotatedType();
             var destinationType = mappingEngine.GetExpressionTypeInfo(assignmentExpression.Left).GetAnnotatedType();
             var mappingExpression = mappingEngine.MapExpression(assignmentExpression.Right.WithoutTrivia(), sourceType, destinationType, new MappingContext(assignmentExpression, semanticModel)); 
             return await ReplaceNode(document, assignmentExpression, assignmentExpression.WithRight(mappingExpression), cancellationToken).ConfigureAwait(false);
         }
 
-        private static async Task<(MappingEngine, SemanticModel)> CreateMappingEngine(Document document, SyntaxNode node, CancellationToken cancellationToken)
+        private static async Task<(MappingEngine, SemanticModel)> CreateMappingEngine(Document document, CancellationToken cancellationToken)
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
             var mappingEngine = await MappingEngine.Create(document, cancellationToken).ConfigureAwait(false);
@@ -72,7 +72,7 @@ namespace MappingGenerator.Features.CodeFixes
 
         private async Task<Document> GenerateExplicitConversion(Document document, ReturnStatementSyntax returnStatement, CancellationToken cancellationToken)
         {
-            var (mappingEngine, semanticModel) = await CreateMappingEngine(document, returnStatement, cancellationToken).ConfigureAwait(false);
+            var (mappingEngine, semanticModel) = await CreateMappingEngine(document, cancellationToken).ConfigureAwait(false);
             var returnExpressionTypeInfo = mappingEngine.GetExpressionTypeInfo(returnStatement.Expression);
             var mappingExpression = mappingEngine.MapExpression(returnStatement.Expression!.WithoutTrivia(), returnExpressionTypeInfo.GetAnnotatedType(), returnExpressionTypeInfo.GetAnnotatedTypeForConverted(), new MappingContext(returnStatement, semanticModel)); 
             return await ReplaceNode(document, returnStatement, returnStatement.WithExpression(mappingExpression), cancellationToken).ConfigureAwait(false);
@@ -80,7 +80,7 @@ namespace MappingGenerator.Features.CodeFixes
 
         private async Task<Document> GenerateExplicitConversion(Document document, YieldStatementSyntax yieldStatement, CancellationToken cancellationToken)
         {
-            var (mappingEngine, semanticModel) = await CreateMappingEngine(document, yieldStatement, cancellationToken).ConfigureAwait(false);
+            var (mappingEngine, semanticModel) = await CreateMappingEngine(document, cancellationToken).ConfigureAwait(false);
             var returnExpressionTypeInfo = mappingEngine.GetExpressionTypeInfo(yieldStatement.Expression);
             var mappingExpression = mappingEngine.MapExpression(yieldStatement.Expression!.WithoutTrivia(), returnExpressionTypeInfo.GetAnnotatedType(), returnExpressionTypeInfo.GetAnnotatedTypeForConverted(), new MappingContext(yieldStatement, semanticModel)); 
             return await ReplaceNode(document, yieldStatement, yieldStatement.WithExpression(mappingExpression), cancellationToken).ConfigureAwait(false);
@@ -95,18 +95,14 @@ namespace MappingGenerator.Features.CodeFixes
 
         private SyntaxNode FindStatementToReplace(SyntaxNode node)
         {
-            switch (node)
+            return node switch
             {
                 //TODO EqualsValueClauseSyntax - Type1 v = vOfType2
-                    case AssignmentExpressionSyntax assignmentStatement:
-                        return assignmentStatement;
-                    case ReturnStatementSyntax returnStatement:
-                        return returnStatement;
-                    case YieldStatementSyntax yieldStatement:
-                        return yieldStatement;
-                    default:
-                        return node.Parent == null? null: FindStatementToReplace(node.Parent);
-            }
+                AssignmentExpressionSyntax assignmentStatement => assignmentStatement,
+                ReturnStatementSyntax returnStatement => returnStatement,
+                YieldStatementSyntax yieldStatement => yieldStatement,
+                _ => node.Parent == null ? null : FindStatementToReplace(node.Parent),
+            };
         }
     }
 }

@@ -46,142 +46,138 @@ namespace MappingGenerator.Mappings.SourceFinders
                     .WithTrailingTrivia(SyntaxFactory.Comment(" /* Stop recursive mapping */"));
             }
 
-            return cache.GetOrAdd(type.ToDisplayString().TrimEnd('?'), _ =>
+            if (SymbolHelper.IsNullable(type, out var underlyingType))
+            {
+                type = underlyingType;
+            }
+
+
+            if (type.TypeKind == TypeKind.Enum && type is INamedTypeSymbol namedTypeSymbol)
+            {
+                var enumOption = namedTypeSymbol.MemberNames.Where(x => x != "value__" && x != ".ctor").OrderBy(x => x).FirstOrDefault();
+                if (enumOption != null)
+                {
+                    return SyntaxFactoryExtensions.CreateMemberAccessExpression(SyntaxFactory.IdentifierName(namedTypeSymbol.Name), false, enumOption);
+                }
+                return syntaxGenerator.DefaultExpression(type);
+            }
+
+            if (type.SpecialType == SpecialType.None)
             {
 
-                if (SymbolHelper.IsNullable(type, out var underlyingType))
-                {
-                    type = underlyingType;
-                }
 
+                ObjectCreationExpressionSyntax objectCreationExpression = null;
 
-                if (type.TypeKind == TypeKind.Enum && type is INamedTypeSymbol namedTypeSymbol)
+                if (MappingHelper.IsCollection(type))
                 {
-                    var enumOption = namedTypeSymbol.MemberNames.Where(x => x != "value__" && x != ".ctor").OrderBy(x => x).FirstOrDefault();
-                    if (enumOption != null)
+                    var isReadonlyCollection = ObjectHelper.IsReadonlyCollection(type);
+
+                    if (type is IArrayTypeSymbol)
                     {
-                        return SyntaxFactoryExtensions.CreateMemberAccessExpression(SyntaxFactory.IdentifierName(namedTypeSymbol.Name), false, enumOption);
+                        objectCreationExpression = CreateObject(type);
                     }
-                    return syntaxGenerator.DefaultExpression(type);
-                }
-
-                if (type.SpecialType == SpecialType.None)
-                {
-
-
-                    ObjectCreationExpressionSyntax objectCreationExpression = null;
-
-                    if (MappingHelper.IsCollection(type))
+                    else if (type.TypeKind == TypeKind.Interface || isReadonlyCollection)
                     {
-                        var isReadonlyCollection = ObjectHelper.IsReadonlyCollection(type);
-
-                        if (type is IArrayTypeSymbol)
+                        if (type is INamedTypeSymbol namedType && namedType.IsGenericType)
                         {
-                            objectCreationExpression = CreateObject(type);
+                            var typeArgumentListSyntax = SyntaxFactory.TypeArgumentList(SyntaxFactory.SeparatedList(namedType.TypeArguments.Select(x => syntaxGenerator.TypeExpression(x))));
+                            var newType = SyntaxFactory.GenericName(SyntaxFactory.Identifier("List"), typeArgumentListSyntax);
+                            objectCreationExpression = SyntaxFactory.ObjectCreationExpression(newType, SyntaxFactory.ArgumentList(), default(InitializerExpressionSyntax));
                         }
-                        else if (type.TypeKind == TypeKind.Interface || isReadonlyCollection)
+                        else
                         {
-                            if (type is INamedTypeSymbol namedType && namedType.IsGenericType)
-                            {
-                                var typeArgumentListSyntax = SyntaxFactory.TypeArgumentList(SyntaxFactory.SeparatedList(namedType.TypeArguments.Select(x => syntaxGenerator.TypeExpression(x))));
-                                var newType = SyntaxFactory.GenericName(SyntaxFactory.Identifier("List"), typeArgumentListSyntax);
-                                objectCreationExpression = SyntaxFactory.ObjectCreationExpression(newType, SyntaxFactory.ArgumentList(), default(InitializerExpressionSyntax));
-                            }
-                            else
-                            {
-                                var newType = SyntaxFactory.ParseTypeName("ArrayList");
-                                objectCreationExpression = SyntaxFactory.ObjectCreationExpression(newType, SyntaxFactory.ArgumentList(), default(InitializerExpressionSyntax));
-                            }
+                            var newType = SyntaxFactory.ParseTypeName("ArrayList");
+                            objectCreationExpression = SyntaxFactory.ObjectCreationExpression(newType, SyntaxFactory.ArgumentList(), default(InitializerExpressionSyntax));
                         }
-                        objectCreationExpression ??= CreateObject(type, Array.Empty<ArgumentSyntax>());
+                    }
+                    objectCreationExpression ??= CreateObject(type, Array.Empty<ArgumentSyntax>());
 
-                        var subType = MappingHelper.GetElementType(type);
-                        var initializationBlockExpressions = new SeparatedSyntaxList<ExpressionSyntax>();
-                        var subTypeDefault = (ExpressionSyntax)GetDefaultExpression(subType.Type, mappingContext, mappingPath.Clone());
-                        if (subTypeDefault != null)
-                        {
-                            initializationBlockExpressions = initializationBlockExpressions.Add(subTypeDefault);
-                        }
-
-                        var initializerExpressionSyntax = SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression, initializationBlockExpressions).FixInitializerExpressionFormatting(objectCreationExpression);
-                        return objectCreationExpression
-                            .WithInitializer(initializerExpressionSyntax)
-                            .WrapInReadonlyCollectionIfNecessary(isReadonlyCollection, syntaxGenerator);
+                    var subType = MappingHelper.GetElementType(type);
+                    var initializationBlockExpressions = new SeparatedSyntaxList<ExpressionSyntax>();
+                    var subTypeDefault = (ExpressionSyntax)GetDefaultExpression(subType.Type, mappingContext, mappingPath.Clone());
+                    if (subTypeDefault != null)
+                    {
+                        initializationBlockExpressions = initializationBlockExpressions.Add(subTypeDefault);
                     }
 
-                    {
-                        var nt = type as INamedTypeSymbol;
-                        if (nt == null)
-                        {
-                            var genericTypeConstraints = type.UnwrapGeneric().ToList();
-                            if (genericTypeConstraints.Any() == false)
-                            {
-                                return GetDefaultForUnknown(type, ObjectType);
-                            }
-                            nt = genericTypeConstraints.FirstOrDefault(x => x.TypeKind == TypeKind.Class) as INamedTypeSymbol ??
-                                  genericTypeConstraints.FirstOrDefault(x => x.TypeKind == TypeKind.Interface) as INamedTypeSymbol;
-                        }
+                    var initializerExpressionSyntax = SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression, initializationBlockExpressions).FixInitializerExpressionFormatting(objectCreationExpression);
+                    return objectCreationExpression
+                        .WithInitializer(initializerExpressionSyntax)
+                        .WrapInReadonlyCollectionIfNecessary(isReadonlyCollection, syntaxGenerator);
+                }
 
-                        if (nt == null)
+                {
+                    var nt = type as INamedTypeSymbol;
+                    if (nt == null)
+                    {
+                        var genericTypeConstraints = type.UnwrapGeneric().ToList();
+                        if (genericTypeConstraints.Any() == false)
+                        {
+                            return GetDefaultForUnknown(type, ObjectType);
+                        }
+                        nt = genericTypeConstraints.FirstOrDefault(x => x.TypeKind == TypeKind.Class) as INamedTypeSymbol ??
+                              genericTypeConstraints.FirstOrDefault(x => x.TypeKind == TypeKind.Interface) as INamedTypeSymbol;
+                    }
+
+                    if (nt == null)
+                    {
+                        return GetDefaultForUnknownType(type);
+                    }
+
+                    if (nt.TypeKind == TypeKind.Interface)
+                    {
+                        var implementations = SymbolFinder.FindImplementationsAsync(type, this._document.Project.Solution).Result;
+                        var firstImplementation = implementations.FirstOrDefault();
+                        if (firstImplementation is INamedTypeSymbol == false)
                         {
                             return GetDefaultForUnknownType(type);
                         }
 
-                        if (nt.TypeKind == TypeKind.Interface )
-                        {
-                            var implementations = SymbolFinder.FindImplementationsAsync(type, this._document.Project.Solution).Result;
-                            var firstImplementation = implementations.FirstOrDefault();
-                            if (firstImplementation is INamedTypeSymbol == false)
-                            {
-                                return GetDefaultForUnknownType(type);
-                            }
+                        nt = firstImplementation as INamedTypeSymbol;
+                        objectCreationExpression = CreateObject(nt);
 
-                            nt = firstImplementation as INamedTypeSymbol;
-                            objectCreationExpression = CreateObject(nt);
-
-                        }
-                        else if (nt.TypeKind == TypeKind.Class && nt.IsAbstract)
-                        {
-                            var randomDerived = SymbolFinder.FindDerivedClassesAsync(nt, this._document.Project.Solution).Result
-                                .FirstOrDefault(x => x.IsAbstract == false);
-
-                            if (randomDerived != null)
-                            {
-                                nt = randomDerived;
-                                objectCreationExpression = CreateObject(nt);
-                            }
-                        }
-                        else
-                        {
-                            var publicConstructors = nt.Constructors.Where(x => mappingContext.AccessibilityHelper.IsSymbolAccessible(x, nt)).ToList();
-                            var hasDefaultConstructor = publicConstructors.Any(x => x.Parameters.Length == 0);
-                            if (hasDefaultConstructor == false && publicConstructors.Count > 0)
-                            {
-                                var randomConstructor = publicConstructors.First();
-                                var constructorArguments = randomConstructor.Parameters.Select(p => GetDefaultExpression(p.Type, mappingContext, mappingPath.Clone())).Select(x => SyntaxFactory.Argument((ExpressionSyntax)x)).ToList();
-                                objectCreationExpression = CreateObject(nt, constructorArguments);
-                            }
-                        }
-
-
-                        var fields = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(nt, mappingContext);
-                        var assignments = fields.Select(x =>
-                        {
-                            var identifier = (ExpressionSyntax)(SyntaxFactory.IdentifierName(x.Name));
-                            var mappingSource = this.FindMappingSource(x.Type, mappingContext, mappingPath.Clone());
-                            return  SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression,identifier, mappingSource.Expression);
-                        }).ToList();
-
-                        if (objectCreationExpression == null)
-                        {
-                            objectCreationExpression = CreateObject(type);
-                        }
-
-                        return SyntaxFactoryExtensions.WithMembersInitialization(objectCreationExpression, assignments);
                     }
+                    else if (nt.TypeKind == TypeKind.Class && nt.IsAbstract)
+                    {
+                        var randomDerived = SymbolFinder.FindDerivedClassesAsync(nt, this._document.Project.Solution).Result
+                            .FirstOrDefault(x => x.IsAbstract == false);
+
+                        if (randomDerived != null)
+                        {
+                            nt = randomDerived;
+                            objectCreationExpression = CreateObject(nt);
+                        }
+                    }
+                    else
+                    {
+                        var publicConstructors = nt.Constructors.Where(x => mappingContext.AccessibilityHelper.IsSymbolAccessible(x, nt)).ToList();
+                        var hasDefaultConstructor = publicConstructors.Any(x => x.Parameters.Length == 0);
+                        if (hasDefaultConstructor == false && publicConstructors.Count > 0)
+                        {
+                            var randomConstructor = publicConstructors.First();
+                            var constructorArguments = randomConstructor.Parameters.Select(p => GetDefaultExpression(p.Type, mappingContext, mappingPath.Clone())).Select(x => SyntaxFactory.Argument((ExpressionSyntax)x)).ToList();
+                            objectCreationExpression = CreateObject(nt, constructorArguments);
+                        }
+                    }
+
+
+                    var fields = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(nt, mappingContext);
+                    var assignments = fields.Select(x =>
+                    {
+                        var identifier = (ExpressionSyntax)(SyntaxFactory.IdentifierName(x.Name));
+                        var mappingSource = this.FindMappingSource(x.Type, mappingContext, mappingPath.Clone());
+                        return SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, identifier, mappingSource.Expression);
+                    }).ToList();
+
+                    if (objectCreationExpression == null)
+                    {
+                        objectCreationExpression = CreateObject(type);
+                    }
+
+                    return SyntaxFactoryExtensions.WithMembersInitialization(objectCreationExpression, assignments);
                 }
-                return GetDefaultForSpecialType(type);
-            });
+            }
+            return GetDefaultForSpecialType(type);
         }
 
         private ObjectCreationExpressionSyntax CreateObject(ITypeSymbol type, IReadOnlyList<ArgumentSyntax> constructorArguments = null)

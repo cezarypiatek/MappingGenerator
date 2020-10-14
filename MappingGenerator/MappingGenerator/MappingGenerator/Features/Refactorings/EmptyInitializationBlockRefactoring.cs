@@ -152,8 +152,9 @@ namespace MappingGenerator.Features.Refactorings
             var oldObjCreation = objectInitializer.FindContainer<ObjectCreationExpressionSyntax>();
             var createdObjectType = ModelExtensions.GetTypeInfo(semanticModel, oldObjCreation).Type;
             var mappingEngine = await MappingEngine.Create(document, cancellationToken).ConfigureAwait(false);
-            
-            var newObjectCreation = mappingEngine.AddInitializerWithMapping(oldObjCreation, mappingMatcher, createdObjectType, new MappingContext(objectInitializer, semanticModel ));
+
+            var mappingContext = new MappingContext(objectInitializer, semanticModel );
+            var newObjectCreation = await mappingEngine.AddInitializerWithMappingAsync(oldObjCreation, mappingMatcher, createdObjectType, mappingContext).ConfigureAwait(false);
             return await document.ReplaceNodes(oldObjCreation, newObjectCreation, cancellationToken).ConfigureAwait(false);
         }
     }

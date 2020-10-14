@@ -32,11 +32,11 @@ namespace MappingGenerator.Features.CodeFixes
             {
                 var mappingContext = new MappingContext(invocation.SourceNode, semanticModel);
                 var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator);
-                var parametersMatch = MethodHelper.FindBestParametersMatch(mappingSourceFinder, overloadParameterSets, mappingContext);
+                var parametersMatch = await MethodHelper.FindBestParametersMatch(mappingSourceFinder, overloadParameterSets, mappingContext).ConfigureAwait(false);
                 if (parametersMatch != null)
                 {
                     
-                    var argumentList = parametersMatch.ToArgumentListSyntax(mappingEngine, mappingContext, generateNamedParameters);
+                    var argumentList = await parametersMatch.ToArgumentListSyntaxAsync(mappingEngine, mappingContext, generateNamedParameters).ConfigureAwait(false);
                     return await document.ReplaceNodes(invocation.SourceNode, invocation.WithArgumentList(argumentList), cancellationToken).ConfigureAwait(false);
                 }
             }
@@ -136,7 +136,7 @@ namespace MappingGenerator.Features.CodeFixes
             
             var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator);
             var sourceListElementType = new AnnotatedType(sourceElementType);
-            var mappingLambda = mappingEngine.CreateMappingLambda("x", sourceListElementType, targetElementType, new MappingPath(), new MappingContext(invocation, semanticModel));
+            var mappingLambda = await mappingEngine.CreateMappingLambdaAsync("x", sourceListElementType, targetElementType, new MappingPath(), new MappingContext(invocation, semanticModel)).ConfigureAwait(false);
             return await document.ReplaceNodes(invocation, invocation.WithArgumentList(SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument((ExpressionSyntax)mappingLambda))), cancellationToken).ConfigureAwait(false);
         }
 

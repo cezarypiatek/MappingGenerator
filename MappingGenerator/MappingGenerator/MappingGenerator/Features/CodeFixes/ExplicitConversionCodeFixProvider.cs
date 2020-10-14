@@ -59,7 +59,8 @@ namespace MappingGenerator.Features.CodeFixes
             var (mappingEngine, semanticModel) = await CreateMappingEngine(document, cancellationToken).ConfigureAwait(false);
             var sourceType = mappingEngine.GetExpressionTypeInfo(assignmentExpression.Right).GetAnnotatedType();
             var destinationType = mappingEngine.GetExpressionTypeInfo(assignmentExpression.Left).GetAnnotatedType();
-            var mappingExpression = mappingEngine.MapExpression(assignmentExpression.Right.WithoutTrivia(), sourceType, destinationType, new MappingContext(assignmentExpression, semanticModel)); 
+            var mappingContext = new MappingContext(assignmentExpression, semanticModel);
+            var mappingExpression = await mappingEngine.MapExpression(assignmentExpression.Right.WithoutTrivia(), sourceType, destinationType, mappingContext).ConfigureAwait(false); 
             return await ReplaceNode(document, assignmentExpression, assignmentExpression.WithRight(mappingExpression), cancellationToken).ConfigureAwait(false);
         }
 
@@ -74,7 +75,8 @@ namespace MappingGenerator.Features.CodeFixes
         {
             var (mappingEngine, semanticModel) = await CreateMappingEngine(document, cancellationToken).ConfigureAwait(false);
             var returnExpressionTypeInfo = mappingEngine.GetExpressionTypeInfo(returnStatement.Expression);
-            var mappingExpression = mappingEngine.MapExpression(returnStatement.Expression!.WithoutTrivia(), returnExpressionTypeInfo.GetAnnotatedType(), returnExpressionTypeInfo.GetAnnotatedTypeForConverted(), new MappingContext(returnStatement, semanticModel)); 
+            var mappingContext = new MappingContext(returnStatement, semanticModel);
+            var mappingExpression = await mappingEngine.MapExpression(returnStatement.Expression!.WithoutTrivia(), returnExpressionTypeInfo.GetAnnotatedType(), returnExpressionTypeInfo.GetAnnotatedTypeForConverted(), mappingContext).ConfigureAwait(false); 
             return await ReplaceNode(document, returnStatement, returnStatement.WithExpression(mappingExpression), cancellationToken).ConfigureAwait(false);
         }
 
@@ -82,7 +84,8 @@ namespace MappingGenerator.Features.CodeFixes
         {
             var (mappingEngine, semanticModel) = await CreateMappingEngine(document, cancellationToken).ConfigureAwait(false);
             var returnExpressionTypeInfo = mappingEngine.GetExpressionTypeInfo(yieldStatement.Expression);
-            var mappingExpression = mappingEngine.MapExpression(yieldStatement.Expression!.WithoutTrivia(), returnExpressionTypeInfo.GetAnnotatedType(), returnExpressionTypeInfo.GetAnnotatedTypeForConverted(), new MappingContext(yieldStatement, semanticModel)); 
+            var mappingContext = new MappingContext(yieldStatement, semanticModel);
+            var mappingExpression = await mappingEngine.MapExpression(yieldStatement.Expression!.WithoutTrivia(), returnExpressionTypeInfo.GetAnnotatedType(), returnExpressionTypeInfo.GetAnnotatedTypeForConverted(), mappingContext).ConfigureAwait(false); 
             return await ReplaceNode(document, yieldStatement, yieldStatement.WithExpression(mappingExpression), cancellationToken).ConfigureAwait(false);
         }
 

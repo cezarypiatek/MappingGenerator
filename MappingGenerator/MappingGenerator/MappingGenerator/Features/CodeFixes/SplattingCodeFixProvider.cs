@@ -72,11 +72,11 @@ namespace MappingGenerator.Features.CodeFixes
                 var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator);
                 var invalidArgumentList = invocation.Arguments;
                 var mappingContext = new MappingContext(invocation.SourceNode, semanticModel);
-                var parametersMatch = FindParametersMatch(invalidArgumentList, overloadParameterSets, semanticModel, syntaxGenerator, mappingContext);
+                var parametersMatch = await FindParametersMatch(invalidArgumentList, overloadParameterSets, semanticModel, syntaxGenerator, mappingContext).ConfigureAwait(false);
                 if (parametersMatch != null)
                 {
                     
-                    var argumentList = parametersMatch.ToArgumentListSyntax(mappingEngine, mappingContext, generateNamedParameters);
+                    var argumentList = await parametersMatch.ToArgumentListSyntaxAsync(mappingEngine, mappingContext, generateNamedParameters).ConfigureAwait(false);
                     return await document.ReplaceNodes(invocation.SourceNode, invocation.WithArgumentList(argumentList), cancellationToken).ConfigureAwait(false);
                 
                 }
@@ -85,12 +85,12 @@ namespace MappingGenerator.Features.CodeFixes
             return document;
         }
 
-        private static MatchedParameterList FindParametersMatch(ArgumentListSyntax invalidArgumentList,
+        private static async Task<MatchedParameterList> FindParametersMatch(ArgumentListSyntax invalidArgumentList,
             IEnumerable<ImmutableArray<IParameterSymbol>> overloadParameterSets, SemanticModel semanticModel,
             SyntaxGenerator syntaxGenerator, MappingContext mappingContext) 
         {
             var sourceFinder = CreateSourceFinderBasedOnInvalidArgument(invalidArgumentList, semanticModel, syntaxGenerator);
-            var parametersMatch = MethodHelper.FindBestParametersMatch(sourceFinder, overloadParameterSets, mappingContext);
+            var parametersMatch = await MethodHelper.FindBestParametersMatch(sourceFinder, overloadParameterSets, mappingContext).ConfigureAwait(false);
             return parametersMatch;
         }
 

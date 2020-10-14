@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using MappingGenerator.Mappings.SourceFinders;
 using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
@@ -17,24 +18,27 @@ namespace MappingGenerator.Mappings.MappingMatchers
             matchers = sourceFinders.Select(x => new SingleSourceMatcher(x)).ToList();
         }
 
-        public IReadOnlyList<MappingMatch> MatchAll(IReadOnlyCollection<IObjectField> targets,
+        public async Task<IReadOnlyList<MappingMatch>> MatchAll(IReadOnlyCollection<IObjectField> targets,
             SyntaxGenerator syntaxGenerator, MappingContext mappingContext, SyntaxNode globalTargetAccessor = null)
         {
-            return GetMatchedSets(targets, syntaxGenerator, mappingContext, globalTargetAccessor)
-                .OrderByDescending(x => x.Count).FirstOrDefault() ?? Array.Empty<MappingMatch>();
+            var matchedSets = await GetMatchedSets(targets, syntaxGenerator, mappingContext, globalTargetAccessor).ConfigureAwait(false);
+            return matchedSets.OrderByDescending(x => x.Count).FirstOrDefault() ?? Array.Empty<MappingMatch>();
         }
 
-        private IEnumerable<IReadOnlyList<MappingMatch>> GetMatchedSets(IReadOnlyCollection<IObjectField> targets, SyntaxGenerator syntaxGenerator, MappingContext mappingContext, SyntaxNode globalTargetAccessor)
+        private async Task<IReadOnlyList<IReadOnlyList<MappingMatch>>> GetMatchedSets(IReadOnlyCollection<IObjectField> targets, SyntaxGenerator syntaxGenerator, MappingContext mappingContext, SyntaxNode globalTargetAccessor)
         {
+            var results = new List<IReadOnlyList<MappingMatch>>();
             foreach (var x in matchers)
             {
-                var matches = x.MatchAll(targets, syntaxGenerator, mappingContext, globalTargetAccessor);
-                yield return matches;
+                var matches = await x.MatchAll(targets, syntaxGenerator, mappingContext, globalTargetAccessor).ConfigureAwait(false);
+                results.Add(matches);
                 if (matches.Count == targets.Count)
                 {
-                    yield break;
+                    break;
                 }
             }
+
+            return results;
         }
     }
 }

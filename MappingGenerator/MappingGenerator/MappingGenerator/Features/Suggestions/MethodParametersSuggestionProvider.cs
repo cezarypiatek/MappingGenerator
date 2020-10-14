@@ -53,7 +53,7 @@ namespace MappingGenerator.Features.Suggestions
                     if (invocationExpression.ArgumentList.Arguments.Count == 0)
                     {
                         var invocation = new MethodInvocation(invocationExpression);
-                        SuggestMethodParameters(context, invocation, semanticModel);
+                        await SuggestMethodParameters(context, invocation, semanticModel).ConfigureAwait(false);
                     }
                 }
                 else if (expression is ObjectCreationExpressionSyntax creationExpression)
@@ -61,28 +61,28 @@ namespace MappingGenerator.Features.Suggestions
                     if (creationExpression.ArgumentList?.Arguments.Count == 0)
                     {
                         var invocation = new ConstructorInvocation(creationExpression);
-                        SuggestMethodParameters(context, invocation, semanticModel);
+                        await SuggestMethodParameters(context, invocation, semanticModel).ConfigureAwait(false);
                     }
                 }
             }
         }
 
-        private void SuggestMethodParameters(CompletionContext context, IInvocation invocation, SemanticModel semanticModel)
+        private async Task SuggestMethodParameters(CompletionContext context, IInvocation invocation, SemanticModel semanticModel)
         {
-            var argumentList = GetArgumentListWithLocalVariables(context.Document, invocation, false, semanticModel);
+            var argumentList = await GetArgumentListWithLocalVariables(context.Document, invocation, false, semanticModel).ConfigureAwait(false);
             if (argumentList != null)
             {
                 context.AddItem(CompletionItem.Create(argumentList, rules: preselectCompletionRules));
             }
 
-            var argumentListWithParameterNames = GetArgumentListWithLocalVariables(context.Document, invocation, true, semanticModel);
+            var argumentListWithParameterNames = await GetArgumentListWithLocalVariables(context.Document, invocation, true, semanticModel).ConfigureAwait(false);
             if (argumentListWithParameterNames != null)
             {
                 context.AddItem(CompletionItem.Create(argumentListWithParameterNames, rules: preselectCompletionRules));
             }
         }
 
-        private string GetArgumentListWithLocalVariables(Document document, IInvocation invocation, bool generateNamedParameters, SemanticModel semanticModel)
+        private async Task<string> GetArgumentListWithLocalVariables(Document document, IInvocation invocation, bool generateNamedParameters, SemanticModel semanticModel)
         {
             var mappingSourceFinder = LocalScopeMappingSourceFinder.FromScope(semanticModel, invocation.SourceNode, AllowedSymbolsForCompletion);
             mappingSourceFinder.AllowMatchOnlyByTypeWhenSingleCandidate = true;
@@ -93,11 +93,11 @@ namespace MappingGenerator.Features.Suggestions
             {
                 var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator);
                 var mappingContext = new MappingContext(invocation.SourceNode, semanticModel);
-                var parametersMatch = MethodHelper.FindBestParametersMatch(mappingSourceFinder, overloadParameterSets, mappingContext);
+                var parametersMatch = await MethodHelper.FindBestParametersMatch(mappingSourceFinder, overloadParameterSets, mappingContext).ConfigureAwait(false);
                 if (parametersMatch != null)
                 {
                     
-                    var argumentList = parametersMatch.ToArgumentListSyntax(mappingEngine, mappingContext, generateNamedParameters);
+                    var argumentList = await parametersMatch.ToArgumentListSyntaxAsync(mappingEngine, mappingContext, generateNamedParameters).ConfigureAwait(false);
                     var chunks = argumentList.Arguments.Select(a => a.ToString());
                     return string.Join(", ", chunks);
                 }

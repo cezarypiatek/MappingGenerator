@@ -8,12 +8,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 namespace MappingGenerator.Mappings.SourceFinders
 {
     public interface IMappingSourceFinder
     {
-        MappingElement FindMappingSource(string targetName, AnnotatedType targetType, MappingContext mappingContext);
+        Task<MappingElement> FindMappingSource(string targetName, AnnotatedType targetType, MappingContext mappingContext);
     }
 
     public class SyntaxFactoryExtensions
@@ -49,7 +50,7 @@ namespace MappingGenerator.Mappings.SourceFinders
             }
         }
 
-        public static ObjectCreationExpressionSyntax WithMembersInitialization(ObjectCreationExpressionSyntax objectCreationExpression, List<AssignmentExpressionSyntax> assignments)
+        public static ObjectCreationExpressionSyntax WithMembersInitialization(ObjectCreationExpressionSyntax objectCreationExpression, IReadOnlyList<AssignmentExpressionSyntax> assignments)
         {
             if (assignments.Count == 0)
             {
@@ -86,9 +87,10 @@ namespace MappingGenerator.Mappings.SourceFinders
             isSourceTypeEnumerable = new Lazy<bool>(() => sourceType.Type.Interfaces.Any(x => x.ToDisplayString().StartsWith("System.Collections.Generic.IEnumerable<")));
         }
 
-        public MappingElement FindMappingSource(string targetName, AnnotatedType targetType, MappingContext mappingContext)
+        public Task<MappingElement> FindMappingSource(string targetName, AnnotatedType targetType, MappingContext mappingContext)
         {
-            return TryFindSource(targetName, mappingContext, sourceType) ?? TryFindSourceForEnumerable(targetName, targetType.Type);
+            var result = TryFindSource(targetName, mappingContext, sourceType) ?? TryFindSourceForEnumerable(targetName, targetType.Type);
+            return Task.FromResult(result);
         }
 
 

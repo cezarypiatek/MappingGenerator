@@ -46,23 +46,28 @@ namespace MappingGenerator.MethodHelpers
             }
         }
 
-        public ArgumentListSyntax ToArgumentListSyntax(MappingEngine mappingEngine, MappingContext mappingContext, bool generateNamedParameters = true)
+        public async System.Threading.Tasks.Task<ArgumentListSyntax> ToArgumentListSyntaxAsync(MappingEngine mappingEngine, MappingContext mappingContext, bool generateNamedParameters = true)
         {
-            return Matches.Aggregate(SyntaxFactory.ArgumentList(), (list, match) =>
+            var resultList = SyntaxFactory.ArgumentList();
+
+            foreach (var match in Matches)
             {
                 if (match.Source?.Expression == null && match.Parameter.IsOptional)
                 {
                     generateNamedParameters = true;
-                    return list;
+                    continue;
                 }
 
-                var parameterType =new AnnotatedType(match.Parameter.Type);
-                var expression = mappingEngine.MapExpression(match.Source, parameterType, mappingContext)?.Expression ?? mappingEngine.CreateDefaultExpression(parameterType.Type);
+                var parameterType = new AnnotatedType(match.Parameter.Type);
+                var mapExpression = await mappingEngine.MapExpression(match.Source, parameterType, mappingContext).ConfigureAwait(false);
+                var expression = mapExpression?.Expression ?? mappingEngine.CreateDefaultExpression(parameterType.Type);
                 var argument = generateNamedParameters
                     ? SyntaxFactory.Argument(SyntaxFactory.NameColon(match.Parameter.Name), SyntaxFactory.Token(SyntaxKind.None), expression)
                     : SyntaxFactory.Argument(expression);
-                return list.AddArguments(argument);
-            });
+                resultList = resultList.AddArguments(argument);
+            }
+
+            return resultList;
         }
 
         class MatchedParameter

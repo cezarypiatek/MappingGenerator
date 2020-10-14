@@ -1,7 +1,7 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -22,23 +22,21 @@ namespace MappingGenerator.Mappings.SourceFinders
             _document = document;
         }
 
-        public MappingElement FindMappingSource(string targetName, AnnotatedType targetType, MappingContext mappingContext)
+        public Task<MappingElement> FindMappingSource(string targetName, AnnotatedType targetType, MappingContext mappingContext)
         {
             return FindMappingSource(targetType, mappingContext, new MappingPath());
         }
 
-        private MappingElement FindMappingSource(AnnotatedType targetType, MappingContext mappingContext, MappingPath mappingPath)
+        private async Task<MappingElement> FindMappingSource(AnnotatedType targetType, MappingContext mappingContext, MappingPath mappingPath)
         {
             return new MappingElement
             {
                 ExpressionType = targetType,
-                Expression = (ExpressionSyntax) GetDefaultExpression(targetType.Type, mappingContext, mappingPath)
+                Expression = (ExpressionSyntax)(await GetDefaultExpression(targetType.Type, mappingContext, mappingPath).ConfigureAwait(false))
             };  
         }
 
-        private ConcurrentDictionary<string, SyntaxNode> cache = new ConcurrentDictionary<string, SyntaxNode>();
-
-        private SyntaxNode GetDefaultExpression(ITypeSymbol type, MappingContext mappingContext, MappingPath mappingPath)
+        private async Task<SyntaxNode> GetDefaultExpression(ITypeSymbol type, MappingContext mappingContext, MappingPath mappingPath)
         {
             if (mappingPath.AddToMapped(type) == false)
             {
@@ -94,7 +92,7 @@ namespace MappingGenerator.Mappings.SourceFinders
 
                     var subType = MappingHelper.GetElementType(type);
                     var initializationBlockExpressions = new SeparatedSyntaxList<ExpressionSyntax>();
-                    var subTypeDefault = (ExpressionSyntax)GetDefaultExpression(subType.Type, mappingContext, mappingPath.Clone());
+                    var subTypeDefault = (ExpressionSyntax) (await GetDefaultExpression(subType.Type, mappingContext, mappingPath.Clone()).ConfigureAwait(false));
                     if (subTypeDefault != null)
                     {
                         initializationBlockExpressions = initializationBlockExpressions.Add(subTypeDefault);
@@ -126,7 +124,7 @@ namespace MappingGenerator.Mappings.SourceFinders
 
                     if (nt.TypeKind == TypeKind.Interface)
                     {
-                        var implementations = SymbolFinder.FindImplementationsAsync(type, this._document.Project.Solution).Result;
+                        var implementations = await SymbolFinder.FindImplementationsAsync(type, _document.Project.Solution).ConfigureAwait(false);
                         var firstImplementation = implementations.FirstOrDefault();
                         if (firstImplementation is INamedTypeSymbol == false)
                         {
@@ -139,8 +137,8 @@ namespace MappingGenerator.Mappings.SourceFinders
                     }
                     else if (nt.TypeKind == TypeKind.Class && nt.IsAbstract)
                     {
-                        var randomDerived = SymbolFinder.FindDerivedClassesAsync(nt, this._document.Project.Solution).Result
-                            .FirstOrDefault(x => x.IsAbstract == false);
+                        var allDerived = await SymbolFinder.FindDerivedClassesAsync(nt, _document.Project.Solution).ConfigureAwait(false);
+                        var randomDerived = allDerived.FirstOrDefault(x => x.IsAbstract == false);
 
                         if (randomDerived != null)
                         {
@@ -155,19 +153,20 @@ namespace MappingGenerator.Mappings.SourceFinders
                         if (hasDefaultConstructor == false && publicConstructors.Count > 0)
                         {
                             var randomConstructor = publicConstructors.First();
-                            var constructorArguments = randomConstructor.Parameters.Select(p => GetDefaultExpression(p.Type, mappingContext, mappingPath.Clone())).Select(x => SyntaxFactory.Argument((ExpressionSyntax)x)).ToList();
+                            var constructorArguments = await GetConstructorArguments(mappingContext, mappingPath, randomConstructor).ConfigureAwait(false);
                             objectCreationExpression = CreateObject(nt, constructorArguments);
                         }
                     }
 
 
                     var fields = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(nt, mappingContext);
-                    var assignments = fields.Select(x =>
+                    var assignments = new List<AssignmentExpressionSyntax>(fields.Count);
+                    foreach (var x in fields)
                     {
                         var identifier = (ExpressionSyntax)(SyntaxFactory.IdentifierName(x.Name));
-                        var mappingSource = this.FindMappingSource(x.Type, mappingContext, mappingPath.Clone());
-                        return SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, identifier, mappingSource.Expression);
-                    }).ToList();
+                        var mappingSource = await this.FindMappingSource(x.Type, mappingContext, mappingPath.Clone()).ConfigureAwait(false);
+                        assignments.Add(SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, identifier, mappingSource.Expression));
+                    }
 
                     if (objectCreationExpression == null)
                     {
@@ -178,6 +177,17 @@ namespace MappingGenerator.Mappings.SourceFinders
                 }
             }
             return GetDefaultForSpecialType(type);
+        }
+
+        private async Task<List<ArgumentSyntax>> GetConstructorArguments(MappingContext mappingContext, MappingPath mappingPath, IMethodSymbol randomConstructor)
+        {
+            var arguments = new List<ArgumentSyntax>(randomConstructor.Parameters.Length);
+            foreach (var p in randomConstructor.Parameters)
+            {
+                var x = await GetDefaultExpression(p.Type, mappingContext, mappingPath.Clone()).ConfigureAwait(false);
+                arguments.Add(SyntaxFactory.Argument((ExpressionSyntax)x));
+            }
+            return arguments;
         }
 
         private ObjectCreationExpressionSyntax CreateObject(ITypeSymbol type, IReadOnlyList<ArgumentSyntax> constructorArguments = null)

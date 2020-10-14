@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using MappingGenerator.Mappings.SourceFinders;
 using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
@@ -18,15 +19,20 @@ namespace MappingGenerator.Mappings.MappingMatchers
             this.sourceFinder = sourceFinder;
         }
 
-        public IReadOnlyList<MappingMatch> MatchAll(IReadOnlyCollection<IObjectField> targets,
-            SyntaxGenerator syntaxGenerator, MappingContext mappingContext, SyntaxNode globalTargetAccessor = null)
+        public async Task<IReadOnlyList<MappingMatch>> MatchAll(IReadOnlyCollection<IObjectField> targets, SyntaxGenerator syntaxGenerator, MappingContext mappingContext, SyntaxNode globalTargetAccessor = null)
         {
-            return targets.Select(target => new MappingMatch
+
+            var results = new List<MappingMatch>(targets.Count);
+            foreach (var target in targets)
+            {
+                results.Add(new MappingMatch
                 {
-                    Source = sourceFinder.FindMappingSource(target.Name, target.Type, mappingContext),
+                    Source = await sourceFinder.FindMappingSource(target.Name, target.Type, mappingContext).ConfigureAwait(false),
                     Target = CreateTargetElement(globalTargetAccessor, target, syntaxGenerator)
-                })
-                .Where(x => x.Source != null).ToList();
+                });
+            }
+
+            return results.Where(x => x.Source != null).ToList();
         }
 
         private MappingElement CreateTargetElement(SyntaxNode globalTargetAccessor, IObjectField target, SyntaxGenerator syntaxGenerator)

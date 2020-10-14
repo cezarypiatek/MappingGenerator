@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using MappingGenerator.Mappings.MappingImplementors;
 using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
@@ -28,14 +30,14 @@ namespace MappingGenerator.Mappings
             return this.implementors.Any(x => x.CanImplement(methodSymbol));
         }
 
-        public IEnumerable<SyntaxNode> GenerateMappingCode(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel, MappingContext mappingContext)
+        private async Task<IReadOnlyList<SyntaxNode>> GenerateMappingCode(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel, MappingContext mappingContext)
         {
             var matchedImplementor = implementors.FirstOrDefault(x => x.CanImplement(methodSymbol));
             if (matchedImplementor != null)
             {
-                return matchedImplementor.GenerateImplementation(methodSymbol, generator, semanticModel, mappingContext);
+                return await matchedImplementor.GenerateImplementation(methodSymbol, generator, semanticModel, mappingContext).ConfigureAwait(false);
             }
-            return Enumerable.Empty<SyntaxNode>();
+            return Array.Empty<SyntaxNode>();
         }
 
         private readonly IReadOnlyList<IMappingMethodImplementor> implementors = new List<IMappingMethodImplementor>()
@@ -51,17 +53,17 @@ namespace MappingGenerator.Mappings
             new ThisObjectToOtherMappingMethodImplementor()
         };
 
-        public BlockSyntax GenerateMappingBlock(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel, MappingContext mappingContext)
+        public async Task<BlockSyntax> GenerateMappingBlockAsync(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel, MappingContext mappingContext)
         {
-            var mappingStatements = GenerateMappingStatements(methodSymbol, generator, semanticModel, mappingContext);
+            var mappingStatements = await  GenerateMappingStatements(methodSymbol, generator, semanticModel, mappingContext).ConfigureAwait(false);
             return SyntaxFactory.Block(mappingStatements).WithAdditionalAnnotations(Formatter.Annotation);
         }
 
-        public IEnumerable<StatementSyntax> GenerateMappingStatements(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel, MappingContext mappingContext)
+        public async Task<IReadOnlyList<StatementSyntax>> GenerateMappingStatements(IMethodSymbol methodSymbol, SyntaxGenerator generator, SemanticModel semanticModel, MappingContext mappingContext)
         {
-            var mappingExpressions = GenerateMappingCode(methodSymbol, generator, semanticModel, mappingContext);
+            var mappingExpressions = await GenerateMappingCode(methodSymbol, generator, semanticModel, mappingContext).ConfigureAwait(false);
             var mappingStatements = mappingExpressions.Select(e => e.AsStatement());
-            return mappingStatements;
+            return mappingStatements.ToList();
         }
     }
 }

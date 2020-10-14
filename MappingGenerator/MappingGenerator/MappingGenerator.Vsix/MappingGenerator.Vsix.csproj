@@ -24,8 +24,9 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <NuGetPackageImportStamp></NuGetPackageImportStamp>
-	<DeployExtension Condition="'$(AppVeyor)' != ''">False</DeployExtension>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <DeployExtension Condition="'$(AppVeyor)' != ''">False</DeployExtension>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -72,6 +73,9 @@
     <StartArguments>/rootsuffix Roslyn</StartArguments>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="..\..\.editorconfig">
+      <Link>.editorconfig</Link>
+    </None>
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

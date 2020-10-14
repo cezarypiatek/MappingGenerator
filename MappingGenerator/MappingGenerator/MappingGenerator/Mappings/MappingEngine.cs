@@ -37,17 +37,18 @@ namespace MappingGenerator.Mappings
             return new MappingEngine(semanticModel, syntaxGenerator);
         }
 
-        public ExpressionSyntax MapExpression(ExpressionSyntax sourceExpression, AnnotatedType sourceType, AnnotatedType destinationType, MappingContext mappingContext)
+        public async Task<ExpressionSyntax> MapExpression(ExpressionSyntax sourceExpression, AnnotatedType sourceType, AnnotatedType destinationType, MappingContext mappingContext)
         {
             var mappingSource = new MappingElement
             {
                 Expression = sourceExpression,
                 ExpressionType = sourceType
             };
-            return MapExpression(mappingSource, destinationType, mappingContext).Expression;
+            var mappingElement = await MapExpression(mappingSource, destinationType, mappingContext).ConfigureAwait(false);
+            return mappingElement.Expression;
         }
 
-        public MappingElement MapExpression(MappingElement source, AnnotatedType targetType, MappingContext mappingContext, MappingPath mappingPath = null)
+        public async Task<MappingElement> MapExpression(MappingElement source, AnnotatedType targetType, MappingContext mappingContext, MappingPath mappingPath = null)
         {
             if (source == null)
             {
@@ -108,7 +109,7 @@ namespace MappingGenerator.Mappings
 
             if (ShouldCreateConversionBetweenTypes(targetType.Type, sourceType.Type))
             {
-                return TryToCreateMappingExpression(source, targetType, mappingPath, mappingContext);
+                return await  TryToCreateMappingExpression(source, targetType, mappingPath, mappingContext).ConfigureAwait(false);
             }
 
 
@@ -137,7 +138,7 @@ namespace MappingGenerator.Mappings
             return sourceType.CanBeAssignedTo(targetType) == false && ObjectHelper.IsSimpleType(targetType)==false && ObjectHelper.IsSimpleType(sourceType)==false;
         }
 
-        protected virtual MappingElement TryToCreateMappingExpression(MappingElement source, AnnotatedType targetType, MappingPath mappingPath, MappingContext mappingContext)
+        protected virtual async Task<MappingElement> TryToCreateMappingExpression(MappingElement source, AnnotatedType targetType, MappingPath mappingPath, MappingContext mappingContext)
         {
             //TODO: If source expression is method or constructor invocation then we should extract local variable and use it im mappings as a reference
             var namedTargetType = targetType.Type as INamedTypeSymbol;
@@ -160,7 +161,7 @@ namespace MappingGenerator.Mappings
             if (MappingHelper.IsMappingBetweenCollections(targetType.Type, source.ExpressionType.Type))
             {
                 var shouldProtectAgainstNull = source.ExpressionType.CanBeNull && targetType.CanBeNull == false;
-                var collectionMapping = MapCollections(source, targetType, mappingPath.Clone(), mappingContext) as ExpressionSyntax;
+                var collectionMapping = (await MapCollectionsAsync(source, targetType, mappingPath.Clone(), mappingContext).ConfigureAwait(false)) as ExpressionSyntax;
                 return new MappingElement
                 {
                     ExpressionType = targetType,
@@ -174,11 +175,12 @@ namespace MappingGenerator.Mappings
             {
                 //maybe there is constructor that accepts parameter matching source properties
                 var constructorOverloadParameterSets = namedTargetType.Constructors.Select(x => x.Parameters);
-                var matchedOverload = MethodHelper.FindBestParametersMatch(subMappingSourceFinder, constructorOverloadParameterSets, mappingContext);
+                var matchedOverload = await MethodHelper.FindBestParametersMatch(subMappingSourceFinder, constructorOverloadParameterSets, mappingContext).ConfigureAwait(false);
 
                 if (matchedOverload != null)
                 {
-                    var creationExpression = CreateObject(targetType.Type, matchedOverload.ToArgumentListSyntax(this, mappingContext));
+                    var argumentListSyntaxAsync = await matchedOverload.ToArgumentListSyntaxAsync(this, mappingContext).ConfigureAwait(false);
+                    var creationExpression = CreateObject(targetType.Type, argumentListSyntaxAsync);
                     var matchedSources = matchedOverload.GetMatchedSources();
                     var restSourceFinder = new IgnorableMappingSourceFinder(subMappingSourceFinder,  foundElement =>
                         {
@@ -188,15 +190,14 @@ namespace MappingGenerator.Mappings
                     return new MappingElement()
                     {
                         ExpressionType = new AnnotatedType(targetType.Type),
-                        Expression = AddInitializerWithMapping(creationExpression, mappingMatcher, targetType.Type, mappingContext, mappingPath),
+                        Expression = await AddInitializerWithMappingAsync(creationExpression, mappingMatcher, targetType.Type, mappingContext, mappingPath).ConfigureAwait(false),
                     };
                 }
             }
 
-            
             var objectCreationExpressionSyntax = CreateObject(targetType.Type);
             var subMappingMatcher = new SingleSourceMatcher(subMappingSourceFinder);
-            var objectCreationWithInitializer = AddInitializerWithMapping(objectCreationExpressionSyntax, subMappingMatcher, targetType.Type, mappingContext, mappingPath);
+            var objectCreationWithInitializer = await AddInitializerWithMappingAsync(objectCreationExpressionSyntax, subMappingMatcher, targetType.Type, mappingContext, mappingPath).ConfigureAwait(false);
             return new MappingElement()
             {
                 ExpressionType = new AnnotatedType(targetType.Type),
@@ -248,20 +249,20 @@ namespace MappingGenerator.Mappings
         }
 
 
-        public ObjectCreationExpressionSyntax AddInitializerWithMapping(
+        public async Task<ObjectCreationExpressionSyntax> AddInitializerWithMappingAsync(
             ObjectCreationExpressionSyntax objectCreationExpression, IMappingMatcher mappingMatcher,
             ITypeSymbol createdObjectTyp,
             MappingContext mappingContext,
             MappingPath mappingPath = null)
         {
             var propertiesToSet = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(createdObjectTyp, mappingContext);
-            var assignments = MapUsingSimpleAssignment(propertiesToSet, mappingMatcher, mappingContext, mappingPath).ToList();
+            var assignments = await MapUsingSimpleAssignment(propertiesToSet, mappingMatcher, mappingContext, mappingPath).ConfigureAwait(false);
             return SyntaxFactoryExtensions.WithMembersInitialization(objectCreationExpression, assignments);
         }
 
 
 
-        public IEnumerable<AssignmentExpressionSyntax> MapUsingSimpleAssignment(IReadOnlyCollection<IObjectField> targets,
+        public async Task<IReadOnlyList<AssignmentExpressionSyntax>> MapUsingSimpleAssignment(IReadOnlyCollection<IObjectField> targets,
             IMappingMatcher mappingMatcher,
             MappingContext mappingContext,
             MappingPath mappingPath = null, SyntaxNode globalTargetAccessor = null)
@@ -270,24 +271,27 @@ namespace MappingGenerator.Mappings
             {
                 mappingPath = new MappingPath();
             }
-          
-            return mappingMatcher.MatchAll(targets, syntaxGenerator, mappingContext, globalTargetAccessor)
-                .Select(match =>
-                {
-                    var sourceMappingElement = MapExpression(match.Source,  match.Target.ExpressionType, mappingContext, mappingPath.Clone());
-                    var sourceExpression = sourceMappingElement.Expression;
-                    if (sourceMappingElement.ExpressionType != match.Target.ExpressionType)
-                    {
-                        mappingContext.AddMissingConversion(sourceMappingElement.ExpressionType.Type, match.Target.ExpressionType.Type);
-                        if (mappingContext.WrapInCustomConversion)
-                        {
-                            var customConversionMethodName = syntaxGenerator.IdentifierName($"MapFrom{sourceMappingElement.ExpressionType.Type.Name}To{match.Target.ExpressionType.Type.Name}");
-                            sourceExpression = (ExpressionSyntax) syntaxGenerator.InvocationExpression(customConversionMethodName, sourceExpression);
-                        }
-                    }
 
-                    return AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, match.Target.Expression, sourceExpression);
-                }).ToList();
+            var results = new List<AssignmentExpressionSyntax>();
+            foreach (var match in await mappingMatcher.MatchAll(targets, syntaxGenerator, mappingContext, globalTargetAccessor).ConfigureAwait(false))
+            {
+                var sourceMappingElement = await MapExpression(match.Source, match.Target.ExpressionType, mappingContext, mappingPath.Clone()).ConfigureAwait(false);
+                var sourceExpression = sourceMappingElement.Expression;
+                if (sourceMappingElement.ExpressionType != match.Target.ExpressionType)
+                {
+                    mappingContext.AddMissingConversion(sourceMappingElement.ExpressionType.Type, match.Target.ExpressionType.Type);
+                    if (mappingContext.WrapInCustomConversion)
+                    {
+                        var customConversionMethodName = syntaxGenerator.IdentifierName($"MapFrom{sourceMappingElement.ExpressionType.Type.Name}To{match.Target.ExpressionType.Type.Name}");
+                        sourceExpression = (ExpressionSyntax)syntaxGenerator.InvocationExpression(customConversionMethodName, sourceExpression);
+                    }
+                }
+
+                var assignmentExpression = AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, match.Target.Expression, sourceExpression);
+                results.Add(assignmentExpression);
+            }
+
+            return results;
         }
 
         private bool IsConversionToSimpleTypeNeeded(ITypeSymbol targetType, ITypeSymbol sourceType)
@@ -384,7 +388,7 @@ namespace MappingGenerator.Mappings
             return wrapperType.GetObjectFields().Where(x =>  x.Type.Type.Equals(wrappedType) && x.CanBeGet(wrappedType, mappingContext));
         }
 
-        private SyntaxNode MapCollections(MappingElement source, AnnotatedType targetListType, MappingPath mappingPath, MappingContext mappingContext)
+        private async Task<SyntaxNode> MapCollectionsAsync(MappingElement source, AnnotatedType targetListType, MappingPath mappingPath, MappingContext mappingContext)
         {
             var isReadonlyCollection = ObjectHelper.IsReadonlyCollection(targetListType.Type);
             var sourceListElementType = MappingHelper.GetElementType(source.ExpressionType.Type);
@@ -393,7 +397,7 @@ namespace MappingGenerator.Mappings
             {
                 var whereFilter = SyntaxFactoryExtensions.CreateMethodAccessExpression(source.Expression, source.ExpressionType.CanBeNull, $"OfType<{sourceListElementType.Type.Name}>");
                 var lambdaParameterName = NameHelper.CreateLambdaParameterName(source.Expression);
-                var mappingLambda = CreateMappingLambda(lambdaParameterName, sourceListElementType.AsNotNull(), targetListElementType, mappingPath, mappingContext);
+                var mappingLambda = await CreateMappingLambdaAsync(lambdaParameterName, sourceListElementType.AsNotNull(), targetListElementType, mappingPath, mappingContext).ConfigureAwait(false);
                 var selectExpression = SyntaxFactoryExtensions.CreateMethodAccessExpression(whereFilter, false, "Select", mappingLambda);
                 var toList = AddMaterializeCollectionInvocation(syntaxGenerator, selectExpression, targetListType.Type, false);
                 return MappingHelper.WrapInReadonlyCollectionIfNecessary(toList, isReadonlyCollection, syntaxGenerator);
@@ -404,7 +408,7 @@ namespace MappingGenerator.Mappings
                 var useConvert = CanUseConvert(source.ExpressionType.Type);
                 var mapMethod = useConvert ? "ConvertAll": "Select";
                 var lambdaParameterName = NameHelper.CreateLambdaParameterName(source.Expression);
-                var mappingLambda = CreateMappingLambda(lambdaParameterName, sourceListElementType, targetListElementType, mappingPath, mappingContext);
+                var mappingLambda = await CreateMappingLambdaAsync(lambdaParameterName, sourceListElementType, targetListElementType, mappingPath, mappingContext).ConfigureAwait(false);
                 var selectExpression =   SyntaxFactoryExtensions.CreateMethodAccessExpression(source.Expression, source.ExpressionType.CanBeNull, mapMethod, mappingLambda);
                 var toList = useConvert? selectExpression: AddMaterializeCollectionInvocation(syntaxGenerator, selectExpression, targetListType.Type, false);
                 return MappingHelper.WrapInReadonlyCollectionIfNecessary(toList, isReadonlyCollection, syntaxGenerator);
@@ -419,7 +423,7 @@ namespace MappingGenerator.Mappings
             return sourceListType.Name == "List" && sourceListType.GetMembers("ConvertAll").Length != 0;
         }
 
-	    public ExpressionSyntax CreateMappingLambda(string lambdaParameterName, AnnotatedType sourceListElementType, AnnotatedType targetListElementType, MappingPath mappingPath, MappingContext mappingContext)
+	    public async Task<ExpressionSyntax> CreateMappingLambdaAsync(string lambdaParameterName, AnnotatedType sourceListElementType, AnnotatedType targetListElementType, MappingPath mappingPath, MappingContext mappingContext)
         {
             var source = new MappingElement()
             {
@@ -427,7 +431,7 @@ namespace MappingGenerator.Mappings
                 Expression = syntaxGenerator.IdentifierName(lambdaParameterName) as ExpressionSyntax,
                 
             };
-            var listElementMappingStm = MapExpression(source, targetListElementType, mappingContext, mappingPath);
+            var listElementMappingStm = await MapExpression(source, targetListElementType, mappingContext, mappingPath).ConfigureAwait(false);
 
 		    return (ExpressionSyntax) syntaxGenerator.ValueReturningLambdaExpression(lambdaParameterName, listElementMappingStm.Expression);
 	    }

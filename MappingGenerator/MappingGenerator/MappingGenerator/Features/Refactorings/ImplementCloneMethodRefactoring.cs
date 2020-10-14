@@ -45,9 +45,9 @@ namespace MappingGenerator.Features.Refactorings
         {
             var generator = SyntaxGenerator.GetGenerator(document);
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
-            var methodSymbol =  semanticModel.GetDeclaredSymbol(methodDeclaration);
+            var methodSymbol =  semanticModel.GetDeclaredSymbol(methodDeclaration, cancellationToken: cancellationToken);
             var mappingContext = new MappingContext(methodSymbol.ContainingType);
-            var cloneExpression = CreateCloneExpression(generator, semanticModel, new AnnotatedType(methodSymbol.ReturnType), mappingContext);
+            var cloneExpression =  await CreateCloneExpressionAsync(generator, semanticModel, new AnnotatedType(methodSymbol.ReturnType), mappingContext).ConfigureAwait(false);
             return await document.ReplaceNodes(methodDeclaration.Body, ((BaseMethodDeclarationSyntax) generator.MethodDeclaration(methodSymbol, cloneExpression)).Body, cancellationToken).ConfigureAwait(false);
         }
 
@@ -69,7 +69,7 @@ namespace MappingGenerator.Features.Refactorings
             //TODO: If method exists, replace it
             var newClassDeclaration = typeDeclaration.AddMethods(new[]
             {
-                GenerateCloneMethodStronglyTyped(generator, typeDeclaration, semanticModel),
+                await GenerateCloneMethodStronglyTypedAsync(generator, typeDeclaration, semanticModel).ConfigureAwait(false),
                 GenerateCloneMethod(generator)
             });
 
@@ -82,12 +82,12 @@ namespace MappingGenerator.Features.Refactorings
             return await document.ReplaceNodes(typeDeclaration, newClassDeclaration, cancellationToken).ConfigureAwait(false);
         }
 
-        private MethodDeclarationSyntax GenerateCloneMethodStronglyTyped(SyntaxGenerator generator,
+        private async Task<MethodDeclarationSyntax> GenerateCloneMethodStronglyTypedAsync(SyntaxGenerator generator,
             TypeDeclarationSyntax typeDeclaration, SemanticModel semanticModel)
         {
             var typeSymbol = semanticModel.GetDeclaredSymbol(typeDeclaration);
             var mappingContext = new MappingContext(typeDeclaration, semanticModel);
-            var cloneExpression = CreateCloneExpression(generator, semanticModel, new AnnotatedType(typeSymbol), mappingContext);
+            var cloneExpression = await CreateCloneExpressionAsync(generator, semanticModel, new AnnotatedType(typeSymbol), mappingContext).ConfigureAwait(false);
             return generator.MethodDeclaration("Clone", 
                 accessibility: Accessibility.Public,
                 statements:cloneExpression,
@@ -108,11 +108,11 @@ namespace MappingGenerator.Features.Refactorings
             
         }
 
-        private SyntaxNode[] CreateCloneExpression(SyntaxGenerator generator, SemanticModel semanticModel, AnnotatedType type, MappingContext mappingContext)
+        private async Task<SyntaxNode[]> CreateCloneExpressionAsync(SyntaxGenerator generator, SemanticModel semanticModel, AnnotatedType type, MappingContext mappingContext)
         {
             //TODO: If subtypes contains clone method use it, remember about casting
             var mappingEngine = new CloneMappingEngine(semanticModel, generator);
-            var newExpression = mappingEngine.MapExpression((ExpressionSyntax)generator.ThisExpression(), type, type, mappingContext);
+            var newExpression = await mappingEngine.MapExpression((ExpressionSyntax)generator.ThisExpression(), type, type, mappingContext).ConfigureAwait(false);
             return new[] { generator.ReturnStatement(newExpression).WithAdditionalAnnotations(Formatter.Annotation) };
         }
     }

@@ -18,7 +18,7 @@ namespace MappingGenerator.OnBuildGenerator
         private const string GeneratorName = "MappingGenerator.OnBuildMappingGenerator";
         private readonly MappingImplementorEngine ImplementorEngine = new MappingImplementorEngine();
 
-        public Task<GenerationResult> GenerateAsync(CSharpSyntaxNode processedNode, AttributeData markerAttribute, TransformationContext context, CancellationToken cancellationToken)
+        public async Task<GenerationResult> GenerateAsync(CSharpSyntaxNode processedNode, AttributeData markerAttribute, TransformationContext context, CancellationToken cancellationToken)
         {
             var syntaxGenerator = SyntaxGenerator.GetGenerator(context.Document);
             var mappingDeclaration = (InterfaceDeclarationSyntax)processedNode;
@@ -37,7 +37,30 @@ namespace MappingGenerator.OnBuildGenerator
                     }); 
                 }
             }
-            
+
+            var memberDeclarationSyntaxes = mappingDeclaration.Members.Select(async x =>
+            {
+                if (x is MethodDeclarationSyntax methodDeclaration)
+                {
+                    var methodSymbol = context.SemanticModel.GetDeclaredSymbol(methodDeclaration);
+                    var statements = ImplementorEngine.CanProvideMappingImplementationFor(methodSymbol) ? await ImplementorEngine.GenerateMappingStatements(methodSymbol, syntaxGenerator, context.SemanticModel, mappingContext).ConfigureAwait(false) :
+                        new List<StatementSyntax>()
+                        {
+                            GenerateThrowNotSupportedException(context, syntaxGenerator, methodSymbol.Name)
+                        };
+
+                    var methodDeclarationSyntax = ((MethodDeclarationSyntax)syntaxGenerator.MethodDeclaration(
+                        methodDeclaration.Identifier.Text,
+                        parameters: methodDeclaration.ParameterList.Parameters,
+                        accessibility: Accessibility.Public,
+                        modifiers: DeclarationModifiers.Virtual,
+                        typeParameters: methodDeclaration.TypeParameterList?.Parameters.Select(xx => xx.Identifier.Text),
+                        returnType: methodDeclaration.ReturnType
+                    )).WithBody(SyntaxFactory.Block(statements));
+                    return methodDeclarationSyntax;
+                }
+                return x;
+            });
             var mappingClass = (ClassDeclarationSyntax)syntaxGenerator.ClassDeclaration(
                 mappingDeclaration.Identifier.Text.Substring(1),
                 accessibility: Accessibility.Public,
@@ -46,29 +69,7 @@ namespace MappingGenerator.OnBuildGenerator
                 {
                     syntaxGenerator.TypeExpression(interfaceSymbol)
                 },
-                members: mappingDeclaration.Members.Select(x =>
-                {
-                    if (x is MethodDeclarationSyntax methodDeclaration)
-                    {
-                        var methodSymbol = context.SemanticModel.GetDeclaredSymbol(methodDeclaration);
-                        var statements = ImplementorEngine.CanProvideMappingImplementationFor(methodSymbol) ? ImplementorEngine.GenerateMappingStatements(methodSymbol, syntaxGenerator, context.SemanticModel, mappingContext) :
-                                new List<StatementSyntax>()
-                                {
-                                    GenerateThrowNotSupportedException(context, syntaxGenerator, methodSymbol.Name)
-                                };
-
-                        var methodDeclarationSyntax = ((MethodDeclarationSyntax)syntaxGenerator.MethodDeclaration(
-                            methodDeclaration.Identifier.Text,
-                            parameters: methodDeclaration.ParameterList.Parameters,
-                            accessibility: Accessibility.Public,
-                            modifiers: DeclarationModifiers.Virtual,
-                            typeParameters: methodDeclaration.TypeParameterList?.Parameters.Select(xx => xx.Identifier.Text),
-                            returnType: methodDeclaration.ReturnType
-                        )).WithBody(SyntaxFactory.Block(statements));
-                        return methodDeclarationSyntax;
-                    }
-                    return x;
-                }));
+                members: await Task.WhenAll(memberDeclarationSyntaxes));
             
             var newRoot = WrapInTheSameNamespace(mappingClass, processedNode);
             var usings = new List<UsingDirectiveSyntax>()
@@ -84,11 +85,11 @@ namespace MappingGenerator.OnBuildGenerator
                 usings.Add(SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("System.Collections.Immutable")));
             }
 
-            return Task.FromResult(new GenerationResult()
+            return new GenerationResult()
             {
                 Members = SyntaxFactory.SingletonList(newRoot),
                 Usings = new SyntaxList<UsingDirectiveSyntax>(usings)
-            });
+            };
         }
 
         private static IEnumerable<INamedTypeSymbol> FindCustomMapperTypes(AttributeData markerAttribute)

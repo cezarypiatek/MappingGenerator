@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Editing;
 
@@ -19,19 +21,19 @@ namespace MappingGenerator.Mappings.MappingImplementors
             return implementors.Any(x => x.CanImplement(methodSymbol));
         }
 
-        public IEnumerable<SyntaxNode> GenerateImplementation(IMethodSymbol methodSymbol, SyntaxGenerator generator,
+        public async Task<IReadOnlyList<SyntaxNode>> GenerateImplementation(IMethodSymbol methodSymbol, SyntaxGenerator generator,
             SemanticModel semanticModel, MappingContext mappingContext)
         {
             foreach (var implementor in implementors)
             {
-                var result = implementor.GenerateImplementation(methodSymbol, generator, semanticModel, mappingContext).ToList();
+                var result = await implementor.GenerateImplementation(methodSymbol, generator, semanticModel, mappingContext).ConfigureAwait(false);
                 if (result.Count > 0)
                 {
                     return result;
                 }
             }
 
-            return Enumerable.Empty<SyntaxNode>();
+            return Array.Empty<SyntaxNode>();
         }
     }
 }

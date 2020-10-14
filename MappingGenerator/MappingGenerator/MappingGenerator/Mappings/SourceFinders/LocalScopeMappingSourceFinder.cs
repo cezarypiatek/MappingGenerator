@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -32,7 +33,7 @@ namespace MappingGenerator.Mappings.SourceFinders
             this.localSymbols = localSymbols;
         }
 
-        public MappingElement FindMappingSource(string targetName, AnnotatedType targetType, MappingContext mappingContext)
+        public async Task<MappingElement> FindMappingSource(string targetName, AnnotatedType targetType, MappingContext mappingContext)
         {
             var candidate= localSymbols.FirstOrDefault(x => x.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase));
             if (candidate != null)

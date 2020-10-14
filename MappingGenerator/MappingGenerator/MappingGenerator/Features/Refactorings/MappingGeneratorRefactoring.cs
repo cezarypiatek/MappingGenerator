@@ -77,7 +77,7 @@ namespace MappingGenerator.Features.Refactorings
         private async Task<Document> GenerateMappingMethodBody(Document document, BaseMethodDeclarationSyntax methodSyntax, bool useMembersMappers, CancellationToken cancellationToken)
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
-            var methodSymbol = semanticModel.GetDeclaredSymbol(methodSyntax);
+            var methodSymbol = semanticModel.GetDeclaredSymbol(methodSyntax, cancellationToken);
             var generator = SyntaxGenerator.GetGenerator(document);
             var mappingContext = new MappingContext(methodSyntax, semanticModel);
             var accessibilityHelper = new AccessibilityHelper(methodSymbol.ContainingType);
@@ -100,7 +100,7 @@ namespace MappingGenerator.Features.Refactorings
                     });
                 }
             }
-            var blockSyntax = MappingImplementorEngine.GenerateMappingBlock(methodSymbol, generator, semanticModel, mappingContext);
+            var blockSyntax = await MappingImplementorEngine.GenerateMappingBlockAsync(methodSymbol, generator, semanticModel, mappingContext).ConfigureAwait(false);
             return await document.ReplaceNodes(methodSyntax, methodSyntax.WithOnlyBody(blockSyntax), cancellationToken).ConfigureAwait(false);
         }
     }

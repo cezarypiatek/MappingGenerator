@@ -64,7 +64,7 @@ namespace MappingGenerator.Features.CodeFixes
 
         private async Task<Document> GenerateSplatting(Document document, IInvocation invocation, bool generateNamedParameters, CancellationToken cancellationToken)
         {
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+            var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
             var overloadParameterSets = invocation.GetOverloadParameterSets(semanticModel);
             if (overloadParameterSets != null)
             {
@@ -77,7 +77,7 @@ namespace MappingGenerator.Features.CodeFixes
                 {
                     
                     var argumentList = parametersMatch.ToArgumentListSyntax(mappingEngine, mappingContext, generateNamedParameters);
-                    return await document.ReplaceNodes(invocation.SourceNode, invocation.WithArgumentList(argumentList), cancellationToken);
+                    return await document.ReplaceNodes(invocation.SourceNode, invocation.WithArgumentList(argumentList), cancellationToken).ConfigureAwait(false);
                 
                 }
             }

@@ -45,9 +45,9 @@ namespace MappingGenerator.Features.CodeFixes
             CancellationToken cancellationToken)
         {
             var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+            var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
             var mappingSourceFinder = new ScaffoldingSourceFinder(syntaxGenerator,document);
-            return await CodeFixHelper.FixInvocationWithParameters(document, invocation, namedArguments, semanticModel, mappingSourceFinder, cancellationToken);
+            return await CodeFixHelper.FixInvocationWithParameters(document, invocation, namedArguments, semanticModel, mappingSourceFinder, cancellationToken).ConfigureAwait(false);
         }
 
         private static IInvocation GetInvocation(SyntaxNode invocationExpression)

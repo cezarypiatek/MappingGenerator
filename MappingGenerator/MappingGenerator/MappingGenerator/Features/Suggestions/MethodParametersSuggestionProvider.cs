@@ -35,8 +35,8 @@ namespace MappingGenerator.Features.Suggestions
         {
             if (!context.Document.SupportsSemanticModel) return;
 
-            var syntaxRoot = await context.Document.GetSyntaxRootAsync();
-            var semanticModel = await context.Document.GetSemanticModelAsync();
+            var syntaxRoot = await context.Document.GetSyntaxRootAsync().ConfigureAwait(false);
+            var semanticModel = await context.Document.GetSemanticModelAsync().ConfigureAwait(false);
 
             var tokenAtCursor = SuggestionHelpers.GetCurrentArgumentListSyntaxToken(syntaxRoot, context.Position);
             if (!tokenAtCursor.IsKind(SyntaxKind.OpenParenToken)) return;

@@ -30,7 +30,7 @@ namespace MappingGenerator.Features.Refactorings
             var container = node.FindContainer<LambdaExpressionSyntax>();
             if (container != null)
             {
-                var semanticModel = await context.Document.GetSemanticModelAsync();
+                var semanticModel = await context.Document.GetSemanticModelAsync().ConfigureAwait(false);
                 var symbol = semanticModel.GetSymbolInfo(container).Symbol;
                 if (symbol is IMethodSymbol methodSymbol && methodSymbol.Parameters.Length == 1 && methodSymbol.ReturnsVoid)
                 {
@@ -41,11 +41,11 @@ namespace MappingGenerator.Features.Refactorings
 
         private async Task<Document> InitializeWithLocals(Document document, LambdaExpressionSyntax lambdaExpressionSyntax, CancellationToken cancellationToken)
         {
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+            var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
             var sourceFinders = GetAllPossibleSourceFinders(lambdaExpressionSyntax, semanticModel, syntaxGenerator).ToList();
             var mappingMatcher = new BestPossibleMatcher(sourceFinders);
-            return await ReplaceWithMappingBody(document, lambdaExpressionSyntax, semanticModel, mappingMatcher, cancellationToken);
+            return await ReplaceWithMappingBody(document, lambdaExpressionSyntax, semanticModel, mappingMatcher, cancellationToken).ConfigureAwait(false);
         }
 
         private static IEnumerable<IMappingSourceFinder> GetAllPossibleSourceFinders(LambdaExpressionSyntax lambdaExpression, SemanticModel semanticModel, SyntaxGenerator syntaxGenerator)
@@ -68,14 +68,14 @@ namespace MappingGenerator.Features.Refactorings
         {
             var methodSymbol = (IMethodSymbol)semanticModel.GetSymbolInfo(lambda).Symbol;
             var createdObjectType = methodSymbol.Parameters.First().Type;
-            var mappingEngine = await MappingEngine.Create(document, cancellationToken);
+            var mappingEngine = await MappingEngine.Create(document, cancellationToken).ConfigureAwait(false);
             var mappingContext = new MappingContext(lambda, semanticModel);
             var propertiesToSet = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(createdObjectType, mappingContext);
             var statements = mappingEngine.MapUsingSimpleAssignment(propertiesToSet, mappingMatcher, mappingContext, globalTargetAccessor: SyntaxFactory.IdentifierName(GetParameterIdentifier(lambda)))
                 .Select(x=>x.AsStatement().WithTrailingTrivia(SyntaxFactory.EndOfLine("\r\n")));
             
             var newLambda = UpdateLambdaBody(lambda, SyntaxFactory.Block(statements)).WithAdditionalAnnotations(Formatter.Annotation);
-            return await document.ReplaceNodes(lambda, newLambda, cancellationToken);
+            return await document.ReplaceNodes(lambda, newLambda, cancellationToken).ConfigureAwait(false);
         }
 
         private static SyntaxToken GetParameterIdentifier(LambdaExpressionSyntax lambda)

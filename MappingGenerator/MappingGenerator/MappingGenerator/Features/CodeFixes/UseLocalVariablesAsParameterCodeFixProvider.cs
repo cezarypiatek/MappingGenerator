@@ -37,7 +37,7 @@ namespace MappingGenerator.Features.CodeFixes
                 {
                     
                     var argumentList = parametersMatch.ToArgumentListSyntax(mappingEngine, mappingContext, generateNamedParameters);
-                    return await document.ReplaceNodes(invocation.SourceNode, invocation.WithArgumentList(argumentList), cancellationToken);
+                    return await document.ReplaceNodes(invocation.SourceNode, invocation.WithArgumentList(argumentList), cancellationToken).ConfigureAwait(false);
                 }
             }
 
@@ -117,7 +117,7 @@ namespace MappingGenerator.Features.CodeFixes
 
         private static async Task<Document> CreateMappingLambda(Document document, InvocationExpressionSyntax invocation, CancellationToken cancellationToken)
         {
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+            var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
             var methodInvocationSymbol = semanticModel.GetSymbolInfo(invocation.Expression);
             var mappingOverload = methodInvocationSymbol.CandidateSymbols.OfType<IMethodSymbol>().FirstOrDefault(IsMappingMethod);
@@ -137,7 +137,7 @@ namespace MappingGenerator.Features.CodeFixes
             var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator);
             var sourceListElementType = new AnnotatedType(sourceElementType);
             var mappingLambda = mappingEngine.CreateMappingLambda("x", sourceListElementType, targetElementType, new MappingPath(), new MappingContext(invocation, semanticModel));
-            return await document.ReplaceNodes(invocation, invocation.WithArgumentList(SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument((ExpressionSyntax)mappingLambda))), cancellationToken);
+            return await document.ReplaceNodes(invocation, invocation.WithArgumentList(SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument((ExpressionSyntax)mappingLambda))), cancellationToken).ConfigureAwait(false);
         }
 
         private static bool IsMappingMethod(IMethodSymbol c)
@@ -188,9 +188,9 @@ namespace MappingGenerator.Features.CodeFixes
 
         private async Task<Document> UseLocalVariablesAsParameters(Document document, IInvocation invocation, bool generateNamedParameters, CancellationToken cancellationToken)
         {
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+            var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
             var mappingSourceFinder =  LocalScopeMappingSourceFinder.FromScope(semanticModel, invocation.SourceNode);
-            return await CodeFixHelper.FixInvocationWithParameters(document, invocation, generateNamedParameters, semanticModel, mappingSourceFinder, cancellationToken);
+            return await CodeFixHelper.FixInvocationWithParameters(document, invocation, generateNamedParameters, semanticModel, mappingSourceFinder, cancellationToken).ConfigureAwait(false);
         }
     }
 }

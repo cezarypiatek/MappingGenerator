@@ -56,39 +56,39 @@ namespace MappingGenerator.Features.CodeFixes
 
         private async Task<Document> GenerateExplicitConversion(Document document, AssignmentExpressionSyntax assignmentExpression, CancellationToken cancellationToken)
         {
-            var (mappingEngine, semanticModel) = await CreateMappingEngine(document, assignmentExpression, cancellationToken);
+            var (mappingEngine, semanticModel) = await CreateMappingEngine(document, assignmentExpression, cancellationToken).ConfigureAwait(false);
             var sourceType = mappingEngine.GetExpressionTypeInfo(assignmentExpression.Right).GetAnnotatedType();
             var destinationType = mappingEngine.GetExpressionTypeInfo(assignmentExpression.Left).GetAnnotatedType();
             var mappingExpression = mappingEngine.MapExpression(assignmentExpression.Right.WithoutTrivia(), sourceType, destinationType, new MappingContext(assignmentExpression, semanticModel)); 
-            return await ReplaceNode(document, assignmentExpression, assignmentExpression.WithRight(mappingExpression), cancellationToken);
+            return await ReplaceNode(document, assignmentExpression, assignmentExpression.WithRight(mappingExpression), cancellationToken).ConfigureAwait(false);
         }
 
         private static async Task<(MappingEngine, SemanticModel)> CreateMappingEngine(Document document, SyntaxNode node, CancellationToken cancellationToken)
         {
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
-            var mappingEngine = await MappingEngine.Create(document, cancellationToken);
+            var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
+            var mappingEngine = await MappingEngine.Create(document, cancellationToken).ConfigureAwait(false);
             return (mappingEngine, semanticModel);
         }
 
         private async Task<Document> GenerateExplicitConversion(Document document, ReturnStatementSyntax returnStatement, CancellationToken cancellationToken)
         {
-            var (mappingEngine, semanticModel) = await CreateMappingEngine(document, returnStatement, cancellationToken);
+            var (mappingEngine, semanticModel) = await CreateMappingEngine(document, returnStatement, cancellationToken).ConfigureAwait(false);
             var returnExpressionTypeInfo = mappingEngine.GetExpressionTypeInfo(returnStatement.Expression);
             var mappingExpression = mappingEngine.MapExpression(returnStatement.Expression!.WithoutTrivia(), returnExpressionTypeInfo.GetAnnotatedType(), returnExpressionTypeInfo.GetAnnotatedTypeForConverted(), new MappingContext(returnStatement, semanticModel)); 
-            return await ReplaceNode(document, returnStatement, returnStatement.WithExpression(mappingExpression), cancellationToken);
+            return await ReplaceNode(document, returnStatement, returnStatement.WithExpression(mappingExpression), cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<Document> GenerateExplicitConversion(Document document, YieldStatementSyntax yieldStatement, CancellationToken cancellationToken)
         {
-            var (mappingEngine, semanticModel) = await CreateMappingEngine(document, yieldStatement, cancellationToken);
+            var (mappingEngine, semanticModel) = await CreateMappingEngine(document, yieldStatement, cancellationToken).ConfigureAwait(false);
             var returnExpressionTypeInfo = mappingEngine.GetExpressionTypeInfo(yieldStatement.Expression);
             var mappingExpression = mappingEngine.MapExpression(yieldStatement.Expression!.WithoutTrivia(), returnExpressionTypeInfo.GetAnnotatedType(), returnExpressionTypeInfo.GetAnnotatedTypeForConverted(), new MappingContext(yieldStatement, semanticModel)); 
-            return await ReplaceNode(document, yieldStatement, yieldStatement.WithExpression(mappingExpression), cancellationToken);
+            return await ReplaceNode(document, yieldStatement, yieldStatement.WithExpression(mappingExpression), cancellationToken).ConfigureAwait(false);
         }
 
         private static async Task<Document> ReplaceNode(Document document, SyntaxNode oldNode, SyntaxNode newNode, CancellationToken cancellationToken)
         {
-            var root = await document.GetSyntaxRootAsync(cancellationToken);
+            var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
             var newRoot = root!.ReplaceNode(oldNode, newNode);
             return document.WithSyntaxRoot(newRoot);
         }

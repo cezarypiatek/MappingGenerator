@@ -44,11 +44,11 @@ namespace MappingGenerator.Features.Refactorings
         private async Task<Document> ImplementCloneMethodBody(Document document, MethodDeclarationSyntax methodDeclaration, CancellationToken cancellationToken)
         {
             var generator = SyntaxGenerator.GetGenerator(document);
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+            var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
             var methodSymbol =  semanticModel.GetDeclaredSymbol(methodDeclaration);
             var mappingContext = new MappingContext(methodSymbol.ContainingType);
             var cloneExpression = CreateCloneExpression(generator, semanticModel, new AnnotatedType(methodSymbol.ReturnType), mappingContext);
-            return await document.ReplaceNodes(methodDeclaration.Body, ((BaseMethodDeclarationSyntax) generator.MethodDeclaration(methodSymbol, cloneExpression)).Body, cancellationToken);
+            return await document.ReplaceNodes(methodDeclaration.Body, ((BaseMethodDeclarationSyntax) generator.MethodDeclaration(methodSymbol, cloneExpression)).Body, cancellationToken).ConfigureAwait(false);
         }
 
         private bool IsCandidateForCloneMethod(MethodDeclarationSyntax md)
@@ -65,7 +65,7 @@ namespace MappingGenerator.Features.Refactorings
         private async Task<Document> AddCloneImplementation(Document document, TypeDeclarationSyntax typeDeclaration, CancellationToken cancellationToken)
         {
             var generator = SyntaxGenerator.GetGenerator(document);
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+            var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
             //TODO: If method exists, replace it
             var newClassDeclaration = typeDeclaration.AddMethods(new[]
             {
@@ -79,7 +79,7 @@ namespace MappingGenerator.Features.Refactorings
                 newClassDeclaration = generator.AddInterfaceType(newClassDeclaration, cloneableInterface.WithAdditionalAnnotations(Formatter.Annotation)) as TypeDeclarationSyntax;
             }
             
-            return await document.ReplaceNodes(typeDeclaration, newClassDeclaration, cancellationToken);
+            return await document.ReplaceNodes(typeDeclaration, newClassDeclaration, cancellationToken).ConfigureAwait(false);
         }
 
         private MethodDeclarationSyntax GenerateCloneMethodStronglyTyped(SyntaxGenerator generator,

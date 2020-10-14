@@ -48,11 +48,11 @@ namespace MappingGenerator.Features.Refactorings
 
         private async Task<Document> InitializeWithLocals(Document document, InitializerExpressionSyntax objectInitializer, CancellationToken cancellationToken)
         {
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+            var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
             var syntaxGenerator= SyntaxGenerator.GetGenerator(document);
             var sourceFinders = GetAllPossibleSourceFinders(objectInitializer, semanticModel, syntaxGenerator).ToList();
             var mappingMatcher = new BestPossibleMatcher(sourceFinders);
-            return await ReplaceEmptyInitializationBlock(document, objectInitializer, semanticModel, mappingMatcher, cancellationToken);
+            return await ReplaceEmptyInitializationBlock(document, objectInitializer, semanticModel, mappingMatcher, cancellationToken).ConfigureAwait(false);
         }
 
         private static IEnumerable<IMappingSourceFinder> GetAllPossibleSourceFinders(InitializerExpressionSyntax objectInitializer, SemanticModel semanticModel, SyntaxGenerator syntaxGenerator)
@@ -128,21 +128,21 @@ namespace MappingGenerator.Features.Refactorings
 
         private async Task<Document> InitializeWithLambdaParameter(Document document, LambdaExpressionSyntax lambdaSyntax, InitializerExpressionSyntax objectInitializer, CancellationToken cancellationToken)
         {
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+            var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
             var generator = SyntaxGenerator.GetGenerator(document);
 
             var lambdaSymbol = semanticModel.GetSymbolInfo(lambdaSyntax).Symbol as IMethodSymbol;
             var firstArgument = lambdaSymbol.Parameters.First();
             var mappingSourceFinder = new ObjectMembersMappingSourceFinder(new AnnotatedType(firstArgument.Type), generator.IdentifierName(firstArgument.Name), generator);
-            return await ReplaceEmptyInitializationBlock(document, objectInitializer, semanticModel, new SingleSourceMatcher(mappingSourceFinder), cancellationToken);
+            return await ReplaceEmptyInitializationBlock(document, objectInitializer, semanticModel, new SingleSourceMatcher(mappingSourceFinder), cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<Document> InitializeWithDefaults(Document document, InitializerExpressionSyntax objectInitializer, CancellationToken cancellationToken)
         {
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+            var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
             var mappingSourceFinder = new ScaffoldingSourceFinder(syntaxGenerator, document);
-            return await ReplaceEmptyInitializationBlock(document, objectInitializer, semanticModel, new SingleSourceMatcher(mappingSourceFinder), cancellationToken);
+            return await ReplaceEmptyInitializationBlock(document, objectInitializer, semanticModel, new SingleSourceMatcher(mappingSourceFinder), cancellationToken).ConfigureAwait(false);
         }
 
         private static async Task<Document> ReplaceEmptyInitializationBlock(Document document,
@@ -151,10 +151,10 @@ namespace MappingGenerator.Features.Refactorings
         {
             var oldObjCreation = objectInitializer.FindContainer<ObjectCreationExpressionSyntax>();
             var createdObjectType = ModelExtensions.GetTypeInfo(semanticModel, oldObjCreation).Type;
-            var mappingEngine = await MappingEngine.Create(document, cancellationToken);
+            var mappingEngine = await MappingEngine.Create(document, cancellationToken).ConfigureAwait(false);
             
             var newObjectCreation = mappingEngine.AddInitializerWithMapping(oldObjCreation, mappingMatcher, createdObjectType, new MappingContext(objectInitializer, semanticModel ));
-            return await document.ReplaceNodes(oldObjCreation, newObjectCreation, cancellationToken);
+            return await document.ReplaceNodes(oldObjCreation, newObjectCreation, cancellationToken).ConfigureAwait(false);
         }
     }
 }

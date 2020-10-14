@@ -32,7 +32,7 @@ namespace MappingGenerator.Mappings
 
         public static async Task<MappingEngine> Create(Document document, CancellationToken cancellationToken)
         {
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
+            var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
             return new MappingEngine(semanticModel, syntaxGenerator);
         }

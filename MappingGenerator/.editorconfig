@@ -1,0 +1,37 @@
+﻿[*.cs]
+
+# RS1004: Recommend adding language support to diagnostic analyzer.
+dotnet_diagnostic.RS1004.severity = error
+
+# RS1009: Only internal implementations of this interface are allowed.
+dotnet_diagnostic.RS1009.severity = error
+
+# RS1001: Missing diagnostic analyzer attribute.
+dotnet_diagnostic.RS1001.severity = error
+
+# AsyncFixer01: Unnecessary async/await usage
+dotnet_diagnostic.AsyncFixer01.severity = error
+
+# AsyncFixer02: Long-running or blocking operations inside an async method
+dotnet_diagnostic.AsyncFixer02.severity = error
+
+# AsyncFixer03: Fire & forget async void methods
+dotnet_diagnostic.AsyncFixer03.severity = error
+
+# AsyncFixer04: Fire & forget async call inside a using block
+dotnet_diagnostic.AsyncFixer04.severity = error
+
+# AsyncFixer05: Downcasting from a nested task to an outer task.
+dotnet_diagnostic.AsyncFixer05.severity = error
+
+# CA2207: Initialize value type static fields inline
+dotnet_diagnostic.CA2207.severity = error
+
+# CA2007: Consider calling ConfigureAwait on the awaited task
+dotnet_diagnostic.CA2007.severity = error
+
+# CA2012: Use ValueTasks correctly
+dotnet_diagnostic.CA2012.severity = error
+
+# CA2247: Argument passed to TaskCompletionSource constructor should be TaskCreationOptions enum instead of TaskContinuationOptions enum
+dotnet_diagnostic.CA2247.severity = error

@@ -13,6 +13,7 @@ using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.Formatting;
 using System.Linq;
 using MappingGenerator.Mappings.MappingImplementors;
+using MappingGenerator.MethodHelpers;
 
 namespace MappingGenerator.Features.Refactorings
 {
@@ -48,7 +49,10 @@ namespace MappingGenerator.Features.Refactorings
             var methodSymbol =  semanticModel.GetDeclaredSymbol(methodDeclaration, cancellationToken: cancellationToken);
             var mappingContext = new MappingContext(methodSymbol.ContainingType);
             var cloneExpression =  await CreateCloneExpressionAsync(generator, semanticModel, new AnnotatedType(methodSymbol.ReturnType), mappingContext).ConfigureAwait(false);
-            return await document.ReplaceNodes(methodDeclaration.Body, ((BaseMethodDeclarationSyntax) generator.MethodDeclaration(methodSymbol, cloneExpression)).Body, cancellationToken).ConfigureAwait(false);
+
+            var cloneBody = ((BaseMethodDeclarationSyntax) generator.MethodDeclaration(methodSymbol, cloneExpression)).Body;
+
+            return await document.ReplaceNodes(methodDeclaration, methodDeclaration.WithOnlyBody(cloneBody), cancellationToken).ConfigureAwait(false);
         }
 
         private bool IsCandidateForCloneMethod(MethodDeclarationSyntax md)
@@ -75,7 +79,7 @@ namespace MappingGenerator.Features.Refactorings
 
             if (newClassDeclaration.BaseList == null || newClassDeclaration.BaseList.Types.Any(x => x.Type.ToString().Contains("ICloneable")) == false)
             {
-                var cloneableInterface = SyntaxFactory.ParseTypeName($"System.ICloneable");
+                var cloneableInterface = SyntaxFactory.ParseTypeName("System.ICloneable");
                 newClassDeclaration = generator.AddInterfaceType(newClassDeclaration, cloneableInterface.WithAdditionalAnnotations(Formatter.Annotation)) as TypeDeclarationSyntax;
             }
             

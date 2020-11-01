@@ -203,9 +203,22 @@ namespace MappingGenerator.Mappings.SourceFinders
                         ExpressionType = new AnnotatedType(subProperty.Type.Type, expressionCanBeNull)
                     };
                 }
-                return FindSubPropertySource(targetName, subProperty.Type.Type, subProperty.Type.Type.GetObjectFields(),  subPropertyAccessor, mappingContext, expressionCanBeNull,  currentNamePart);
+                return FindSubPropertySource(targetName, subProperty.Type.Type, GetFields(subProperty.Type.Type),  subPropertyAccessor, mappingContext, expressionCanBeNull,  currentNamePart);
             }
             return null;
+        }
+
+
+        private readonly Dictionary<ITypeSymbol, IReadOnlyList<IObjectField>> _typeFieldsCache = new Dictionary<ITypeSymbol, IReadOnlyList<IObjectField>>();
+        private IReadOnlyList<IObjectField> GetFields(ITypeSymbol typeSymbol)
+        {
+            if (_typeFieldsCache.TryGetValue(typeSymbol, out var fields))
+            {
+                return fields;
+            }
+            var freshFields = typeSymbol.GetObjectFields().ToList();
+            _typeFieldsCache[typeSymbol] = freshFields;
+            return freshFields;
         }
     }
 }

@@ -131,7 +131,7 @@ namespace MappingGenerator.Features.Refactorings
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
             var generator = SyntaxGenerator.GetGenerator(document);
 
-            var lambdaSymbol = semanticModel.GetSymbolInfo(lambdaSyntax).Symbol as IMethodSymbol;
+            var lambdaSymbol = semanticModel.GetSymbolInfo(lambdaSyntax, cancellationToken).Symbol as IMethodSymbol;
             var firstArgument = lambdaSymbol.Parameters.First();
             var mappingSourceFinder = new ObjectMembersMappingSourceFinder(new AnnotatedType(firstArgument.Type), generator.IdentifierName(firstArgument.Name), generator);
             return await ReplaceEmptyInitializationBlock(document, objectInitializer, semanticModel, new SingleSourceMatcher(mappingSourceFinder), cancellationToken).ConfigureAwait(false);

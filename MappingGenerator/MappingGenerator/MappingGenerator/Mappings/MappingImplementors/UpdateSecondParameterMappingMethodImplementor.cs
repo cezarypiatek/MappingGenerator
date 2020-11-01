@@ -25,7 +25,8 @@ namespace MappingGenerator.Mappings.MappingImplementors
             var mappingEngine = new MappingEngine(semanticModel, generator);
             var source = methodSymbol.Parameters[0];
             var target = methodSymbol.Parameters[1];
-            var targets = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(target.Type, mappingContext);
+            var mappingTargetHelper = new MappingTargetHelper();
+            var targets = mappingTargetHelper.GetFieldsThaCanBeSetPublicly(target.Type, mappingContext);
             var sourceFinder = new ObjectMembersMappingSourceFinder(new AnnotatedType(source.Type), generator.IdentifierName(source.Name), generator);
             return await mappingEngine.MapUsingSimpleAssignment(targets, new SingleSourceMatcher(sourceFinder), mappingContext, globalTargetAccessor: generator.IdentifierName(target.Name)).ConfigureAwait(false);
         }

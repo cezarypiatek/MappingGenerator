@@ -248,14 +248,14 @@ namespace MappingGenerator.Mappings
             return ObjectCreationExpression(identifierNameSyntax).WithArgumentList(argumentList ?? ArgumentList());
         }
 
-
+        private readonly MappingTargetHelper _mappingTargetHelper = new MappingTargetHelper();
         public async Task<ObjectCreationExpressionSyntax> AddInitializerWithMappingAsync(
             ObjectCreationExpressionSyntax objectCreationExpression, IMappingMatcher mappingMatcher,
             ITypeSymbol createdObjectTyp,
             MappingContext mappingContext,
             MappingPath mappingPath = null)
         {
-            var propertiesToSet = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(createdObjectTyp, mappingContext);
+            var propertiesToSet = _mappingTargetHelper.GetFieldsThaCanBeSetPublicly(createdObjectTyp, mappingContext);
             var assignments = await MapUsingSimpleAssignment(propertiesToSet, mappingMatcher, mappingContext, mappingPath).ConfigureAwait(false);
             return SyntaxFactoryExtensions.WithMembersInitialization(objectCreationExpression, assignments);
         }

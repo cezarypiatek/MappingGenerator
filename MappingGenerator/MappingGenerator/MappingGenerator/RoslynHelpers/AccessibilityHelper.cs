@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -13,7 +14,22 @@ namespace MappingGenerator.RoslynHelpers
             _contextSymbol = new Lazy<INamedTypeSymbol>(()=> contextSymbol);
         }
 
+        private readonly ConcurrentDictionary<(ISymbol, ITypeSymbol), bool> _accessibilityCache = new ConcurrentDictionary<(ISymbol, ITypeSymbol), bool>();
+
         public bool IsSymbolAccessible(ISymbol x, ITypeSymbol via)
+        {
+            var key = (x, via);
+            if (_accessibilityCache.TryGetValue(key, out var result))
+            {
+                return result;
+            }
+
+            var freshResult = CalculateIsSymbolVisible(x, via);
+            _accessibilityCache[key] = freshResult;
+            return freshResult;
+        }
+
+        private bool CalculateIsSymbolVisible(ISymbol x, ITypeSymbol via)
         {
             if (_contextSymbol.Value == null)
             {

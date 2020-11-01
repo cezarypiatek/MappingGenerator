@@ -25,7 +25,8 @@ namespace MappingGenerator.Mappings.MappingImplementors
             var mappingEngine = new MappingEngine(semanticModel, generator);
             var source = methodSymbol.Parameters[0];
             var sourceFinder = new ObjectMembersMappingSourceFinder(new AnnotatedType(source.Type), generator.IdentifierName(source.Name), generator);
-            var targets = MappingTargetHelper.GetFieldsThaCanBeSetPrivately(methodSymbol.ContainingType, mappingContext);
+            var mappingTargetHelper = new MappingTargetHelper();
+            var targets = mappingTargetHelper.GetFieldsThaCanBeSetPrivately(methodSymbol.ContainingType, mappingContext);
             return await mappingEngine.MapUsingSimpleAssignment(targets, new SingleSourceMatcher(sourceFinder), mappingContext).ConfigureAwait(false);
         }
     }

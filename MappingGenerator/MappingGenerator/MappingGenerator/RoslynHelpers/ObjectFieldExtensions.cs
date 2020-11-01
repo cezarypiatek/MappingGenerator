@@ -8,7 +8,7 @@ namespace MappingGenerator.RoslynHelpers
     {
         public static IEnumerable<IObjectField> GetObjectFields(this ITypeSymbol type)
         {
-            var allMembers = type.GetAllMembers();;
+            var allMembers = type.GetAllMembers();
             foreach (var objectField in GetObjectFields(allMembers))
                 yield return objectField;
         }

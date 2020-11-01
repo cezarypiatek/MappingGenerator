@@ -158,8 +158,7 @@ namespace MappingGenerator.Mappings.SourceFinders
                         }
                     }
 
-
-                    var fields = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(nt, mappingContext);
+                    var fields = mappingTargetHelper.GetFieldsThaCanBeSetPublicly(nt, mappingContext);
                     var assignments = new List<AssignmentExpressionSyntax>(fields.Count);
                     foreach (var x in fields)
                     {
@@ -178,6 +177,8 @@ namespace MappingGenerator.Mappings.SourceFinders
             }
             return GetDefaultForSpecialType(type);
         }
+
+        private readonly MappingTargetHelper mappingTargetHelper = new MappingTargetHelper();
 
         private async Task<List<ArgumentSyntax>> GetConstructorArguments(MappingContext mappingContext, MappingPath mappingPath, IMethodSymbol randomConstructor)
         {

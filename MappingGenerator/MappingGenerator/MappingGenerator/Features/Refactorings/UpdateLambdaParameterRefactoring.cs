@@ -31,7 +31,7 @@ namespace MappingGenerator.Features.Refactorings
             if (container != null)
             {
                 var semanticModel = await context.Document.GetSemanticModelAsync().ConfigureAwait(false);
-                var symbol = semanticModel.GetSymbolInfo(container).Symbol;
+                var symbol = semanticModel.GetSymbolInfo(container, context.CancellationToken).Symbol;
                 if (symbol is IMethodSymbol methodSymbol && methodSymbol.Parameters.Length == 1 && methodSymbol.ReturnsVoid)
                 {
                     context.RegisterRefactoring(CodeAction.Create(title: Title, createChangedDocument: c => InitializeWithLocals(context.Document, container, c), equivalenceKey: Title));
@@ -66,11 +66,12 @@ namespace MappingGenerator.Features.Refactorings
 
         private static async Task<Document> ReplaceWithMappingBody(Document document, LambdaExpressionSyntax lambda, SemanticModel semanticModel, IMappingMatcher mappingMatcher, CancellationToken cancellationToken)
         {
-            var methodSymbol = (IMethodSymbol)semanticModel.GetSymbolInfo(lambda).Symbol;
+            var methodSymbol = (IMethodSymbol)semanticModel.GetSymbolInfo(lambda, cancellationToken).Symbol;
             var createdObjectType = methodSymbol.Parameters.First().Type;
             var mappingEngine = await MappingEngine.Create(document, cancellationToken).ConfigureAwait(false);
             var mappingContext = new MappingContext(lambda, semanticModel);
-            var propertiesToSet = MappingTargetHelper.GetFieldsThaCanBeSetPublicly(createdObjectType, mappingContext);
+            var mappingTargetHelper = new MappingTargetHelper();
+            var propertiesToSet = mappingTargetHelper.GetFieldsThaCanBeSetPublicly(createdObjectType, mappingContext);
             var mappings = await mappingEngine.MapUsingSimpleAssignment(propertiesToSet, mappingMatcher, mappingContext, globalTargetAccessor: SyntaxFactory.IdentifierName(GetParameterIdentifier(lambda))).ConfigureAwait(false);
             var statements = mappings.Select(x=>x.AsStatement().WithTrailingTrivia(SyntaxFactory.EndOfLine("\r\n")));
             

@@ -5,24 +5,38 @@ using Microsoft.CodeAnalysis;
 
 namespace MappingGenerator.RoslynHelpers
 {
-    public static class MappingTargetHelper
+    public class MappingTargetHelper
     {
         private static readonly NameEqualityComparer nameEqualityComparer = new NameEqualityComparer();
-        public static IReadOnlyCollection<IObjectField> GetFieldsThaCanBeSetFromConstructor(ITypeSymbol type, MappingContext mappingContext)
+        public IReadOnlyCollection<IObjectField> GetFieldsThaCanBeSetFromConstructor(ITypeSymbol type, MappingContext mappingContext)
         {
-            return type.GetObjectFields().Where(x=>x.CanBeSetInConstructor(type, mappingContext)).Distinct(nameEqualityComparer).ToList();
+            return GetObjectFields(type).Where(x=>x.CanBeSetInConstructor(type, mappingContext)).Distinct(nameEqualityComparer).ToList();
         }
 
-        public static IReadOnlyCollection<IObjectField> GetFieldsThaCanBeSetPublicly(ITypeSymbol type,
+        public  IReadOnlyCollection<IObjectField> GetFieldsThaCanBeSetPublicly(ITypeSymbol type,
             MappingContext mappingContext)
         {
-            return type.GetObjectFields().Where(x => x.CanBeSet(type, mappingContext)).Distinct(nameEqualityComparer).ToList();
+            return GetObjectFields(type).Where(x => x.CanBeSet(type, mappingContext)).Distinct(nameEqualityComparer).ToList();
         }
 
-        public static IReadOnlyCollection<IObjectField> GetFieldsThaCanBeSetPrivately(ITypeSymbol type, MappingContext mappingContext)
+        public  IReadOnlyCollection<IObjectField> GetFieldsThaCanBeSetPrivately(ITypeSymbol type, MappingContext mappingContext)
         {
-            return type.GetObjectFields().Where(x => x.CanBeSet(type, mappingContext)).Distinct(nameEqualityComparer).ToList(); 
+            return GetObjectFields(type).Where(x => x.CanBeSet(type, mappingContext)).Distinct(nameEqualityComparer).ToList(); 
         }
+
+        private readonly Dictionary<ITypeSymbol, IReadOnlyList<IObjectField>> fieldsCache = new Dictionary<ITypeSymbol, IReadOnlyList<IObjectField>>();
+        private  IReadOnlyList<IObjectField> GetObjectFields(ITypeSymbol type)
+        {
+            if (fieldsCache.TryGetValue(type, out var fields))
+            {
+                return fields;
+            }
+
+            var freshFields = type.GetObjectFields().ToList();
+            fieldsCache[type] = freshFields;
+            return freshFields;
+        }
+
 
         class NameEqualityComparer : IEqualityComparer<IObjectField>
         {

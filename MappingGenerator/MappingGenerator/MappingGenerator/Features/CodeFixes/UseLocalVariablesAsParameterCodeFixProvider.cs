@@ -119,7 +119,7 @@ namespace MappingGenerator.Features.CodeFixes
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
-            var methodInvocationSymbol = semanticModel.GetSymbolInfo(invocation.Expression);
+            var methodInvocationSymbol = semanticModel.GetSymbolInfo(invocation.Expression, cancellationToken);
             var mappingOverload = methodInvocationSymbol.CandidateSymbols.OfType<IMethodSymbol>().FirstOrDefault(IsMappingMethod);
             if (mappingOverload == null)
             {

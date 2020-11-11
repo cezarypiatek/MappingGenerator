@@ -52,7 +52,7 @@ namespace MappingGenerator.Features.CodeFixes
 
                     if (assignmentExpression.Parent is InitializerExpressionSyntax || assignmentExpression.Parent is StatementSyntax)
                     {
-                        context.RegisterCodeFix(CodeAction.Create(title: title2, createChangedDocument: c => GenerateExplicitConversion(context.Document, assignmentExpression, true, c), equivalenceKey: title), diagnostic);
+                        context.RegisterCodeFix(CodeAction.Create(title: title2, createChangedDocument: c => GenerateExplicitConversion(context.Document, assignmentExpression, true, c), equivalenceKey: title2), diagnostic);
                     }
                     break;
                 case ReturnStatementSyntax returnStatement:

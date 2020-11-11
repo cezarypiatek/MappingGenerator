@@ -47,6 +47,12 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public int? FourthAuthentication { get; set;}
         public AuthenticationKind? FifthAuthentication { get; set;}
         public Guid UniqueKey { get; set;}
+        public string YetAnotherSnakeCaseField { get; set;}
+        public string YetAnotherAddressCity { get; set; }
+        public string YetAnotherAddressZipCode { get; set; }
+        public string YetAnotherAddressStreet { get; set; }
+        public string YetAnotherAddressFlatNo { get; set; }
+        public string YetAnotherAddressBuildingNo { get; set; }
     }
 
     public class UserSourceDTO
@@ -119,6 +125,8 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public AuthenticationKind? FourthAuthentication { get; set;}
         public int? FifthAuthentication { get; set;}
         public Guid UniqueKey { get; set;}
+        public string YET_ANOTHER_SNAKE_CASE_FIELD { get; set;}
+        public AddressEntity YetAnotherAddress { get; set;}
     }
 
     public class AddressEntity
@@ -127,7 +135,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public string ZipCode { get; set; }
         public string Street { get; set; }
         public string FlatNo { get; set; }
-        public string BuildingNo { get; set; }
+        public string Building_No { get; set; }
     }
 
     public class UnitEntity

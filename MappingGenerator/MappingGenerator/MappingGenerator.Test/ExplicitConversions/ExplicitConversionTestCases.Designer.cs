@@ -19,7 +19,7 @@ namespace MappingGenerator.Test.ExplicitConversions {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class ExplicitConversionTestCases {
@@ -74,14 +74,14 @@ namespace MappingGenerator.Test.ExplicitConversions {
         ///        public void DoSomething()
         ///        {
         ///            var addressEntity = new AddressEntity();
-        ///            this.Address = addressEntity;
+        ///            this.Address = [|addressEntity|];
         ///        }
         ///    }
         ///
         ///    public class AddressDTO
         ///    {
         ///        public string FlatNo { get; set; }
-        ///        public string BuildtingNo { get;  [rest of string was truncated]&quot;;.
+        ///        public string BuildtingNo { g [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _001_ExplicitConversionForInvalidAssigment {
             get {
@@ -103,11 +103,11 @@ namespace MappingGenerator.Test.ExplicitConversions {
         ///        public void DoSomething()
         ///        {
         ///            var addressEntity = new AddressEntity();
-        ///            this.Address = new AddressDTO()
+        ///            this.Address = new AddressDTO
         ///            {
         ///                FlatNo = addressEntity.FlatNo,
         ///                BuildtingNo = addressEntity.BuildtingNo,
-        ///                St [rest of string was truncated]&quot;;.
+        ///                Stre [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _001_ExplicitConversionForInvalidAssigment_FIXED {
             get {
@@ -129,14 +129,14 @@ namespace MappingGenerator.Test.ExplicitConversions {
         ///
         ///        public ReadOnlyCollection&lt;AddressDTO&gt; DoSomething(IList&lt;AddressEntity&gt; addresses)
         ///        {
-        ///            return addresses;
+        ///            return [|addresses|];
         ///        }
         ///    }
         ///
         ///    public class AddressDTO
         ///    {
         ///        public string FlatNo { get; set; }
-        ///        publ [rest of string was truncated]&quot;;.
+        ///         [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _002_ExplicitConversionForInvalidReturn {
             get {
@@ -158,10 +158,10 @@ namespace MappingGenerator.Test.ExplicitConversions {
         ///
         ///        public ReadOnlyCollection&lt;AddressDTO&gt; DoSomething(IList&lt;AddressEntity&gt; addresses)
         ///        {
-        ///            return addresses.Select(address =&gt; new AddressDTO()
+        ///            return addresses.Select(address =&gt; new AddressDTO
         ///            {
         ///                FlatNo = address.FlatNo,
-        ///                Build [rest of string was truncated]&quot;;.
+        ///                Buildti [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _002_ExplicitConversionForInvalidReturn_FIXED {
             get {
@@ -180,7 +180,7 @@ namespace MappingGenerator.Test.ExplicitConversions {
         ///
         ///        public IEnumerable&lt;AddressDTO&gt; DoSomething(AddressEntity address)
         ///        {
-        ///            yield return address;
+        ///            yield return [|address|];
         ///        }
         ///    }
         ///
@@ -189,7 +189,7 @@ namespace MappingGenerator.Test.ExplicitConversions {
         ///        public string FlatNo { get; set; }
         ///        public string BuildtingNo { get; set; }
         ///        public string Street { get; set; }
-        ///      [rest of string was truncated]&quot;;.
+        ///  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _003_ExplicitConversionForInvalidYield {
             get {
@@ -208,12 +208,12 @@ namespace MappingGenerator.Test.ExplicitConversions {
         ///
         ///        public IEnumerable&lt;AddressDTO&gt; DoSomething(AddressEntity address)
         ///        {
-        ///            yield return new AddressDTO()
+        ///            yield return new AddressDTO
         ///            {
         ///                FlatNo = address.FlatNo,
         ///                BuildtingNo = address.BuildtingNo,
         ///                Street = address.Street,
-        ///                ZipCode = address.ZipCo [rest of string was truncated]&quot;;.
+        ///                ZipCode = address.ZipCode [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _003_ExplicitConversionForInvalidYield_FIXED {
             get {
@@ -236,13 +236,13 @@ namespace MappingGenerator.Test.ExplicitConversions {
         ///        {
         ///            var addressEntity = new AddressEntity();
         ///            return new UserDTO{
-        ///                Address = addressEntity
+        ///                Address = [|addressEntity|]
         ///            }
         ///        }
         ///    }
         ///
         ///    public class UserDTO{
-        ///        public AddressDTO Address {get; set;} [rest of string was truncated]&quot;;.
+        ///        public AddressDTO Address {get; s [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _004_ExplicitConversionForInvalidAssigmentInInitBlock {
             get {
@@ -265,17 +265,123 @@ namespace MappingGenerator.Test.ExplicitConversions {
         ///        {
         ///            var addressEntity = new AddressEntity();
         ///            return new UserDTO{
-        ///                Address = addressEntity
+        ///                Address = new AddressDTO
+        ///                {
+        ///                    FlatNo = addressEntity.FlatNo,
+        ///                    BuildtingNo = a [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _004_ExplicitConversionForInvalidAssigmentInInitBlock_FIXED {
+            get {
+                return ResourceManager.GetString("_004_ExplicitConversionForInvalidAssigmentInInitBlock_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///
+        ///namespace MappingGenerator.Test.ExplicitConversions.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public AddressDTO Address { get; set; }
+        ///
+        ///        public void DoSomething()
+        ///        {
+        ///            var addressEntity = new AddressEntity();
+        ///            this.Address = [|addressEntity|];
+        ///        }
+        ///    }
+        ///
+        ///    public class AddressDTO
+        ///    {
+        ///        public string FlatNo { get; set; }
+        ///        public string BuildtingNo { g [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _005_ExplicitConversionReUseInstance {
+            get {
+                return ResourceManager.GetString("_005_ExplicitConversionReUseInstance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///
+        ///namespace MappingGenerator.Test.ExplicitConversions.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public AddressDTO Address { get; set; }
+        ///
+        ///        public void DoSomething()
+        ///        {
+        ///            var addressEntity = new AddressEntity();
+        ///            this.Address.FlatNo = addressEntity.FlatNo;
+        ///            this.Address.BuildtingNo = addressEntity.BuildtingNo;
+        ///            this.Address.Street = addressEntity.Street;
+        ///    [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _005_ExplicitConversionReUseInstance_FIXED {
+            get {
+                return ResourceManager.GetString("_005_ExplicitConversionReUseInstance_FIXED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///
+        ///namespace MappingGenerator.Test.ExplicitConversions.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public AddressDTO Address { get; set; }
+        ///
+        ///        public UserDTO DoSomething()
+        ///        {
+        ///            var addressEntity = new AddressEntity();
+        ///            return new UserDTO{
+        ///                Address = [|addressEntity|]
         ///            }
         ///        }
         ///    }
         ///
         ///    public class UserDTO{
-        ///        public AddressDTO Address {get; set;} [rest of string was truncated]&quot;;.
+        ///        public AddressDTO Address {get; s [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string _004_ExplicitConversionForInvalidAssigmentInInitBlock_FIXED {
+        internal static string _006_ExplicitConversionForInvalidAssigmentInInitBlockReuseInstance {
             get {
-                return ResourceManager.GetString("_004_ExplicitConversionForInvalidAssigmentInInitBlock_FIXED", resourceCulture);
+                return ResourceManager.GetString("_006_ExplicitConversionForInvalidAssigmentInInitBlockReuseInstance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///
+        ///namespace MappingGenerator.Test.ExplicitConversions.TestCaseData
+        ///{
+        ///    public class TestMapper
+        ///    {
+        ///        public AddressDTO Address { get; set; }
+        ///
+        ///        public UserDTO DoSomething()
+        ///        {
+        ///            var addressEntity = new AddressEntity();
+        ///            return new UserDTO{
+        ///                Address =
+        ///                {
+        ///                    FlatNo = addressEntity.FlatNo,
+        ///                    BuildtingNo = addressEntity.Bu [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string _006_ExplicitConversionForInvalidAssigmentInInitBlockReuseInstance_FIXED {
+            get {
+                return ResourceManager.GetString("_006_ExplicitConversionForInvalidAssigmentInInitBlockReuseInstance_FIXED", resourceCulture);
             }
         }
     }

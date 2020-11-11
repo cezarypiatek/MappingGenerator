@@ -32,7 +32,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                     ZipCode = entity.MainAddress.ZipCode,
                     Street = entity.MainAddress.Street,
                     FlatNo = entity.MainAddress.FlatNo,
-                    BuildingNo = entity.MainAddress.BuildingNo
+                    BuildingNo = entity.MainAddress.Building_No
                 },
                 Addresses = entity.Addresses.ConvertAll(entityAddress => new AddressDTO
                 {
@@ -40,7 +40,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                     ZipCode = entityAddress.ZipCode,
                     Street = entityAddress.Street,
                     FlatNo = entityAddress.FlatNo,
-                    BuildingNo = entityAddress.BuildingNo
+                    BuildingNo = entityAddress.Building_No
                 }).AsReadOnly(),
                 ExtraAddresses = entity.ExtraAddresses.Select(entityExtraAddress => new AddressDTO
                 {
@@ -48,7 +48,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                     ZipCode = entityExtraAddress.ZipCode,
                     Street = entityExtraAddress.Street,
                     FlatNo = entityExtraAddress.FlatNo,
-                    BuildingNo = entityExtraAddress.BuildingNo
+                    BuildingNo = entityExtraAddress.Building_No
                 }).ToImmutableArray(),
                 UnitId = entity.Unit.Id,
                 ExtraSavings = entity.ExtraSavings ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.ExtraSavings' should not be null"),
@@ -60,6 +60,12 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                 FourthAuthentication = (int?)entity.FourthAuthentication,
                 FifthAuthentication = (AuthenticationKind?)entity.FifthAuthentication,
                 UniqueKey = entity.UniqueKey,
+                YetAnotherSnakeCaseField = entity.YET_ANOTHER_SNAKE_CASE_FIELD,
+                YetAnotherAddressCity = entity.YetAnotherAddress.City,
+                YetAnotherAddressZipCode = entity.YetAnotherAddress.ZipCode,
+                YetAnotherAddressStreet = entity.YetAnotherAddress.Street,
+                YetAnotherAddressFlatNo = entity.YetAnotherAddress.FlatNo,
+                YetAnotherAddressBuildingNo = entity.YetAnotherAddress.Building_No,
                 Version = entity.Version
             };
         }
@@ -98,6 +104,12 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public int? FourthAuthentication { get; set;}
         public AuthenticationKind? FifthAuthentication { get; set;}
         public Guid UniqueKey { get; set;}
+        public string YetAnotherSnakeCaseField { get; set;}
+        public string YetAnotherAddressCity { get; set; }
+        public string YetAnotherAddressZipCode { get; set; }
+        public string YetAnotherAddressStreet { get; set; }
+        public string YetAnotherAddressFlatNo { get; set; }
+        public string YetAnotherAddressBuildingNo { get; set; }
     }
 
     public class UserSourceDTO
@@ -170,6 +182,8 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public AuthenticationKind? FourthAuthentication { get; set;}
         public int? FifthAuthentication { get; set;}
         public Guid UniqueKey { get; set;}
+        public string YET_ANOTHER_SNAKE_CASE_FIELD { get; set;}
+        public AddressEntity YetAnotherAddress { get; set;}
     }
 
     public class AddressEntity
@@ -178,7 +192,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public string ZipCode { get; set; }
         public string Street { get; set; }
         public string FlatNo { get; set; }
-        public string BuildingNo { get; set; }
+        public string Building_No { get; set; }
     }
 
     public class UnitEntity

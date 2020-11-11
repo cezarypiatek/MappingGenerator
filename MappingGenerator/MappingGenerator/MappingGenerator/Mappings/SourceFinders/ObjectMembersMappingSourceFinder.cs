@@ -125,12 +125,12 @@ namespace MappingGenerator.Mappings.SourceFinders
         {
             //Direct 1-1 mapping
             var matchedSourceProperty = sourceProperties.Value
-                .Where(x => x.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase) || $"{potentialPrefix}{x.Name}".Equals(targetName, StringComparison.OrdinalIgnoreCase))
+                .Where(x => IsMatched(targetName, x, potentialPrefix))
                 .FirstOrDefault(p => p.CanBeGet(accessedVia.Type, mappingContext));
 
             if (matchedSourceProperty != null)
             {
-                return new MappingElement()
+                return new MappingElement
                 {
                     Expression = SyntaxFactoryExtensions.CreateMemberAccessExpression((ExpressionSyntax)sourceGlobalAccessor, accessedVia.CanBeNull, matchedSourceProperty.Name),
                     ExpressionType = new AnnotatedType(matchedSourceProperty.Type.Type, accessedVia.CanBeNull || matchedSourceProperty.Type.CanBeNull)
@@ -170,6 +170,16 @@ namespace MappingGenerator.Mappings.SourceFinders
             return null;
         }
 
+        private static bool IsMatched(string targetName, IObjectField source, string sourceAccessPrefix)
+        {
+            var sanitizedName = SanitizeName(source.Name);
+            var sanitizedTargetName = SanitizeName(targetName);
+            var sanitizedNameWithPrefix = SanitizeName($"{sourceAccessPrefix}{source.Name}");
+            return sanitizedName.Equals(sanitizedTargetName, StringComparison.OrdinalIgnoreCase) || sanitizedNameWithPrefix.Equals(sanitizedTargetName, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string SanitizeName(string name) => name.Replace("_", "");
+
         private readonly Regex acronymPattern = new Regex(@"(?<!^)(?=[A-Z])", RegexOptions.Compiled);
 
         private string GetAcronym(string targetName)
@@ -185,14 +195,14 @@ namespace MappingGenerator.Mappings.SourceFinders
                 return null;
             }
 
-            var subProperty = properties.Where(x => targetName.StartsWith($"{prefix}{x.Name}", StringComparison.OrdinalIgnoreCase))
+            var subProperty = properties.Where(x => SanitizeName(targetName).StartsWith(SanitizeName($"{prefix}{x.Name}"), StringComparison.OrdinalIgnoreCase))
                 .FirstOrDefault(p => p.CanBeGet(containingType, mappingContext));
             if (subProperty != null)
             {
                 var currentNamePart = $"{prefix}{subProperty.Name}";
                 var subPropertyAccessor = SyntaxFactoryExtensions.CreateMemberAccessExpression((ExpressionSyntax)currentAccessor, isCurrentAccessorNullable, subProperty.Name);
                 var expressionCanBeNull = isCurrentAccessorNullable || subProperty.Type.CanBeNull;
-                if (targetName.Equals(currentNamePart, StringComparison.OrdinalIgnoreCase))
+                if (SanitizeName(targetName).Equals(SanitizeName(currentNamePart), StringComparison.OrdinalIgnoreCase))
                 {
                     
                     return new MappingElement

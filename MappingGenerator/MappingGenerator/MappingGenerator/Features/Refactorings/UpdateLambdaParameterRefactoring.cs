@@ -42,13 +42,12 @@ namespace MappingGenerator.Features.Refactorings
         private async Task<Document> InitializeWithLocals(Document document, LambdaExpressionSyntax lambdaExpressionSyntax, CancellationToken cancellationToken)
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
-            var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
-            var sourceFinders = GetAllPossibleSourceFinders(lambdaExpressionSyntax, semanticModel, syntaxGenerator).ToList();
+            var sourceFinders = GetAllPossibleSourceFinders(lambdaExpressionSyntax, semanticModel).ToList();
             var mappingMatcher = new BestPossibleMatcher(sourceFinders);
             return await ReplaceWithMappingBody(document, lambdaExpressionSyntax, semanticModel, mappingMatcher, cancellationToken).ConfigureAwait(false);
         }
 
-        private static IEnumerable<IMappingSourceFinder> GetAllPossibleSourceFinders(LambdaExpressionSyntax lambdaExpression, SemanticModel semanticModel, SyntaxGenerator syntaxGenerator)
+        private static IEnumerable<IMappingSourceFinder> GetAllPossibleSourceFinders(LambdaExpressionSyntax lambdaExpression, SemanticModel semanticModel)
         {
             var localSymbols = semanticModel.GetLocalSymbols(lambdaExpression);
             yield return new LocalScopeMappingSourceFinder(semanticModel, localSymbols);
@@ -59,7 +58,7 @@ namespace MappingGenerator.Features.Refactorings
                 
                 if (symbolType !=null && ObjectHelper.IsSimpleType(symbolType) == false)
                 {
-                    yield return new ObjectMembersMappingSourceFinder(new AnnotatedType(symbolType), SyntaxFactory.IdentifierName(localSymbol.Name), syntaxGenerator);
+                    yield return new ObjectMembersMappingSourceFinder(new AnnotatedType(symbolType), SyntaxFactory.IdentifierName(localSymbol.Name));
                 }
             }
         }

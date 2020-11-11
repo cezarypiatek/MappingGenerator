@@ -169,7 +169,7 @@ namespace MappingGenerator.Mappings
                 };
             }
 
-            var subMappingSourceFinder = new ObjectMembersMappingSourceFinder(source.ExpressionType.AsNotNull(), source.Expression, syntaxGenerator);
+            var subMappingSourceFinder = new ObjectMembersMappingSourceFinder(source.ExpressionType.AsNotNull(), source.Expression);
 
             if (namedTargetType != null)
             {

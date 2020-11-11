@@ -68,18 +68,16 @@ namespace MappingGenerator.Mappings.SourceFinders
     {
         private readonly AnnotatedType sourceType;
         private readonly SyntaxNode sourceGlobalAccessor;
-        private readonly SyntaxGenerator generator;
         private readonly Lazy<IReadOnlyList<IObjectField>> sourceProperties;
         private readonly Lazy<IReadOnlyList<IMethodSymbol>> sourceMethods;
         private readonly string potentialPrefix;
         private readonly Lazy<bool> isSourceTypeEnumerable;
 
 
-        public ObjectMembersMappingSourceFinder(AnnotatedType sourceType, SyntaxNode sourceGlobalAccessor, SyntaxGenerator generator)
+        public ObjectMembersMappingSourceFinder(AnnotatedType sourceType, SyntaxNode sourceGlobalAccessor)
         {
             this.sourceType = sourceType;
             this.sourceGlobalAccessor = sourceGlobalAccessor;
-            this.generator = generator;
             potentialPrefix = NameHelper.ToLocalVariableName(sourceGlobalAccessor.ToFullString());
             var sourceAllMembers = sourceType.Type.GetAllMembers();
             sourceProperties = new Lazy<IReadOnlyList<IObjectField>>(() =>ObjectFieldExtensions.GetObjectFields(sourceAllMembers).ToList());

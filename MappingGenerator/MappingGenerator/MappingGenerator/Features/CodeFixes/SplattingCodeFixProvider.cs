@@ -72,7 +72,7 @@ namespace MappingGenerator.Features.CodeFixes
                 var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator);
                 var invalidArgumentList = invocation.Arguments;
                 var mappingContext = new MappingContext(invocation.SourceNode, semanticModel);
-                var parametersMatch = await FindParametersMatch(invalidArgumentList, overloadParameterSets, semanticModel, syntaxGenerator, mappingContext).ConfigureAwait(false);
+                var parametersMatch = await FindParametersMatch(invalidArgumentList, overloadParameterSets, semanticModel, mappingContext).ConfigureAwait(false);
                 if (parametersMatch != null)
                 {
                     
@@ -87,18 +87,19 @@ namespace MappingGenerator.Features.CodeFixes
 
         private static async Task<MatchedParameterList> FindParametersMatch(ArgumentListSyntax invalidArgumentList,
             IEnumerable<ImmutableArray<IParameterSymbol>> overloadParameterSets, SemanticModel semanticModel,
-            SyntaxGenerator syntaxGenerator, MappingContext mappingContext) 
+            MappingContext mappingContext) 
         {
-            var sourceFinder = CreateSourceFinderBasedOnInvalidArgument(invalidArgumentList, semanticModel, syntaxGenerator);
+            var sourceFinder = CreateSourceFinderBasedOnInvalidArgument(invalidArgumentList, semanticModel);
             var parametersMatch = await MethodHelper.FindBestParametersMatch(sourceFinder, overloadParameterSets, mappingContext).ConfigureAwait(false);
             return parametersMatch;
         }
 
-        private static ObjectMembersMappingSourceFinder CreateSourceFinderBasedOnInvalidArgument(ArgumentListSyntax invalidArgumentList, SemanticModel semanticModel, SyntaxGenerator syntaxGenerator)
+        private static ObjectMembersMappingSourceFinder CreateSourceFinderBasedOnInvalidArgument(
+            ArgumentListSyntax invalidArgumentList, SemanticModel semanticModel)
         {
             var invalidArgument = invalidArgumentList.Arguments.First();
             var sourceType = semanticModel.GetTypeInfo(invalidArgument.Expression).GetAnnotatedType();
-            return new ObjectMembersMappingSourceFinder(new AnnotatedType(sourceType.Type), invalidArgument.Expression, syntaxGenerator);
+            return new ObjectMembersMappingSourceFinder(new AnnotatedType(sourceType.Type), invalidArgument.Expression);
         }
     }
 }

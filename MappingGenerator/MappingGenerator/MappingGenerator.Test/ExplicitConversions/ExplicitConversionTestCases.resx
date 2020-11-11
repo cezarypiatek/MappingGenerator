@@ -142,4 +142,16 @@
   <data name="_004_ExplicitConversionForInvalidAssigmentInInitBlock_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>TestCaseData\004_ExplicitConversionForInvalidAssigmentInInitBlock_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="_005_ExplicitConversionReUseInstance" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\005_ExplicitConversionReUseInstance.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_005_ExplicitConversionReUseInstance_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\005_ExplicitConversionReUseInstance_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_006_ExplicitConversionForInvalidAssigmentInInitBlockReuseInstance" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\006_ExplicitConversionForInvalidAssigmentInInitBlockReuseInstance.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_006_ExplicitConversionForInvalidAssigmentInInitBlockReuseInstance_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\006_ExplicitConversionForInvalidAssigmentInInitBlockReuseInstance_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

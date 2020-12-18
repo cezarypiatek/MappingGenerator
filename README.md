@@ -28,7 +28,7 @@ Before you start any contributing work, please read the [contribution guidline](
 ### Supported IDE
 
 #### VisualStudio.
-Install as VSIX from [Market place](https://marketplace.visualstudio.com/items?itemName=54748ff9-45fc-43c2-8ec5-cf7912bc3b84.mappinggenerator) or as a [NuGet package](https://www.nuget.org/packages/MappingGenerator/). Verify your Roslyn integration option in case you are using R#.
+Install as VSIX from [Market place](https://marketplace.visualstudio.com/items?itemName=54748ff9-45fc-43c2-8ec5-cf7912bc3b84.mappinggenerator) or as a [NuGet package](https://www.nuget.org/packages/MappingGenerator/). Verify your [Roslyn integration option in case you are using R#](#using-along-with-resharper).
 
 #### JetBrains Rider
 Install as a [NuGet package](https://www.nuget.org/packages/MappingGenerator/)

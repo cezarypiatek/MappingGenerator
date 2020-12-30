@@ -1,0 +1,99 @@
+name: release
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build-extension:
+    runs-on: windows-latest
+    env: 
+        DOTNET_NOLOGO: true
+        DOTNET_CLI_TELEMETRY_OPTOUT: true
+        Configuration: Release
+        SolutionPath: MappingGenerator\MappingGenerator.sln
+        VsixManifestPath: MappingGenerator\MappingGenerator\MappingGenerator.Vsix\source.extension.vsixmanifest
+        VsixPath: MappingGenerator\MappingGenerator\MappingGenerator.Vsix\bin\Release\MappingGenerator.vsix
+        VsixPublishManifestPath: MappingGenerator\MappingGenerator\MappingGenerator.Vsix\publishManifest.json
+        Version: '1.21.${{ github.run_number }}'
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2   
+    - name: Fetch all history and tags from all branches for release note
+      run: git fetch --prune --unshallow
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '3.1.x'
+    - name: Setup MSBuild.exe
+      uses: microsoft/setup-msbuild@v1.0.2
+      id: MsBuildSetup
+      with:
+        vs-version: '[16.8,16.9)'
+    - name: Setup nuget
+      uses: nuget/setup-nuget@v1
+      with:
+        nuget-version: '5.x'
+    - name: Restore NuGet Packages
+      run: nuget restore $env:SolutionPath
+    - name: Set version for VSIX
+      run: |
+        $manifestXml = [xml](Get-Content $env:VsixManifestPath -Raw)
+        $manifestXml.PackageManifest.Metadata.Identity.Version = $env:Version
+        $manifestXml.save($env:VsixManifestPath)
+    - name: Build extension
+      run: msbuild $env:SolutionPath /t:Rebuild
+      env: 
+        DeployExtension: False
+    - name: Test extension
+      run: dotnet test --no-build --verbosity normal $env:SolutionPath
+    - name: Generate release note
+      run: |
+        $commitLog = git log "$(git describe --tags --abbrev=0)..HEAD" --pretty=format:"- %s"
+        "What's new: `r`n`r`n$([string]::Join("`r`n",$commitLog))" | Out-File release_note.md -Encoding utf8
+    - name: Create Github Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.Version }}
+        release_name:  ${{ env.Version }}
+        body_path: release_note.md
+        draft: false
+        prerelease: false
+    - name: Upload Release Asset - MappingGenerator.vsix
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ env.VsixPath }}
+        asset_name: MappingGenerator.vsix
+        asset_content_type: binary/octet-stream
+    - name: Upload Release Asset - MappingGenerator Nuget
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: MappingGenerator\MappingGenerator\MappingGenerator\bin\Release\MappingGenerator.${{ env.Version }}.nupkg
+        asset_name: MappingGenerator.${{ env.Version }}.nupkg
+        asset_content_type: binary/octet-stream
+    - name: Upload Release Asset - MappingGenerator.OnBuildGenerator Nuget
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path:  MappingGenerator\OnBuildGenerator\bin\Release\MappingGenerator.OnBuildGenerator.${{ env.Version }}.nupkg
+        asset_name: MappingGenerator.OnBuildGenerator.${{ env.Version }}.nupkg
+        asset_content_type: binary/octet-stream
+    - name: Publish extension to Marketplace
+      run: |
+        $MsBuildDir = "${{ steps.MsBuildSetup.outputs.msbuildPath }}"
+        $VsixPublisher = Join-Path -Path $MsBuildDir -ChildPath "..\..\..\VSSDK\VisualStudioIntegration\Tools\Bin\VsixPublisher.exe" -Resolve
+        & $VsixPublisher publish -personalAccessToken ${{ secrets.VS_PUBLISHER_ACCESS_TOKEN }}  -payload $env:VsixPath -publishManifest $env:VsixPublishManifestPath
+    - name: Publish extension to Nuget
+      run: |
+        dotnet nuget push MappingGenerator\MappingGenerator\MappingGenerator\bin\Release\MappingGenerator.*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+        dotnet nuget push MappingGenerator\OnBuildGenerator\bin\Release\MappingGenerator.OnBuildGenerator.*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json

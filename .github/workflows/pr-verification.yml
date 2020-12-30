@@ -1,0 +1,51 @@
+name: pr-verification
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  build-extension:
+    runs-on: windows-latest
+    env: 
+        DOTNET_NOLOGO: true
+        DOTNET_CLI_TELEMETRY_OPTOUT: true
+        Configuration: Release
+        SolutionPath: MappingGenerator\MappingGenerator.sln
+        VsixManifestPath: MappingGenerator\MappingGenerator\MappingGenerator.Vsix\source.extension.vsixmanifest
+        Version: '1.21.${{ github.run_number }}-pr'
+    steps:
+    - uses: actions/checkout@v2   
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '3.1.x'
+    - name: Setup MSBuild.exe
+      uses: microsoft/setup-msbuild@v1.0.2
+      with:
+        vs-version: '[16.8,16.9)'
+    - name: Setup nuget
+      uses: nuget/setup-nuget@v1
+      with:
+        nuget-version: '5.x'
+    - name: Restore NuGet Packages
+      run: nuget restore $env:SolutionPath
+    - name: Set version for VSIX
+      run: |
+        $manifestXml = [xml](Get-Content $env:VsixManifestPath -Raw)
+        $manifestXml.PackageManifest.Metadata.Identity.Version = $env:Version
+        $manifestXml.save($env:VsixManifestPath)
+    - name: Build extension
+      run: msbuild $env:SolutionPath /t:Rebuild
+      env: 
+        DeployExtension: False
+    - name: Test extension
+      run: dotnet test --no-build --verbosity normal $env:SolutionPath
+    - name: Collect artifacts - VSIX
+      uses: actions/upload-artifact@v2
+      with:
+        name: MappingGenerator-VSIX
+        path: MappingGenerator\MappingGenerator\MappingGenerator.Vsix\bin\Release\MappingGenerator.vsix
+    - name: Collect artifacts - nugets
+      uses: actions/upload-artifact@v2
+      with:
+        name: MappingGenerator-Nugets
+        path: '**/MappingGenerator*.nupkg'

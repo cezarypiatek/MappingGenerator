@@ -1,0 +1,16 @@
+{
+    "$schema": "http://json.schemastore.org/vsix-publish",
+    "categories": [
+        "coding",
+        "scaffolding"
+    ],
+    "identity": {
+        "internalName": "mappinggenerator"
+    },
+    "overview": "overview.md",
+    "priceCategory": "free",
+    "publisher": "54748ff9-45fc-43c2-8ec5-cf7912bc3b84",
+    "private": false,
+    "qna": true,
+    "repo": "https://github.com/cezarypiatek/MappingGenerator"
+}

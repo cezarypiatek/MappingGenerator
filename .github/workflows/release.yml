@@ -23,6 +23,11 @@ jobs:
       uses: actions/checkout@v2   
     - name: Fetch all history and tags from all branches for release note
       run: git fetch --prune --unshallow
+    - name: Cache nuget packages
+      uses: actions/cache@v2
+      with:
+        path: ~/.nuget/packages
+        key: nuget-${{ hashFiles('**/*.csproj') }}
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:

@@ -13,7 +13,13 @@ jobs:
         VsixManifestPath: MappingGenerator\MappingGenerator\MappingGenerator.Vsix\source.extension.vsixmanifest
         Version: '1.21.${{ github.run_number }}-pr'
     steps:
-    - uses: actions/checkout@v2   
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Cache nuget packages
+      uses: actions/cache@v2
+      with:
+        path: ~/.nuget/packages
+        key: nuget-${{ hashFiles('**/*.csproj') }}   
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:

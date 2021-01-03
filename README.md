@@ -1,14 +1,7 @@
 # Mapping Generator [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=&quot;AutoMapper&quot;%20ike,%20Roslyn%20based,%20code%20fix%20provider%20that%20allows%20to%20generate%20mapping%20code%20in%20design%20time.&related=@cezary_piatek&url=https://github.com/cezarypiatek/MappingGenerator)  
 
 
-|Branch   | Status  |
-|---------|---------|
-|Master   | [![Build status](https://ci.appveyor.com/api/projects/status/v73nnoo09cc8kkmo/branch/master?svg=true)](https://ci.appveyor.com/project/cezarypiatek/mappinggenerator/branch/master)|
-|Develop  | [![Build status](https://ci.appveyor.com/api/projects/status/v73nnoo09cc8kkmo/branch/develop?svg=true)](https://ci.appveyor.com/project/cezarypiatek/mappinggenerator/branch/develop)|
-
-
-
-"AutoMapper" like, Roslyn based, code fix provider that allows to generate mapping code in design time.
+"AutoMapper" like, Roslyn based, code fix provider that allows to generate mapping code in design time. Read more [Mapping Generator – Design Time Alternative to AutoMapper](https://guidnew.com/en/blog/mapping-generator-design-time-alternative-to-automapper/)
 
 You can download it as Visual Studio Extension from [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=54748ff9-45fc-43c2-8ec5-cf7912bc3b84.mappinggenerator).
 

@@ -91,10 +91,11 @@ jobs:
         asset_name: MappingGenerator.OnBuildGenerator.${{ env.Version }}.nupkg
         asset_content_type: binary/octet-stream
     - name: Publish extension to Marketplace
-      run: |
-        $MsBuildDir = "${{ steps.MsBuildSetup.outputs.msbuildPath }}"
-        $VsixPublisher = Join-Path -Path $MsBuildDir -ChildPath "..\..\..\VSSDK\VisualStudioIntegration\Tools\Bin\VsixPublisher.exe" -Resolve
-        & $VsixPublisher publish -personalAccessToken ${{ secrets.VS_PUBLISHER_ACCESS_TOKEN }}  -payload $env:VsixPath -publishManifest $env:VsixPublishManifestPath
+      uses: cezarypiatek/VsixPublisherAction@0.1
+      with:
+        extension-file: ${{ env.VsixPath }}
+        publish-manifest-file: ${{ env.VsixPublishManifestPath }}
+        personal-access-code: ${{ secrets.VS_PUBLISHER_ACCESS_TOKEN }}      
     - name: Publish extension to Nuget
       run: |
         dotnet nuget push MappingGenerator\MappingGenerator\MappingGenerator\bin\Release\MappingGenerator.*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json

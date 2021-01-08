@@ -71,7 +71,7 @@ namespace MappingGenerator.Features.Refactorings
             var mappingContext = new MappingContext(lambda, semanticModel);
             var mappingTargetHelper = new MappingTargetHelper();
             var propertiesToSet = mappingTargetHelper.GetFieldsThaCanBeSetPublicly(createdObjectType, mappingContext);
-            var mappings = await mappingEngine.MapUsingSimpleAssignment(propertiesToSet, mappingMatcher, mappingContext, globalTargetAccessor: SyntaxFactory.IdentifierName(GetParameterIdentifier(lambda))).ConfigureAwait(false);
+            var mappings = await mappingEngine.MapUsingSimpleAssignment(new TargetHolder(propertiesToSet, createdObjectType, SyntaxFactory.IdentifierName(GetParameterIdentifier(lambda))), mappingMatcher, mappingContext).ConfigureAwait(false);
             var statements = mappings.Select(x=>x.AsStatement().WithTrailingTrivia(SyntaxFactory.EndOfLine("\r\n")));
             
             var newLambda = UpdateLambdaBody(lambda, SyntaxFactory.Block(statements)).WithAdditionalAnnotations(Formatter.Annotation);

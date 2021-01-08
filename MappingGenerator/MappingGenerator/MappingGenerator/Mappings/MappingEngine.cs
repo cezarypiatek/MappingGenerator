@@ -14,6 +14,20 @@ using Microsoft.CodeAnalysis.Editing;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 namespace MappingGenerator.Mappings
 {
+    public class TargetHolder
+    {
+        public TargetHolder(IReadOnlyCollection<IObjectField> elementsToSet, ITypeSymbol targetType, SyntaxNode globalTargetAccessor = null)
+        {
+            ElementsToSet = elementsToSet;
+            TargetType = targetType;
+            GlobalTargetAccessor = globalTargetAccessor;
+        }
+
+        public IReadOnlyCollection<IObjectField> ElementsToSet { get; private set; }
+        public ITypeSymbol TargetType { get; }
+        public SyntaxNode GlobalTargetAccessor { get; private set; }
+    }
+
     public class MappingEngine
     {
         protected readonly SemanticModel semanticModel;
@@ -252,31 +266,35 @@ namespace MappingGenerator.Mappings
             MappingPath mappingPath = null)
         {
             var propertiesToSet = _mappingTargetHelper.GetFieldsThaCanBeSetPublicly(createdObjectTyp, mappingContext);
-            var assignments = await MapUsingSimpleAssignment(propertiesToSet, mappingMatcher, mappingContext, mappingPath).ConfigureAwait(false);
+            var assignments = await MapUsingSimpleAssignment(new TargetHolder(propertiesToSet, createdObjectTyp), mappingMatcher, mappingContext, mappingPath).ConfigureAwait(false);
             return SyntaxFactoryExtensions.WithMembersInitialization(objectCreationExpression, assignments);
         }
 
-        class TargetHolder
-        {
-            public ITypeSymbol Type { get; set; }
-            public SyntaxNode Accessor { get; set; }
-            public IReadOnlyCollection<IObjectField> ElementsToSet { get; set; }
-        }
-
-        public async Task<IReadOnlyList<AssignmentExpressionSyntax>> MapUsingSimpleAssignment(IReadOnlyCollection<IObjectField> targets,
+        public async Task<IReadOnlyList<AssignmentExpressionSyntax>> MapUsingSimpleAssignment(TargetHolder targetHolder,
             IMappingMatcher mappingMatcher,
             MappingContext mappingContext,
-            MappingPath mappingPath = null, SyntaxNode globalTargetAccessor = null)
+            MappingPath mappingPath = null)
         {
-            var matched = await mappingMatcher.MatchAll(targets, syntaxGenerator, mappingContext, globalTargetAccessor).ConfigureAwait(false);
+            var matched = await mappingMatcher.MatchAll(targetHolder, syntaxGenerator, mappingContext).ConfigureAwait(false);
             var results = new List<AssignmentExpressionSyntax>(matched.Count);
             foreach (var match in matched)
             {
                 var subBranchMappingPath = mappingPath?.Clone() ?? new MappingPath();
                 var sourceMappingElement = await MapExpression(match.Source, match.Target.ExpressionType, mappingContext, subBranchMappingPath).ConfigureAwait(false);
                 var sourceExpression = sourceMappingElement.Expression;
-                var assignmentExpression = AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, match.Target.Expression, sourceExpression);
-                results.Add(assignmentExpression);
+                if (match.Target.OnlyIndirectInit)
+                {
+                    if (match.Source.Expression is ObjectCreationExpressionSyntax obc && obc.Initializer.Expressions.Count > 0)
+                    {
+                        var assignmentExpression = AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, match.Target.Expression, obc.Initializer);
+                        results.Add(assignmentExpression);
+                    }
+                }
+                else
+                {
+                    var assignmentExpression = AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, match.Target.Expression, sourceExpression);
+                    results.Add(assignmentExpression);
+                }
             }
 
             return results;

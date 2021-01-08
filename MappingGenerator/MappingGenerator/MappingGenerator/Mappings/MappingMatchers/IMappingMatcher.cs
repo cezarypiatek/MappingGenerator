@@ -8,7 +8,6 @@ namespace MappingGenerator.Mappings.MappingMatchers
 {
     public interface IMappingMatcher
     {
-        Task<IReadOnlyList<MappingMatch>> MatchAll(IReadOnlyCollection<IObjectField> targets, SyntaxGenerator syntaxGenerator,
-            MappingContext mappingContext, SyntaxNode globalTargetAccessor = null);
+        Task<IReadOnlyList<MappingMatch>> MatchAll(TargetHolder targetHolder, SyntaxGenerator syntaxGenerator, MappingContext mappingContext);
     }
 }

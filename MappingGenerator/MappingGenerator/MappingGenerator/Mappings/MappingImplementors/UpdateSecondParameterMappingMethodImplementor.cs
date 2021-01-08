@@ -28,7 +28,7 @@ namespace MappingGenerator.Mappings.MappingImplementors
             var mappingTargetHelper = new MappingTargetHelper();
             var targets = mappingTargetHelper.GetFieldsThaCanBeSetPublicly(target.Type, mappingContext);
             var sourceFinder = new ObjectMembersMappingSourceFinder(new AnnotatedType(source.Type), generator.IdentifierName(source.Name));
-            return await mappingEngine.MapUsingSimpleAssignment(targets, new SingleSourceMatcher(sourceFinder), mappingContext, globalTargetAccessor: generator.IdentifierName(target.Name)).ConfigureAwait(false);
+            return await mappingEngine.MapUsingSimpleAssignment(new TargetHolder(targets, target.Type, generator.IdentifierName(target.Name)), new SingleSourceMatcher(sourceFinder), mappingContext ).ConfigureAwait(false);
         }
     }
 }

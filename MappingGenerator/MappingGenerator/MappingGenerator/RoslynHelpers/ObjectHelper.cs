@@ -103,5 +103,6 @@ namespace MappingGenerator.RoslynHelpers
         bool CanBeSetInConstructor(ITypeSymbol via, MappingContext mappingContext);
 
         bool CanBeGet(ITypeSymbol via, MappingContext mappingContext);
+        bool CanBeSetOnlyIndirectly(ITypeSymbol via, MappingContext mappingContext);
     }
 }

@@ -18,21 +18,21 @@ namespace MappingGenerator.Mappings.MappingMatchers
             matchers = sourceFinders.Select(x => new SingleSourceMatcher(x)).ToList();
         }
 
-        public async Task<IReadOnlyList<MappingMatch>> MatchAll(IReadOnlyCollection<IObjectField> targets,
-            SyntaxGenerator syntaxGenerator, MappingContext mappingContext, SyntaxNode globalTargetAccessor = null)
+        public async Task<IReadOnlyList<MappingMatch>> MatchAll(TargetHolder targetHolder,
+            SyntaxGenerator syntaxGenerator, MappingContext mappingContext)
         {
-            var matchedSets = await GetMatchedSets(targets, syntaxGenerator, mappingContext, globalTargetAccessor).ConfigureAwait(false);
+            var matchedSets = await GetMatchedSets(targetHolder, syntaxGenerator, mappingContext).ConfigureAwait(false);
             return matchedSets.OrderByDescending(x => x.Count).FirstOrDefault() ?? Array.Empty<MappingMatch>();
         }
 
-        private async Task<IReadOnlyList<IReadOnlyList<MappingMatch>>> GetMatchedSets(IReadOnlyCollection<IObjectField> targets, SyntaxGenerator syntaxGenerator, MappingContext mappingContext, SyntaxNode globalTargetAccessor)
+        private async Task<IReadOnlyList<IReadOnlyList<MappingMatch>>> GetMatchedSets(TargetHolder targetHolder, SyntaxGenerator syntaxGenerator, MappingContext mappingContext)
         {
             var results = new List<IReadOnlyList<MappingMatch>>();
             foreach (var x in matchers)
             {
-                var matches = await x.MatchAll(targets, syntaxGenerator, mappingContext, globalTargetAccessor).ConfigureAwait(false);
+                var matches = await x.MatchAll(targetHolder, syntaxGenerator, mappingContext).ConfigureAwait(false);
                 results.Add(matches);
-                if (matches.Count == targets.Count)
+                if (matches.Count == targetHolder.ElementsToSet.Count)
                 {
                     break;
                 }

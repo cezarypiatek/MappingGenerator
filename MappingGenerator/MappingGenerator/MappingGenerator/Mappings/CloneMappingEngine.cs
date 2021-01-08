@@ -18,7 +18,7 @@ namespace MappingGenerator.Mappings
 
         protected override bool ShouldCreateConversionBetweenTypes(ITypeSymbol targetType, ITypeSymbol sourceType)
         {
-            if (targetType.Equals(sourceType) && SymbolHelper.IsNullable(targetType, out _))
+            if (targetType.Equals(sourceType) && SymbolHelper.IsNullable(targetType))
             {
                 return false;
             }
@@ -26,7 +26,7 @@ namespace MappingGenerator.Mappings
             return  ObjectHelper.IsSimpleType(targetType) == false && ObjectHelper.IsSimpleType(sourceType) == false;
         }
 
-        protected override Task<MappingElement> TryToCreateMappingExpression(MappingElement source, AnnotatedType targetType, MappingPath mappingPath, MappingContext mappingContext)
+        protected override Task<SourceMappingElement> TryToCreateMappingExpression(SourceMappingElement source, AnnotatedType targetType, MappingPath mappingPath, MappingContext mappingContext)
         {
             //TODO: check if source is not null (conditional member access)
 
@@ -37,7 +37,7 @@ namespace MappingGenerator.Mappings
                 var cloneMethods = targetType.Type.GetMembers("Clone").OfType<IMethodSymbol>().Where(m => mappingContext.AccessibilityHelper.IsSymbolAccessible(m, targetType.Type)).ToList();
                 if (cloneMethods.Any(IsGenericCloneMethod))
                 {
-                    return Task.FromResult(new MappingElement()
+                    return Task.FromResult(new SourceMappingElement()
                     {
                         ExpressionType = targetType,
                         Expression = invokeClone as ExpressionSyntax
@@ -48,7 +48,7 @@ namespace MappingGenerator.Mappings
 
                 if (objectClone != null)
                 {
-                    return Task.FromResult(new MappingElement()
+                    return Task.FromResult(new SourceMappingElement()
                     {
                         ExpressionType = targetType,
                         Expression = syntaxGenerator.TryCastExpression(invokeClone, targetType.Type) as ExpressionSyntax
@@ -59,7 +59,7 @@ namespace MappingGenerator.Mappings
                 if (implicitClone!=null)
                 {
                     var castedOnICloneable = syntaxGenerator.CastExpression(SyntaxFactory.ParseTypeName("ICloneable"), source.Expression);
-                    return Task.FromResult(new MappingElement()
+                    return Task.FromResult(new SourceMappingElement()
                         {
                             ExpressionType = targetType,
                             Expression = syntaxGenerator.TryCastExpression(syntaxGenerator.InvocationExpression(syntaxGenerator.MemberAccessExpression(castedOnICloneable, "Clone")), targetType.Type) as ExpressionSyntax

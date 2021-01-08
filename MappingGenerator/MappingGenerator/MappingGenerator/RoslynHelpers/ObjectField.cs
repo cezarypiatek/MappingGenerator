@@ -1,6 +1,5 @@
 using System;
 using MappingGenerator.Mappings;
-using MappingGenerator.Mappings.SourceFinders;
 using Microsoft.CodeAnalysis;
 
 namespace MappingGenerator.RoslynHelpers
@@ -39,5 +38,7 @@ namespace MappingGenerator.RoslynHelpers
         {
             return mappingContext.AccessibilityHelper.IsSymbolAccessible(fieldSymbol, via);
         }
+
+        public bool CanBeSetOnlyIndirectly(ITypeSymbol via, MappingContext mappingContext) => false;
     }
 }

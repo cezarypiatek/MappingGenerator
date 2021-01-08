@@ -2,7 +2,7 @@
 {
     public class MappingMatch
     {
-        public MappingElement Source { get; set; }
-        public MappingElement Target { get; set; }
+        public SourceMappingElement Source { get; set; }
+        public TargetMappingElement Target { get; set; }
     }
 }

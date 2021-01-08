@@ -12,7 +12,7 @@ namespace MappingGenerator.Mappings.SourceFinders
             this.sourceFinders = sourceFinders;
         }
 
-        public async Task<MappingElement> FindMappingSource(string targetName, AnnotatedType targetType, MappingContext mappingContext)
+        public async Task<SourceMappingElement> FindMappingSource(string targetName, AnnotatedType targetType, MappingContext mappingContext)
         {
             foreach (var sourceFinder in sourceFinders)
             {

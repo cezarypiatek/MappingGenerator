@@ -15,7 +15,7 @@ namespace MappingGenerator.Mappings.SourceFinders
             this.ignore = ignore;
         }
 
-        public async Task<MappingElement> FindMappingSource(string targetName, AnnotatedType targetType, MappingContext mappingContext)
+        public async Task<SourceMappingElement> FindMappingSource(string targetName, AnnotatedType targetType, MappingContext mappingContext)
         {
             var mapping =  await wrappedFinder.FindMappingSource(targetName, targetType, mappingContext).ConfigureAwait(false);
             return mapping == null || ignore(mapping) ? null : mapping;

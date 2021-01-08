@@ -27,19 +27,20 @@ namespace MappingGenerator.Mappings.MappingMatchers
                 results.Add(new MappingMatch
                 {
                     Source = await sourceFinder.FindMappingSource(target.Name, target.Type, mappingContext).ConfigureAwait(false),
-                    Target = CreateTargetElement(globalTargetAccessor, target)
+                    Target = CreateTargetElement(globalTargetAccessor, target, mappingContext)
                 });
             }
 
             return results.Where(x => x.Source != null).ToList();
         }
 
-        private MappingElement CreateTargetElement(SyntaxNode globalTargetAccessor, IObjectField target)
+        private TargetMappingElement CreateTargetElement(SyntaxNode globalTargetAccessor, IObjectField target, MappingContext mappingContext)
         {
-            return new MappingElement
+            return new TargetMappingElement
             {
                 Expression = (ExpressionSyntax)CreateAccessPropertyExpression(globalTargetAccessor, target),
-                ExpressionType = target.Type
+                ExpressionType = target.Type,
+                OnlyIndirectInit = target.CanBeSetOnlyIndirectly(,mappingContext)
             };
         }
 

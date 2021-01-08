@@ -22,14 +22,14 @@ namespace MappingGenerator.Mappings.SourceFinders
             _document = document;
         }
 
-        public Task<MappingElement> FindMappingSource(string targetName, AnnotatedType targetType, MappingContext mappingContext)
+        public Task<SourceMappingElement> FindMappingSource(string targetName, AnnotatedType targetType, MappingContext mappingContext)
         {
             return FindMappingSource(targetType, mappingContext, new MappingPath());
         }
 
-        private async Task<MappingElement> FindMappingSource(AnnotatedType targetType, MappingContext mappingContext, MappingPath mappingPath)
+        private async Task<SourceMappingElement> FindMappingSource(AnnotatedType targetType, MappingContext mappingContext, MappingPath mappingPath)
         {
-            return new MappingElement
+            return new SourceMappingElement
             {
                 ExpressionType = targetType,
                 Expression = (ExpressionSyntax)(await GetDefaultExpression(targetType.Type, mappingContext, mappingPath).ConfigureAwait(false))

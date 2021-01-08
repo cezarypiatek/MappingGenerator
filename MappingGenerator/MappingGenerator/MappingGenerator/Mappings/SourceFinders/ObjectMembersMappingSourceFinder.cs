@@ -14,7 +14,7 @@ namespace MappingGenerator.Mappings.SourceFinders
 {
     public interface IMappingSourceFinder
     {
-        Task<MappingElement> FindMappingSource(string targetName, AnnotatedType targetType, MappingContext mappingContext);
+        Task<SourceMappingElement> FindMappingSource(string targetName, AnnotatedType targetType, MappingContext mappingContext);
     }
 
     public class SyntaxFactoryExtensions
@@ -85,7 +85,7 @@ namespace MappingGenerator.Mappings.SourceFinders
             isSourceTypeEnumerable = new Lazy<bool>(() => sourceType.Type.Interfaces.Any(x => x.ToDisplayString().StartsWith("System.Collections.Generic.IEnumerable<")));
         }
 
-        public Task<MappingElement> FindMappingSource(string targetName, AnnotatedType targetType, MappingContext mappingContext)
+        public Task<SourceMappingElement> FindMappingSource(string targetName, AnnotatedType targetType, MappingContext mappingContext)
         {
             var result = TryFindSource(targetName, mappingContext, sourceType) ?? TryFindSourceForEnumerable(targetName, targetType.Type);
             return Task.FromResult(result);
@@ -93,7 +93,7 @@ namespace MappingGenerator.Mappings.SourceFinders
 
 
         //TODO: Acquire semantic model and try to search through extensions methods with no arguments
-        private MappingElement TryFindSourceForEnumerable(string targetName, ITypeSymbol targetType)
+        private SourceMappingElement TryFindSourceForEnumerable(string targetName, ITypeSymbol targetType)
         {
             if (isSourceTypeEnumerable.Value)
             {
@@ -111,17 +111,17 @@ namespace MappingGenerator.Mappings.SourceFinders
             return null;
         }
 
-        private MappingElement CreateMappingElementFromExtensionMethod(ITypeSymbol targetType, string methodName)
+        private SourceMappingElement CreateMappingElementFromExtensionMethod(ITypeSymbol targetType, string methodName)
         {
             var sourceMethodAccessor = SyntaxFactoryExtensions.CreateMethodAccessExpression((ExpressionSyntax)sourceGlobalAccessor, sourceType.CanBeNull, methodName);
-            return new MappingElement()
+            return new SourceMappingElement
             {
                 Expression = sourceMethodAccessor,
                 ExpressionType = new AnnotatedType(targetType)
             };
         }
 
-        private MappingElement TryFindSource(string targetName, MappingContext mappingContext, AnnotatedType accessedVia)
+        private SourceMappingElement TryFindSource(string targetName, MappingContext mappingContext, AnnotatedType accessedVia)
         {
             //Direct 1-1 mapping
             var matchedSourceProperty = sourceProperties.Value
@@ -130,7 +130,7 @@ namespace MappingGenerator.Mappings.SourceFinders
 
             if (matchedSourceProperty != null)
             {
-                return new MappingElement
+                return new SourceMappingElement
                 {
                     Expression = SyntaxFactoryExtensions.CreateMemberAccessExpression((ExpressionSyntax)sourceGlobalAccessor, accessedVia.CanBeNull, matchedSourceProperty.Name),
                     ExpressionType = new AnnotatedType(matchedSourceProperty.Type.Type, accessedVia.CanBeNull || matchedSourceProperty.Type.CanBeNull)
@@ -149,7 +149,7 @@ namespace MappingGenerator.Mappings.SourceFinders
             if (matchedSourceMethod != null)
             {
                 var sourceMethodAccessor = SyntaxFactoryExtensions.CreateMethodAccessExpression((ExpressionSyntax)sourceGlobalAccessor, sourceType.CanBeNull, matchedSourceMethod.Name);
-                return new MappingElement()
+                return new SourceMappingElement()
                 {
                     Expression = sourceMethodAccessor,
                     ExpressionType = new AnnotatedType(matchedSourceMethod.ReturnType, sourceType.CanBeNull || matchedSourceMethod.CanBeNull())
@@ -188,7 +188,7 @@ namespace MappingGenerator.Mappings.SourceFinders
             return new string(capitalLetters);
         }
 
-        private MappingElement FindSubPropertySource(string targetName, ITypeSymbol containingType, IEnumerable<IObjectField> properties, SyntaxNode currentAccessor, MappingContext mappingContext, bool isCurrentAccessorNullable,  string prefix = null)
+        private SourceMappingElement FindSubPropertySource(string targetName, ITypeSymbol containingType, IEnumerable<IObjectField> properties, SyntaxNode currentAccessor, MappingContext mappingContext, bool isCurrentAccessorNullable,  string prefix = null)
         {
             if (ObjectHelper.IsSimpleType(containingType))
             {
@@ -205,7 +205,7 @@ namespace MappingGenerator.Mappings.SourceFinders
                 if (SanitizeName(targetName).Equals(SanitizeName(currentNamePart), StringComparison.OrdinalIgnoreCase))
                 {
                     
-                    return new MappingElement
+                    return new SourceMappingElement
                     {
                         Expression = subPropertyAccessor,
                         ExpressionType = new AnnotatedType(subProperty.Type.Type, expressionCanBeNull)

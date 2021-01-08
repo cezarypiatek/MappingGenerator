@@ -32,9 +32,9 @@ namespace MappingGenerator.MethodHelpers
             return Matches.Where(x => x.Source != null).Select(x => x.Source).ToList();
         }
 
-        public void AddMatch(IParameterSymbol parameter, MappingElement  mappingSrc=null)
+        public void AddMatch(IParameterSymbol parameter, SourceMappingElement mappingSrc =null)
         {
-            Matches.Add(new MatchedParameter()
+            Matches.Add(new MatchedParameter
             {
                 Parameter = parameter,
                 Source = mappingSrc
@@ -73,7 +73,7 @@ namespace MappingGenerator.MethodHelpers
         class MatchedParameter
         {
             public IParameterSymbol Parameter { get; set; }
-            public MappingElement Source { get; set; }
+            public SourceMappingElement Source { get; set; }
         }
     }
 }

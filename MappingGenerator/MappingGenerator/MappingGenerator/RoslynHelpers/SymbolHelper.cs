@@ -30,7 +30,7 @@ namespace MappingGenerator.RoslynHelpers
 
         public static bool IsNullable(ITypeSymbol type, out ITypeSymbol underlyingType)
         {
-            if (type.TypeKind == TypeKind.Struct && type.Name == "Nullable")
+            if (IsNullable(type))
             {
                 underlyingType = GetUnderlyingNullableType(type);
                 return true;
@@ -39,6 +39,7 @@ namespace MappingGenerator.RoslynHelpers
             underlyingType = null;
             return false;
         }
+        public static bool IsNullable(ITypeSymbol type) => type.TypeKind == TypeKind.Struct && type.Name == "Nullable";
 
         public static ITypeSymbol GetUnderlyingNullableType(ITypeSymbol type)
         {

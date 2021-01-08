@@ -1,7 +1,5 @@
-using System;
 using System.Linq;
 using MappingGenerator.Mappings;
-using MappingGenerator.Mappings.SourceFinders;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -24,13 +22,29 @@ namespace MappingGenerator.RoslynHelpers
 
         public bool CanBeSet(ITypeSymbol via, MappingContext mappingContext)
         {
-            //TODO: handle properties that can be set via {}
+            
             if(property.SetMethod == null)
+            {
+                //Handle properties that can be set via { }
+                return CanBeSetOnlyIndirectly(via, mappingContext);
+            }
+
+            return mappingContext.AccessibilityHelper.IsSymbolAccessible(property.SetMethod, via);
+        }
+
+        public bool CanBeSetOnlyIndirectly(ITypeSymbol via, MappingContext mappingContext)
+        {
+            if (property.SetMethod != null)
             {
                 return false;
             }
 
-            return mappingContext.AccessibilityHelper.IsSymbolAccessible(property.SetMethod, via);
+            if (ObjectHelper.IsSimpleType(property.Type) || SymbolHelper.IsNullable(property.Type))
+            {
+                return false;
+            }
+
+            return mappingContext.AccessibilityHelper.IsSymbolAccessible(property, via);
         }
 
 

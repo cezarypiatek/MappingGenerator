@@ -33,7 +33,7 @@ namespace MappingGenerator.Mappings.SourceFinders
             this.localSymbols = localSymbols;
         }
 
-        public async Task<MappingElement> FindMappingSource(string targetName, AnnotatedType targetType, MappingContext mappingContext)
+        public async Task<SourceMappingElement> FindMappingSource(string targetName, AnnotatedType targetType, MappingContext mappingContext)
         {
             var candidate= localSymbols.FirstOrDefault(x => x.Name.Equals(targetName, StringComparison.OrdinalIgnoreCase));
             if (candidate != null)
@@ -41,7 +41,7 @@ namespace MappingGenerator.Mappings.SourceFinders
                 var type = semanticModel.GetTypeForSymbol(candidate);
                 if (type != null)
                 {
-                    return new MappingElement
+                    return new SourceMappingElement
                     {
                         ExpressionType = new AnnotatedType(type),
                         Expression = CreateIdentifierName(candidate)
@@ -58,7 +58,7 @@ namespace MappingGenerator.Mappings.SourceFinders
                     var type = semanticModel.GetTypeForSymbol(byTypeCandidate);
                     if (type != null)
                     {
-                        return new MappingElement()
+                        return new SourceMappingElement()
                         {
                             ExpressionType = new AnnotatedType(type),
                             Expression = CreateIdentifierName(byTypeCandidate)

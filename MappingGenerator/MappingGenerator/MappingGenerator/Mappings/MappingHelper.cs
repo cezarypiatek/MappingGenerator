@@ -104,5 +104,11 @@ namespace MappingGenerator.Mappings
 
             return typeDeclaration.WithMembers(newMembers.Concat(list));
         }
+
+
+        public static IMethodSymbol FindDirectlyMappingConstructor(this INamedTypeSymbol toType, ITypeSymbol fromType)
+        {
+            return toType.Constructors.FirstOrDefault(c => c.Parameters.Length == 1 && c.Parameters[0].Type.Equals(fromType));
+        }
     }
 }

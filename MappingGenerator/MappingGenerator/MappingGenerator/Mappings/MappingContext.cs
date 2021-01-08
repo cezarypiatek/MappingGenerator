@@ -25,16 +25,6 @@ namespace MappingGenerator.Mappings
             ContextSymbol =  semanticModel.GetDeclaredSymbol(typeDeclaration) as INamedTypeSymbol;
             AccessibilityHelper = new AccessibilityHelper(ContextSymbol);
         }
-
-        public HashSet<MappingType> MissingConversions { get; } = new HashSet<MappingType>();
-
-        public void AddMissingConversion(ITypeSymbol fromType, ITypeSymbol toType) => MissingConversions.Add(
-            new MappingType()
-            {
-                FromType = fromType,
-                ToType = toType
-            });
-
         public bool WrapInCustomConversion { get; set; }
 
         public List<CustomConversion> CustomConversions { get; }  = new List<CustomConversion>();

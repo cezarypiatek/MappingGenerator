@@ -19,8 +19,7 @@
     <PackageReleaseNotes></PackageReleaseNotes>
     <Copyright>Copyright</Copyright>
     <PackageTags>MappingGenerator, analyzers</PackageTags>
-    <NoPackageAnalysis>true</NoPackageAnalysis>   
-    <LangVersion>8.0</LangVersion>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
   </PropertyGroup>
   
    

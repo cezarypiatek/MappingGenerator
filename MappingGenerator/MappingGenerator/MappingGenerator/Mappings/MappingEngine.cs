@@ -55,18 +55,15 @@ namespace MappingGenerator.Mappings
                 return null;
             }
 
-            if (mappingPath == null)
-            {
-                mappingPath = new MappingPath();
-            }
+            mappingPath ??= new MappingPath();
 
             var sourceType = source.ExpressionType;
             if (mappingPath.AddToMapped(sourceType.Type) == false)
             {
-                return new MappingElement()
+                return new MappingElement
                 {
                     ExpressionType = sourceType,
-                    Expression = source.Expression.WithTrailingTrivia(SyntaxFactory.Comment(" /* Stop recursive mapping */")),
+                    Expression = source.Expression.WithTrailingTrivia(Comment(" /* Stop recursive mapping */")),
                 };
             }
 
@@ -82,7 +79,6 @@ namespace MappingGenerator.Mappings
                     Expression = HandleSafeNull(source, userDefinedConversion.FromType, conversionExpression)
                 };
             }
-
 
             if (ObjectHelper.IsSimpleType(targetType.Type) && SymbolHelper.IsNullable(sourceType.Type, out var underlyingType) )
             {
@@ -109,7 +105,7 @@ namespace MappingGenerator.Mappings
 
             if (ShouldCreateConversionBetweenTypes(targetType.Type, sourceType.Type))
             {
-                return await  TryToCreateMappingExpression(source, targetType, mappingPath, mappingContext).ConfigureAwait(false);
+                return await TryToCreateMappingExpression(source, targetType, mappingPath, mappingContext).ConfigureAwait(false);
             }
 
 
@@ -145,10 +141,9 @@ namespace MappingGenerator.Mappings
             
             if (namedTargetType != null)
             {
-                var directlyMappingConstructor = namedTargetType.Constructors.FirstOrDefault(c => c.Parameters.Length == 1 && c.Parameters[0].Type.Equals(source.ExpressionType.Type));
-                if (directlyMappingConstructor != null)
+                if (namedTargetType.FindDirectlyMappingConstructor(source.ExpressionType.Type) is {} directlyMappingConstructor )
                 {
-                    var creationExpression = CreateObject(targetType.Type, SyntaxFactory.ArgumentList().AddArguments(SyntaxFactory.Argument(source.Expression)));
+                    var creationExpression = CreateObject(targetType.Type, ArgumentList().AddArguments(Argument(source.Expression)));
                     var shouldProtectAgainstNull = directlyMappingConstructor.Parameters[0].Type.CanBeNull() == false && source.ExpressionType.CanBeNull;
                     return new MappingElement
                     {
@@ -187,7 +182,7 @@ namespace MappingGenerator.Mappings
                             return matchedSources.Any(x => x.Expression.IsEquivalentTo(foundElement.Expression));
                         });
                     var mappingMatcher = new SingleSourceMatcher(restSourceFinder);
-                    return new MappingElement()
+                    return new MappingElement
                     {
                         ExpressionType = new AnnotatedType(targetType.Type),
                         Expression = await AddInitializerWithMappingAsync(creationExpression, mappingMatcher, targetType.Type, mappingContext, mappingPath).ConfigureAwait(false),
@@ -198,7 +193,7 @@ namespace MappingGenerator.Mappings
             var objectCreationExpressionSyntax = CreateObject(targetType.Type);
             var subMappingMatcher = new SingleSourceMatcher(subMappingSourceFinder);
             var objectCreationWithInitializer = await AddInitializerWithMappingAsync(objectCreationExpressionSyntax, subMappingMatcher, targetType.Type, mappingContext, mappingPath).ConfigureAwait(false);
-            return new MappingElement()
+            return new MappingElement
             {
                 ExpressionType = new AnnotatedType(targetType.Type),
                 Expression = HandleSafeNull(source, targetType, objectCreationWithInitializer)
@@ -220,19 +215,19 @@ namespace MappingGenerator.Mappings
         {
             var methodArgumentName = (expressionText.Contains(".")?  expressionText.Substring(0, expressionText.IndexOf('.')): expressionText).TrimEnd('?');
             var nameofInvocation=  InvocationExpression(IdentifierName("nameof")).WithArgumentList(ArgumentList(SingletonSeparatedList<ArgumentSyntax>(Argument(IdentifierName(methodArgumentName)))));
-            var errorMessageExpression = LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal($"The value of '{expressionText}' should not be null"));
-            var exceptionTypeName = SyntaxFactory.IdentifierName("ArgumentNullException");
+            var errorMessageExpression = LiteralExpression(SyntaxKind.StringLiteralExpression, Literal($"The value of '{expressionText}' should not be null"));
+            var exceptionTypeName = IdentifierName("ArgumentNullException");
             var exceptionParameters = ArgumentList(new SeparatedSyntaxList<ArgumentSyntax>().AddRange(new []{ Argument(nameofInvocation) , Argument(errorMessageExpression)}));
-            var throwExpressionSyntax = SyntaxFactory.ThrowExpression(CreateObject(exceptionTypeName, exceptionParameters));
+            var throwExpressionSyntax = ThrowExpression(CreateObject(exceptionTypeName, exceptionParameters));
             return throwExpressionSyntax;
         }
         
         private static ThrowExpressionSyntax ThrowNullReferenceException(string expressionText)
         {
-            var errorMessageExpression = LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal($"The value of '{expressionText}' should not be null"));
-            var exceptionTypeName = SyntaxFactory.IdentifierName("NullReferenceException");
+            var errorMessageExpression = LiteralExpression(SyntaxKind.StringLiteralExpression, Literal($"The value of '{expressionText}' should not be null"));
+            var exceptionTypeName = IdentifierName("NullReferenceException");
             var exceptionParameters = ArgumentList(new SeparatedSyntaxList<ArgumentSyntax>().AddRange(new []{ Argument(errorMessageExpression)}));
-            var throwExpressionSyntax = SyntaxFactory.ThrowExpression(CreateObject(exceptionTypeName, exceptionParameters));
+            var throwExpressionSyntax = ThrowExpression(CreateObject(exceptionTypeName, exceptionParameters));
             return throwExpressionSyntax;
         }
 
@@ -267,26 +262,12 @@ namespace MappingGenerator.Mappings
             MappingContext mappingContext,
             MappingPath mappingPath = null, SyntaxNode globalTargetAccessor = null)
         {
-            if (mappingPath == null)
-            {
-                mappingPath = new MappingPath();
-            }
-
             var results = new List<AssignmentExpressionSyntax>();
             foreach (var match in await mappingMatcher.MatchAll(targets, syntaxGenerator, mappingContext, globalTargetAccessor).ConfigureAwait(false))
             {
-                var sourceMappingElement = await MapExpression(match.Source, match.Target.ExpressionType, mappingContext, mappingPath.Clone()).ConfigureAwait(false);
+                var subBranchMappingPath = mappingPath?.Clone() ?? new MappingPath();
+                var sourceMappingElement = await MapExpression(match.Source, match.Target.ExpressionType, mappingContext, subBranchMappingPath).ConfigureAwait(false);
                 var sourceExpression = sourceMappingElement.Expression;
-                if (sourceMappingElement.ExpressionType != match.Target.ExpressionType)
-                {
-                    mappingContext.AddMissingConversion(sourceMappingElement.ExpressionType.Type, match.Target.ExpressionType.Type);
-                    if (mappingContext.WrapInCustomConversion)
-                    {
-                        var customConversionMethodName = syntaxGenerator.IdentifierName($"MapFrom{sourceMappingElement.ExpressionType.Type.Name}To{match.Target.ExpressionType.Type.Name}");
-                        sourceExpression = (ExpressionSyntax)syntaxGenerator.InvocationExpression(customConversionMethodName, sourceExpression);
-                    }
-                }
-
                 var assignmentExpression = AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, match.Target.Expression, sourceExpression);
                 results.Add(assignmentExpression);
             }
@@ -334,8 +315,8 @@ namespace MappingGenerator.Mappings
 
                 if (source.ExpressionType.Type.SpecialType == SpecialType.System_String && targetType.Type.TypeKind  == TypeKind.Enum)
                 {
-                    var parseEnumAccess = syntaxGenerator.MemberAccessExpression(SyntaxFactory.ParseTypeName("System.Enum"), "Parse");
-                    var enumType = SyntaxFactory.ParseTypeName(targetType.Type.Name);
+                    var parseEnumAccess = syntaxGenerator.MemberAccessExpression(ParseTypeName("System.Enum"), "Parse");
+                    var enumType = ParseTypeName(targetType.Type.Name);
                     var parseInvocation = (InvocationExpressionSyntax)syntaxGenerator.InvocationExpression(parseEnumAccess, new[]
                     {
                         syntaxGenerator.TypeOfExpression(enumType),
@@ -489,7 +470,7 @@ namespace MappingGenerator.Mappings
 
         public MappingPath()
         {
-            this.mapped = new List<ITypeSymbol>();
+            mapped = new List<ITypeSymbol>();
         }
 
         public bool AddToMapped(ITypeSymbol newType)
@@ -504,7 +485,7 @@ namespace MappingGenerator.Mappings
 
         public MappingPath Clone()
         {
-            return new MappingPath(this.mapped.ToList());
+            return new MappingPath(mapped.ToList());
         }
     }
 }

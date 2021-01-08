@@ -21,36 +21,35 @@ namespace MappingGenerator.Mappings.MappingMatchers
 
         public async Task<IReadOnlyList<MappingMatch>> MatchAll(IReadOnlyCollection<IObjectField> targets, SyntaxGenerator syntaxGenerator, MappingContext mappingContext, SyntaxNode globalTargetAccessor = null)
         {
-
             var results = new List<MappingMatch>(targets.Count);
             foreach (var target in targets)
             {
                 results.Add(new MappingMatch
                 {
                     Source = await sourceFinder.FindMappingSource(target.Name, target.Type, mappingContext).ConfigureAwait(false),
-                    Target = CreateTargetElement(globalTargetAccessor, target, syntaxGenerator)
+                    Target = CreateTargetElement(globalTargetAccessor, target)
                 });
             }
 
             return results.Where(x => x.Source != null).ToList();
         }
 
-        private MappingElement CreateTargetElement(SyntaxNode globalTargetAccessor, IObjectField target, SyntaxGenerator syntaxGenerator)
+        private MappingElement CreateTargetElement(SyntaxNode globalTargetAccessor, IObjectField target)
         {
             return new MappingElement
             {
-                Expression = (ExpressionSyntax)CreateAccessPropertyExpression(globalTargetAccessor, target, syntaxGenerator),
+                Expression = (ExpressionSyntax)CreateAccessPropertyExpression(globalTargetAccessor, target),
                 ExpressionType = target.Type
             };
         }
 
-        private static SyntaxNode CreateAccessPropertyExpression(SyntaxNode globalTargetAccessor, IObjectField property, SyntaxGenerator generator)
+        private static SyntaxNode CreateAccessPropertyExpression(SyntaxNode globalTargetAccessor, IObjectField property)
         {
             if (globalTargetAccessor == null)
             {
                 return SyntaxFactory.IdentifierName(property.Name);
             }
-            return generator.MemberAccessExpression(globalTargetAccessor, property.Name);
+            return SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, (ExpressionSyntax)globalTargetAccessor, SyntaxFactory.IdentifierName(property.Name));
         }
     }
 }

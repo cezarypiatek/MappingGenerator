@@ -17,7 +17,6 @@ jobs:
         VsixManifestPath: MappingGenerator\MappingGenerator\MappingGenerator.Vsix\source.extension.vsixmanifest
         VsixPath: MappingGenerator\MappingGenerator\MappingGenerator.Vsix\bin\Release\MappingGenerator.vsix
         VsixPublishManifestPath: MappingGenerator\MappingGenerator\MappingGenerator.Vsix\publishManifest.json
-        Version: '1.21.${{ github.run_number }}'
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2   
@@ -36,6 +35,11 @@ jobs:
         nuget-version: '5.x'
     - name: Restore NuGet Packages
       run: nuget restore $env:SolutionPath
+    - name: Calculate next version
+      uses: cezarypiatek/NextVersionGeneratorAction@0.3
+      with:
+        minor-pattern: '.*'
+        output-to-env-variable: 'Version'
     - name: Set version for Visual Studio Extension
       uses: cezarypiatek/VsixVersionAction@1.0
       with:

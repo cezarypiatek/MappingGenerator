@@ -12,12 +12,14 @@ jobs:
     env: 
         DOTNET_NOLOGO: true
         DOTNET_CLI_TELEMETRY_OPTOUT: true
+        RepositoryUrl: 'https://github.com/${{ github.repository }}'
+        RepositoryBranch: '${{ github.ref }}'
+        SourceRevisionId: '${{ github.sha }}'
         Configuration: Release
         SolutionPath: MappingGenerator\MappingGenerator.sln
         VsixManifestPath: MappingGenerator\MappingGenerator\MappingGenerator.Vsix\source.extension.vsixmanifest
         VsixPath: MappingGenerator\MappingGenerator\MappingGenerator.Vsix\bin\Release\MappingGenerator.vsix
         VsixPublishManifestPath: MappingGenerator\MappingGenerator\MappingGenerator.Vsix\publishManifest.json
-        Version: '1.21.${{ github.run_number }}'
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2   
@@ -30,12 +32,13 @@ jobs:
       id: MsBuildSetup
       with:
         vs-version: '[16.8,16.9)'
-    - name: Setup nuget
-      uses: nuget/setup-nuget@v1
-      with:
-        nuget-version: '5.x'
     - name: Restore NuGet Packages
       run: nuget restore $env:SolutionPath
+    - name: Calculate next version
+      uses: cezarypiatek/NextVersionGeneratorAction@0.3
+      with:
+        minor-pattern: '.*'
+        output-to-env-variable: 'Version'
     - name: Set version for Visual Studio Extension
       uses: cezarypiatek/VsixVersionAction@1.0
       with:

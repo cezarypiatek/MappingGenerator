@@ -1,0 +1,17 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace MappingGenerator.Test.ExplicitConversions.TestCaseData
+{
+    public class Source { }
+    public class Destination { }
+
+    public class SampleMapper
+    {
+        public IEnumerable<Destination> Example(Dictionary<string, Source> source)
+        {
+            return [|source.Values|];
+        }
+    }
+}

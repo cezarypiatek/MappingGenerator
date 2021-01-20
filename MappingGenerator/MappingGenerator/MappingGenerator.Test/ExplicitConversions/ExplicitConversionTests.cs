@@ -46,6 +46,12 @@ namespace MappingGenerator.Test.ExplicitConversions
         {
             TestCodeFix(ExplicitConversionTestCases._006_ExplicitConversionForInvalidAssigmentInInitBlockReuseInstance, ExplicitConversionTestCases._006_ExplicitConversionForInvalidAssigmentInInitBlockReuseInstance_FIXED, ExplicitConversionCodeFixProvider.CS0029, 1);
         }
+        
+        [Test]
+        public void should_be_able_to_generate_conversion_for_value_collection()
+        {
+            TestCodeFix(ExplicitConversionTestCases._007_ExplicitConversionForValueCollection, ExplicitConversionTestCases._007_ExplicitConversionForValueCollection_FIXED, ExplicitConversionCodeFixProvider.CS0029, 0);
+        }
         protected override string LanguageName => LanguageNames.CSharp;
 
         protected override CodeFixProvider CreateProvider()

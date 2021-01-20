@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using MappingGenerator.Features.Refactorings;
-using MappingGenerator.Mappings.SourceFinders;
 using MappingGenerator.RoslynHelpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -45,6 +44,16 @@ namespace MappingGenerator.Mappings
                         }
                         return GetElementType(namedType.BaseType);
                     }
+                    
+                    //INFO: Type is reported as generic when containing type is generic
+                    if (namedType.Arity == 0 && namedType.ContainingType?.TypeKind is {} containerType && (containerType == TypeKind.Class || containerType == TypeKind.Structure))
+                    {
+                        if (namedType.Interfaces.FirstOrDefault(x => x.Name == "IEnumerable" && x.IsGenericType) is {} enumerable)
+                        {
+                            return new AnnotatedType(enumerable.TypeParameters[0]);
+                        }
+                    }
+
                     return new AnnotatedType(namedType.TypeArguments[0]);
                 case IArrayTypeSymbol arrayType:
                     return new AnnotatedType(arrayType.ElementType);

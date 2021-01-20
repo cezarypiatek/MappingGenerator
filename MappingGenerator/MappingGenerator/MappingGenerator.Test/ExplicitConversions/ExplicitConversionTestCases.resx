@@ -154,4 +154,10 @@
   <data name="_006_ExplicitConversionForInvalidAssigmentInInitBlockReuseInstance_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>TestCaseData\006_ExplicitConversionForInvalidAssigmentInInitBlockReuseInstance_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="_007_ExplicitConversionForValueCollection" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\007_ExplicitConversionForValueCollection.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_007_ExplicitConversionForValueCollection_FIXED" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestCaseData\007_ExplicitConversionForValueCollection_FIXED.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

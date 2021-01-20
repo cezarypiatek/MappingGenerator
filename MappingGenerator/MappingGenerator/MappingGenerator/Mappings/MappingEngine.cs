@@ -438,6 +438,11 @@ namespace MappingGenerator.Mappings
 
         private static SyntaxNode AddMaterializeCollectionInvocation(SyntaxGenerator generator, SyntaxNode sourceAccess, ITypeSymbol targetListType, bool isSourceNullable)
         {
+            if (targetListType.TypeKind == TypeKind.Interface && targetListType.Name == "IEnumerable")
+            {
+                return sourceAccess;
+            }
+
             var materializeFunction =  GetCollectionMaterializeFunction(targetListType);
             var toListAccess = SyntaxFactoryExtensions.CreateMemberAccessExpression((ExpressionSyntax)sourceAccess, isSourceNullable, materializeFunction);
             return generator.InvocationExpression(toListAccess);

@@ -384,5 +384,49 @@ namespace MappingGenerator.Test.ExplicitConversions {
                 return ResourceManager.GetString("_006_ExplicitConversionForInvalidAssigmentInInitBlockReuseInstance_FIXED", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///
+        ///namespace MappingGenerator.Test.ExplicitConversions.TestCaseData
+        ///{
+        ///    public class Source { }
+        ///    public class Destination { }
+        ///
+        ///    public IEnumerable&lt;Destination&gt; Example(Dictionary&lt;string, Source&gt; source)
+        ///    {
+        ///	    return [|source.Values|];
+        ///    }
+        ///}.
+        /// </summary>
+        internal static string _007_ExplicitConversionForValueCollection {
+            get {
+                return ResourceManager.GetString("_007_ExplicitConversionForValueCollection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Text;
+        ///
+        ///namespace MappingGenerator.Test.ExplicitConversions.TestCaseData
+        ///{
+        ///    public class Source { }
+        ///    public class Destination { }
+        ///
+        ///    public IEnumerable&lt;Destination&gt; Example(Dictionary&lt;string, Source&gt; source)
+        ///    {
+        ///	    return source.Values.Select(x =&gt; new Destination());
+        ///    }
+        ///}.
+        /// </summary>
+        internal static string _007_ExplicitConversionForValueCollection_FIXED {
+            get {
+                return ResourceManager.GetString("_007_ExplicitConversionForValueCollection_FIXED", resourceCulture);
+            }
+        }
     }
 }

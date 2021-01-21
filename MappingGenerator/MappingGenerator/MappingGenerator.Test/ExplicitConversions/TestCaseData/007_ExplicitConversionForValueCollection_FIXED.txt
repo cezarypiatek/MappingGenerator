@@ -4,14 +4,24 @@ using System.Text;
 
 namespace MappingGenerator.Test.ExplicitConversions.TestCaseData
 {
-    public class Source { }
-    public class Destination { }
+    public class Source
+    {
+        public string A { get; set; }
+    }
+
+    public class Destination
+    {
+        public string A { get; set; }
+    }
 
     public class SampleMapper
     {
         public IEnumerable<Destination> Example(Dictionary<string, Source> source)
         {
-            return source.Values.Select(sourceValue => new Destination());
+            return source.Values.Select(sourceValue => new Destination
+            {
+                A = sourceValue.A
+            });
         }
     }
 }

@@ -50,7 +50,7 @@ namespace MappingGenerator.Mappings
                     {
                         if (namedType.Interfaces.FirstOrDefault(x => x.Name == "IEnumerable" && x.IsGenericType) is {} enumerable)
                         {
-                            return new AnnotatedType(enumerable.TypeParameters[0]);
+                            return new AnnotatedType(enumerable.TypeArguments[0]);
                         }
                     }
 

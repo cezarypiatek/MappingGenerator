@@ -37,7 +37,8 @@ jobs:
     - name: Calculate next version
       uses: cezarypiatek/NextVersionGeneratorAction@0.3
       with:
-        minor-pattern: '.*'
+        minor-pattern: '\bAdd\b'
+        patch-pattern: '.*'
         output-to-env-variable: 'Version'
     - name: Set version for Visual Studio Extension
       uses: cezarypiatek/VsixVersionAction@1.0

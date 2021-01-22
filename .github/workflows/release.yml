@@ -35,7 +35,7 @@ jobs:
     - name: Restore NuGet Packages
       run: nuget restore $env:SolutionPath
     - name: Calculate next version
-      uses: cezarypiatek/NextVersionGeneratorAction@0.3
+      uses: cezarypiatek/NextVersionGeneratorAction@0.4
       with:
         minor-pattern: '\bAdd\b'
         patch-pattern: '.*'

@@ -18,26 +18,30 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                 FirstName = entity.FirstName,
                 MiddleName = entity.MiddleName,
                 LastName = entity.LastName,
-                Age = entity.Age,
+                AgeValue = entity.Age ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.Age' should not be null"),
                 Account = entity.Account != null ? new AccountDTO
                 {
                     BankName = entity.Account.BankName,
-                    Number = entity.Account.Number
+                    Number = entity.Account.Number,
+                    Key = entity.Account.Key ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.Account.Key' should not be null")
                 } : null,
                 Account2 = entity.Account2 != null ? new AccountDTO
                 {
                     BankName = entity.Account2.BankName,
-                    Number = entity.Account2.Number
+                    Number = entity.Account2.Number,
+                    Key = entity.Account2.Key ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.Account2.Key' should not be null")
                 } : throw new ArgumentNullException(nameof(entity), "The value of 'entity.Account2' should not be null"),
                 Debs = entity.Debs?.ConvertAll(entityDeb => new AccountDTO
                 {
                     BankName = entityDeb.BankName,
-                    Number = entityDeb.Number
+                    Number = entityDeb.Number,
+                    Key = entityDeb.Key ?? throw new ArgumentNullException(nameof(entityDeb), "The value of 'entityDeb.Key' should not be null")
                 }),
                 Debs2 = entity.Debs2?.ConvertAll(entityDebs2 => new AccountDTO
                 {
                     BankName = entityDebs2.BankName,
-                    Number = entityDebs2.Number
+                    Number = entityDebs2.Number,
+                    Key = entityDebs2.Key ?? throw new ArgumentNullException(nameof(entityDebs2), "The value of 'entityDebs2.Key' should not be null")
                 }) ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.Debs2' should not be null"),
                 AddressCity = entity.Address?.City ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.Address?.City' should not be null"),
                 AddressZipCode = entity.Address?.ZipCode ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.Address?.ZipCode' should not be null"),
@@ -69,7 +73,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public string FirstName { get; set; }
         public string? MiddleName { get; set; }
         public string LastName { get; set; }
-        public int Age { get; set; }
+        public int AgeValue { get; set; }
         public AccountDTO? Account { get; set; }
         public AccountDTO Account2 { get; set; }
         public List<AccountDTO>? Debs { get; set; }
@@ -95,6 +99,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
     {
         public string BankName { get; set; }
         public string Number { get; set; }
+        public int Key { get; set; }
     }
 
     public class AddressDTO
@@ -136,7 +141,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string? MiddleName { get; set; }
-        public int Age { get; set; }
+        public int? Age { get; set; }
         public AccountEntity? Account { get; set; }
         public AccountEntity? Account2 { get; set; }
         public List<AccountEntity>? Debs { get; set; }
@@ -158,6 +163,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
     {
         public string BankName { get; set; }
         public string Number { get; set; }
+        public int? Key { get; set; }
     }
 
     public class AddressEntity

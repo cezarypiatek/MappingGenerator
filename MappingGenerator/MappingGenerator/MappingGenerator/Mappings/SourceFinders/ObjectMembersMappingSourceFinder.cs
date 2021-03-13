@@ -204,7 +204,16 @@ namespace MappingGenerator.Mappings.SourceFinders
                 var expressionCanBeNull = isCurrentAccessorNullable || subProperty.Type.CanBeNull;
                 if (SanitizeName(targetName).Equals(SanitizeName(currentNamePart), StringComparison.OrdinalIgnoreCase))
                 {
-                    
+                    //Special Case: x.YValue = z.Y.Value
+                    if (subProperty.Name == "Value" && SymbolHelper.IsNullable(containingType, out var _))
+                    {
+                        return new MappingElement
+                        {
+                            Expression = (ExpressionSyntax)currentAccessor,
+                            ExpressionType = new AnnotatedType(containingType, true)
+                        };
+                    }
+                   
                     return new MappingElement
                     {
                         Expression = subPropertyAccessor,

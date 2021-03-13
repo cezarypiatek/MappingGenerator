@@ -24,10 +24,7 @@ namespace MappingGenerator.Features.CodeFixes
         public const string CS0029 = nameof(CS0029);
         public const string CS0266 = nameof(CS0266);
 
-        public sealed override ImmutableArray<string> FixableDiagnosticIds
-        {
-            get { return ImmutableArray.Create( CS0029, CS0266); }
-        }
+        public sealed override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(CS0029, CS0266);
 
         public sealed override FixAllProvider GetFixAllProvider()
         {
@@ -96,7 +93,8 @@ namespace MappingGenerator.Features.CodeFixes
         private static async Task<(MappingEngine, SemanticModel)> CreateMappingEngine(Document document, CancellationToken cancellationToken)
         {
             var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
-            var mappingEngine = await MappingEngine.Create(document, cancellationToken).ConfigureAwait(false);
+            var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
+            var mappingEngine =  new MappingEngine(semanticModel, syntaxGenerator);
             return (mappingEngine, semanticModel);
         }
 

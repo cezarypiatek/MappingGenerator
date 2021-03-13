@@ -17,8 +17,7 @@ namespace MappingGenerator.Mappings
     {
         protected readonly SemanticModel semanticModel;
         protected readonly SyntaxGenerator syntaxGenerator;
-
-
+        
         public MappingEngine(SemanticModel semanticModel, SyntaxGenerator syntaxGenerator)
         {
             this.semanticModel = semanticModel;
@@ -28,13 +27,6 @@ namespace MappingGenerator.Mappings
         public TypeInfo GetExpressionTypeInfo(SyntaxNode expression)
         {
             return semanticModel.GetTypeInfo(expression);
-        }
-
-        public static async Task<MappingEngine> Create(Document document, CancellationToken cancellationToken)
-        {
-            var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
-            var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
-            return new MappingEngine(semanticModel, syntaxGenerator);
         }
 
         public async Task<ExpressionSyntax> MapExpression(ExpressionSyntax sourceExpression, AnnotatedType sourceType, AnnotatedType destinationType, MappingContext mappingContext)

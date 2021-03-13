@@ -67,7 +67,8 @@ namespace MappingGenerator.Features.Refactorings
         {
             var methodSymbol = (IMethodSymbol)semanticModel.GetSymbolInfo(lambda, cancellationToken).Symbol;
             var createdObjectType = methodSymbol.Parameters.First().Type;
-            var mappingEngine = await MappingEngine.Create(document, cancellationToken).ConfigureAwait(false);
+            var syntaxGenerator = SyntaxGenerator.GetGenerator(document);
+            var mappingEngine = new MappingEngine(semanticModel, syntaxGenerator);
             var mappingContext = new MappingContext(lambda, semanticModel);
             var mappingTargetHelper = new MappingTargetHelper();
             var propertiesToSet = mappingTargetHelper.GetFieldsThaCanBeSetPublicly(createdObjectType, mappingContext);

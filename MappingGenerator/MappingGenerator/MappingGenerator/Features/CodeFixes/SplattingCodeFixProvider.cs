@@ -24,7 +24,7 @@ namespace MappingGenerator.Features.CodeFixes
         public const string CS7036 = nameof(CS7036);
         public const string CS1501 = nameof(CS1501);
 
-        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(CS7036, CS1501);
+        public sealed override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(CS7036, CS1501);
 
         public sealed override FixAllProvider GetFixAllProvider()
         {

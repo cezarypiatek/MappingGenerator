@@ -84,13 +84,15 @@ namespace MappingGenerator.Mappings
             }
 
 
-            if (ObjectHelper.IsSimpleType(targetType.Type) && SymbolHelper.IsNullable(sourceType.Type, out var underlyingType) )
+            if (ObjectHelper.IsSimpleType(targetType.Type) && SymbolHelper.IsNullable(sourceType.Type, out var underlyingType))
             {
-                return new MappingElement
+                var mapping = new MappingElement
                 {
-                    Expression =  OrFailWhenArgumentNull(source.Expression),
+                    Expression = OrFailWhenArgumentNull(source.Expression),
                     ExpressionType = new AnnotatedType(underlyingType, false)
                 };
+
+                return IsConversionToSimpleTypeNeeded(targetType.Type, underlyingType) ? ConvertToSimpleType(targetType, mapping, mappingContext) : mapping;
             }
 
             if (IsConversionToSimpleTypeNeeded(targetType.Type, source.ExpressionType.Type))

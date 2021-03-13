@@ -19,6 +19,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
                 MiddleName = entity.MiddleName,
                 LastName = entity.LastName,
                 AgeValue = entity.Age ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.Age' should not be null"),
+                Weight = (double)(entity.Weight ?? throw new ArgumentNullException(nameof(entity), "The value of 'entity.Weight' should not be null")),
                 Account = entity.Account != null ? new AccountDTO
                 {
                     BankName = entity.Account.BankName,
@@ -74,6 +75,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public string? MiddleName { get; set; }
         public string LastName { get; set; }
         public int AgeValue { get; set; }
+        public double Weight { get; set; }
         public AccountDTO? Account { get; set; }
         public AccountDTO Account2 { get; set; }
         public List<AccountDTO>? Debs { get; set; }
@@ -142,6 +144,7 @@ namespace MappingGenerator.Test.MappingGenerator.TestCaseData
         public string LastName { get; set; }
         public string? MiddleName { get; set; }
         public int? Age { get; set; }
+        public decimal? Weight { get; set; }
         public AccountEntity? Account { get; set; }
         public AccountEntity? Account2 { get; set; }
         public List<AccountEntity>? Debs { get; set; }

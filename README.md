@@ -1,3 +1,17 @@
+## WHY THIS PROJECT IS ARCHIVED - EXPLANATION
+------------------------------
+MappingGenerator is discontinued in the form of FOSS. I spent the last three months (March 2021 - June 2021) working hard on improving MappingGenerator. I solved many issues and added a bunch of new cool features. I also made a general refactoring which restored the project maintainability. All of that cost me a lot of my private time and I did it all by myself, so I decided to convert MappingGenerator into a commercial product. A perpetual license for a new version of MappingGenerator can be obtained via the official product website https://www.mappinggenerator.net/
+
+I would like to thank all of you who contributed to this product by reporting issues, testing, authoring PRs, or buying me coffee. **PR authors (except the Only README Updaters) and Coffee Buyers will be awarded with a special license for MappingGenerator for free -  I will send them an email with details in a few days.**
+
+Links: 
+
+- Product page https://www.mappinggenerator.net/
+- Download page https://marketplace.visualstudio.com/items?itemName=54748ff9-45fc-43c2-8ec5-cf7912bc3b84.mappinggenerator
+- New Issue Tracker https://github.com/cezarypiatek/MappingGeneratorIssueTracker
+
+------------------------------
+
 # Mapping Generator [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=&quot;AutoMapper&quot;%20ike,%20Roslyn%20based,%20code%20fix%20provider%20that%20allows%20to%20generate%20mapping%20code%20in%20design%20time.&related=@cezary_piatek&url=https://github.com/cezarypiatek/MappingGenerator)  
 
 
@@ -8,15 +22,9 @@ You can download it as Visual Studio Extension from [Visual Studio Marketplace](
 ## Motivation
 [The reasons behind why I don't use AutoMapper](https://cezarypiatek.github.io/post/why-i-dont-use-automapper/)
 
-## Further Development
-If you find this extension useful (you feel it helps you on the daily basis) you can support further development by buying me a coffee (it's simple, just click the button below). Sometimes it's hard to stay awake till midnight implementing new features, coffee helps me with that. . I really appreciate your support in any form.
-
-[![](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/tmAJLYvWy)
-
-![support guide](/doc/support_anim.gif)
 
 ### Contributing
-Before you start any contributing work, please read the [contribution guidline](/docs/CONTRIBUTING.md)
+Before you start any contributing work, please read the [contribution guideline](/docs/CONTRIBUTING.md)
 
 ### Supported IDE
 

@@ -4,10 +4,12 @@ MappingGenerator is discontinued in the form of FOSS. I spent the last three mon
 
 I would like to thank all of you who contributed to this product by reporting issues, testing, authoring PRs, or buying me coffee. **PR authors (except the Only README Updaters) and Coffee Buyers will be awarded with a special license for MappingGenerator for free -  I will send them an email with details in a few days.**
 
-Links: 
+🔥 Important Links: 
 
 - Product page https://www.mappinggenerator.net/
-- Download page https://marketplace.visualstudio.com/items?itemName=54748ff9-45fc-43c2-8ec5-cf7912bc3b84.mappinggenerator
+- Download page for VS2017 and VS2019 https://marketplace.visualstudio.com/items?itemName=54748ff9-45fc-43c2-8ec5-cf7912bc3b84.mappinggenerator
+- Download page for VS2022 https://marketplace.visualstudio.com/items?itemName=54748ff9-45fc-43c2-8ec5-cf7912bc3b84.MappingGenerator2022
+- Current release notes https://github.com/cezarypiatek/MappingGeneratorReleases/releases
 - New Issue Tracker https://github.com/cezarypiatek/MappingGeneratorIssueTracker
 
 ------------------------------
